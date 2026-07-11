@@ -1,0 +1,34 @@
+/*
+ * Bundled caption fonts — deterministic preview↔export parity.
+ *
+ * Loaded via <link> from public/index.html rather than @font-face in
+ * src/index.css because CRA's css-loader tries to webpack-resolve
+ * url(/fonts/...) paths at build time; keeping this file in /public/ makes
+ * the browser fetch these .ttf paths at runtime with no webpack in the way.
+ *
+ * The referenced .ttf files under /public/fonts/ are symlinks to the SAME
+ * .ttf files the backend consumes via `fontsdir` (services/assets/fonts),
+ * so preview and export render byte-identical glyph shapes on every
+ * machine — no OS Telugu-font dependency.
+ */
+@font-face {
+    font-family: "Noto Sans Telugu";
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url("/fonts/NotoSansTelugu-Regular.ttf") format("truetype");
+}
+@font-face {
+    font-family: "Ramabhadra";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("/fonts/Ramabhadra-Regular.ttf") format("truetype");
+}
+@font-face {
+    font-family: "Mandali";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("/fonts/Mandali-Regular.ttf") format("truetype");
+}

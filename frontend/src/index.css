@@ -1,33 +1,14 @@
 @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Manrope:wght@200;300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap");
 
-/* ── Bundled caption fonts (deterministic preview↔export parity) ──────────
- * Same .ttf files the backend burn-in consumes via `fontsdir`
- * (services/fonts.py :: CAPTION_FONTS_DIR) — served here via symlinks under
- * public/fonts/ so the editor preview renders in the byte-identical font
- * regardless of what the viewer's OS has installed. Without this, machines
- * without Noto Sans Telugu installed fell back to Nirmala UI / OS default
- * and no longer matched the export (see KNOWN_ISSUES §(d), now resolved). */
-@font-face {
-    font-family: "Noto Sans Telugu";
-    font-style: normal;
-    font-weight: 100 900;
-    font-display: swap;
-    src: url("/fonts/NotoSansTelugu-Regular.ttf") format("truetype");
-}
-@font-face {
-    font-family: "Ramabhadra";
-    font-style: normal;
-    font-weight: 400;
-    font-display: swap;
-    src: url("/fonts/Ramabhadra-Regular.ttf") format("truetype");
-}
-@font-face {
-    font-family: "Mandali";
-    font-style: normal;
-    font-weight: 400;
-    font-display: swap;
-    src: url("/fonts/Mandali-Regular.ttf") format("truetype");
-}
+/* ── Bundled caption fonts ────────────────────────────────────────────
+ * @font-face rules for Noto Sans Telugu / Ramabhadra / Mandali live in
+ * public/fonts.css (loaded via <link> from public/index.html), NOT here.
+ * CRA's css-loader webpack-resolves url(/fonts/...) at build time, which
+ * fails for public-folder paths; keeping the @font-face in /public/ makes
+ * the browser fetch them at runtime with no webpack in the way. The .ttf
+ * files are symlinks to services/assets/fonts/* — the SAME files the
+ * backend hands libass via fontsdir, so preview and export render byte-
+ * identical glyph shapes on every machine (see KNOWN_ISSUES §d resolved). */
 
 @tailwind base;
 @tailwind components;

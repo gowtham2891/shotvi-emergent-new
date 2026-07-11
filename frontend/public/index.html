@@ -6,6 +6,11 @@
         <meta name="theme-color" content="#000000" />
         <meta name="description" content="Shotvi — Telugu video repurposing and clip editor" />
         <link rel="icon" type="image/svg+xml" href="%PUBLIC_URL%/favicon.svg" />
+        <!-- Bundled caption fonts — deterministic preview↔export parity.
+             .ttf files under /public/fonts/ are symlinks to
+             services/assets/fonts/*, the SAME files the backend hands to
+             libass via fontsdir. See public/fonts.css. -->
+        <link rel="stylesheet" href="%PUBLIC_URL%/fonts.css" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap" rel="stylesheet" />
