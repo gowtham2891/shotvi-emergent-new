@@ -70,6 +70,13 @@ if (config.enableHealthCheck) {
 }
 
 let webpackConfig = {
+  jest: {
+    configure: {
+      moduleNameMapper: { "^@/(.*)$": "<rootDir>/src/$1" },
+      // axios/sonner ship ESM that CRA's default jest config won't transform
+      transformIgnorePatterns: ["node_modules/(?!(axios|sonner)/)"],
+    },
+  },
   eslint: {
     configure: {
       extends: ["plugin:react-hooks/recommended"],

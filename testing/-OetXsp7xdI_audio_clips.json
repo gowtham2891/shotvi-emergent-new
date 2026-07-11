@@ -1,0 +1,339 @@
+{
+  "video_id": "-OetXsp7xdI",
+  "video_duration": 864.72,
+  "total_sentences": 194,
+  "total_segments": 14,
+  "clips": [
+    {
+      "clip_id": "-OetXsp7xdI_c7",
+      "start": 568.8,
+      "end": 649.1,
+      "duration": 80.3,
+      "segments": [
+        {
+          "start_sent_id": 132,
+          "end_sent_id": 145
+        }
+      ],
+      "confidence_rank": 1,
+      "confidence_note": "Controversial Take: Blames British rule for diabetes in Indian genetics, sparking high curiosity and cultural resonance.",
+      "hook_text": "అసలు మన genetics-లోకి diabetes అనేది ఎలా వచ్చిందంటే దానికి కారణం British వాళ్ళు.",
+      "payoff_text": "అందుకే Western countries వాళ్ళతో compare చేస్తే మనకి diabetes వచ్చే chance-లు 3 to 5 times ఎక్కువ ఉంటుంది.",
+      "why": "Links Indian diabetes susceptibility to British rule, famines, and genetic changes.",
+      "visual_note": "The speaker's tone is conspiratorial and revealing. The video shows historical depictions of ancient India and British rule, visually connecting the past to the present health issue, along with comparative data.",
+      "engagement_type": "Controversial",
+      "hook_score": 10.0,
+      "coherence_score": 9.0,
+      "cultural_score": 10.0,
+      "engagement_score": 10.0,
+      "psychological_trigger": "Controversial Take, Historical Blame, Curiosity Gap",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "",
+      "virality_score": 10.0,
+      "para_id": 132,
+      "anchor_text": "అందుకే Western countries వాళ్ళతో compare చేస్తే మనకి diabetes వచ్చే chance-లు 3 to 5 times ఎక్కువ ఉంటుంది.",
+      "anchor_score": 10.0,
+      "transcript_text": "అసలు మన genetics-లోకి diabetes అనేది ఎలా వచ్చిందంటే దానికి కారణం British వాళ్ళు. Yes, India-లో diabetes వ్యాప్తి చెందడానికి British rule ఒక కారణం ఎలానో చెప్తాను చూడండి. British Raj time-లో India-లో 25 major famines వచ్చాయి. Famine అంటే కరువు అన్నమాట. ఈ 25 famines-లో దాదాపు 60 million Indians చనిపోయారు. ఒక పక్క కరువుతో కడుపులు మండుతుంటే ఇంకో పక్క British వాళ్ళు దారుణమైన tax-లు విధించడంతో పాటు మన దగ్గర ఉన్న కాస్త food-ని కూడా వాళ్ళ country-లకు export చేసుకునే వాళ్ళు. Over the years famines రావటం plus Britishers మన దగ్గర ఉన్న food-ని లాక్కోవడంతో South Asians-లో ముఖ్యంగా Indians physiology-లో fat-ని store చేసుకునే పద్ధతి అండ్ sugar-ని process చేసే పద్ధతిలో తేడా వచ్చేస్తుంది. Over the time behavior-లు అండ్ environmental changes వల్ల మన genes working అనేది change అవుతూ వచ్చింది. But underlying DNA sequence మాత్రం అలానే ఉంటుంది. సో ఈ కరువుల వల్ల వచ్చిన ఈ genes changes అనేవి generations నుంచి pass అవుతూ వచ్చి diabetes వచ్చే chance-లను పెంచాయి. మీరు గమనిస్తే same age gender body mass ఉన్న ఒక white foreigner-ని and South Asians like India, Pakistan వాళ్ళని తీసుకొని compare చేస్తే South Asians-లో insulin resistance అనేది కొద్దిగా ఎక్కువ ఉంటుంది. అందుకే Western countries వాళ్ళతో compare చేస్తే మనకి diabetes వచ్చే chance-లు 3 to 5 times ఎక్కువ ఉంటుంది."
+    },
+    {
+      "clip_id": "-OetXsp7xdI_c6",
+      "start": 338.16,
+      "end": 352.58,
+      "duration": 14.42,
+      "segments": [
+        {
+          "start_sent_id": 83,
+          "end_sent_id": 84
+        }
+      ],
+      "confidence_rank": 2,
+      "confidence_note": "Middle-Class Relatability: Directly questions financial readiness for medical emergencies, hitting a common anxiety.",
+      "hook_text": "లక్షలు ఖర్చు అయ్యే hospital bills కట్టడానికి మన దగ్గర డబ్బులు ఉన్నాయా?",
+      "payoff_text": "Because accident, surgery లేదా sudden illness కారణం ఏదైనా సరే ఒక్కసారి hospital-కి వెళ్తే మీరు సంవత్సరాల పాటు save చేసుకున్న money అంతా ఒక్కసారిగా మాయం అయిపోతుంది.",
+      "why": "Warns about financial impact of medical emergencies on savings.",
+      "visual_note": "The speaker's tone is serious and direct. The video shows a person looking into an empty wallet, visually reinforcing the financial loss.",
+      "engagement_type": "Emotional",
+      "hook_score": 10.0,
+      "coherence_score": 9.0,
+      "cultural_score": 10.0,
+      "engagement_score": 10.0,
+      "psychological_trigger": "Fear, Middle-Class Relatability, Urgency",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "Slightly under 15 seconds but highly impactful.",
+      "virality_score": 10.0,
+      "para_id": 83,
+      "anchor_text": "Because accident, surgery లేదా sudden illness కారణం ఏదైనా సరే ఒక్కసారి hospital-కి వెళ్తే మీరు సంవత్సరాల పాటు save చేసుకున్న money అంతా ఒక్కసారిగా మాయం అయిపోతుంది.",
+      "anchor_score": 10.0,
+      "transcript_text": "లక్షలు ఖర్చు అయ్యే hospital bills కట్టడానికి మన దగ్గర డబ్బులు ఉన్నాయా? Because accident, surgery లేదా sudden illness కారణం ఏదైనా సరే ఒక్కసారి hospital-కి వెళ్తే మీరు సంవత్సరాల పాటు save చేసుకున్న money అంతా ఒక్కసారిగా మాయం అయిపోతుంది."
+    },
+    {
+      "clip_id": "-OetXsp7xdI_c2",
+      "start": 49.1,
+      "end": 72.34,
+      "duration": 23.24,
+      "segments": [
+        {
+          "start_sent_id": 13,
+          "end_sent_id": 18
+        }
+      ],
+      "confidence_rank": 3,
+      "confidence_note": "Relatability: Uses a personal family scenario to highlight widespread diabetes, creating immediate connection.",
+      "hook_text": "ఇవన్నీ కాదు మీ family WhatsApp group ఓపెన్ చేయండి.",
+      "payoff_text": "అప్పుడు మీకే అర్థమవుతుంది diabetes situation అనేది ఎలా ఉందో.",
+      "why": "Personalizes diabetes prevalence through a relatable family scenario.",
+      "visual_note": "The speaker uses expressive hand gestures, leans forward, and points to emphasize the family scenario and the resulting realization. The visuals show a person offering sweets and then a family WhatsApp group.",
+      "engagement_type": "Relatable",
+      "hook_score": 9.0,
+      "coherence_score": 9.0,
+      "cultural_score": 10.0,
+      "engagement_score": 10.0,
+      "psychological_trigger": "Relatability, Personal Relevance, Call to Action",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "",
+      "virality_score": 9.8,
+      "para_id": 13,
+      "anchor_text": "అప్పుడు మీకే అర్థమవుతుంది diabetes situation అనేది ఎలా ఉందో.",
+      "anchor_score": 9.8,
+      "transcript_text": "ఇవన్నీ కాదు మీ family WhatsApp group ఓపెన్ చేయండి. ఎంతమంది రోజు diabetes-కి medicine వేసుకుంటున్నారు? ఎంతమంది pre-diabetic అని అడగండి. పోనీ మీ family function ఏదైనా attend అయినప్పుడు మీ family-లో ఉన్న వాళ్ళందరికీ sweets offer చేయండి. ఎంతమంది ఆ sweets accept చేసి తింటారో గమనించండి. అప్పుడు మీకే అర్థమవుతుంది diabetes situation అనేది ఎలా ఉందో."
+    },
+    {
+      "clip_id": "-OetXsp7xdI_c1",
+      "start": 8.8,
+      "end": 48.96,
+      "duration": 40.16,
+      "segments": [
+        {
+          "start_sent_id": 3,
+          "end_sent_id": 12
+        }
+      ],
+      "confidence_rank": 4,
+      "confidence_note": "Curiosity Gap: Surprising facts about India's diabetes status and future projections are highly engaging.",
+      "hook_text": "ఈ ప్రపంచంలో ఉన్న దేశాలన్నిటిలో highest diabetes patients ఉన్న దేశం ఏంటో తెలుసా?",
+      "payoff_text": "50-కి India-లో diabetes patient సంఖ్య 156 million-కి చేరుకునే అవకాశం ఉంది.",
+      "why": "Reveals India's alarming diabetes status and future projections.",
+      "visual_note": "The speaker uses hand gestures to emphasize the question and the surprising answer. Data tables and graphs are shown on screen, highlighting statistics for different countries and projections for India.",
+      "engagement_type": "Educational",
+      "hook_score": 9.0,
+      "coherence_score": 9.0,
+      "cultural_score": 9.0,
+      "engagement_score": 9.0,
+      "psychological_trigger": "Curiosity Gap, Shocking Fact, Urgency",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "",
+      "virality_score": 9.0,
+      "para_id": 3,
+      "anchor_text": "50-కి India-లో diabetes patient సంఖ్య 156 million-కి చేరుకునే అవకాశం ఉంది.",
+      "anchor_score": 9.0,
+      "transcript_text": "ఈ ప్రపంచంలో ఉన్న దేశాలన్నిటిలో highest diabetes patients ఉన్న దేశం ఏంటో తెలుసా? చాలా మంది India అనుకుంటారు కదా? కాదు, China. India 2nd place-లో ఉంది, America 3rd place-లో ఉంది, next వచ్చేసి Pakistan ఉంది. India 2nd place-లో ఉంది, but diabetes capital of the world ఏంటి అని Google తల్లిని అడిగితే bold letter-లలో India అని చెప్తుంది. But why? Because India-లో diabetes పెరుగుతున్న speed అలాంటిది. Year 2000-లో 32.7 million adult-లకు diabetes ఉంటే 2024-కి ఆ number 90 million-కి చేరుకుంది. ఇదే కొనసాగితే 2000 50-కి India-లో diabetes patient సంఖ్య 156 million-కి చేరుకునే అవకాశం ఉంది."
+    },
+    {
+      "clip_id": "-OetXsp7xdI_c8",
+      "start": 649.14,
+      "end": 757.96,
+      "duration": 108.82,
+      "segments": [
+        {
+          "start_sent_id": 146,
+          "end_sent_id": 169
+        }
+      ],
+      "confidence_rank": 5,
+      "confidence_note": "Counter-Intuitive: Challenges the positive view of economic development by linking it to rising diabetes.",
+      "hook_text": "diabetes పెరిగిపోవడానికి next కారణం economic development.",
+      "payoff_text": "సో economic development మంచిదే కానీ దాని మాయలో పడిపోయి మనం diabetes-కి లొంగిపోతున్నాం అని ఎవరు గ్రహించట్లేదు.",
+      "why": "Explains how economic development and fast food contribute to diabetes in India.",
+      "visual_note": "The speaker uses hand gestures to emphasize the irony. The video shows images of urban development, fast food chains, and people eating, visually connecting the concepts of economic growth and health decline.",
+      "engagement_type": "Insight",
+      "hook_score": 9.0,
+      "coherence_score": 9.0,
+      "cultural_score": 9.0,
+      "engagement_score": 8.0,
+      "psychological_trigger": "Counter-Intuitive, Insight, Social Commentary",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "Long but dense and coherent educational content.",
+      "virality_score": 8.9,
+      "para_id": 146,
+      "anchor_text": "సో economic development మంచిదే కానీ దాని మాయలో పడిపోయి మనం diabetes-కి లొంగిపోతున్నాం అని ఎవరు గ్రహించట్లేదు.",
+      "anchor_score": 8.9,
+      "transcript_text": "diabetes పెరిగిపోవడానికి next కారణం economic development. economic development కావాలని అందరూ గోల పెడుతుంటే economic development వల్ల డయాబెటిస్ వస్తుంది అంటాడు ఏంటి వీడు అనుకుంటారేమో. ఎకనామిక్ డెవలప్మెంట్ అనేది చాలా అవసరం. బట్ సాడ్ ట్రూత్ ఏంటంటే డెవలప్ అవుతున్న ఎకానమీ వల్ల వచ్చే సైడ్ ఎఫెక్ట్-లో డయాబెటిస్ కూడా ఉంది. సీ ఏ దేశమైనా ఎకనామిక్ డెవలప్మెంట్ వైపు వెళ్తున్నప్పుడు జనాలు బిజీ అయిపోతారు. ఎక్కువ సంపాదిస్తున్నారు అండ్ ఎక్కువ తినేస్తారు. ఇన్ని ఎక్కువల మధ్యలో హెల్త్-ని పట్టించుకోవడం ఎక్సర్సైజ్-లు చేయడం అనేది తక్కువ అయిపోయింది. అండ్ లాస్ట్ ఫ్యూ ఇయర్స్-లో ఇదే జరిగింది. ఇంట్లో వండుకోవడం మానేసి ఫాస్ట్ ఫుడ్ మీద పడ్డారు జనాలు. ఈ fast food వల్ల obesity ఇంకా diabetes fast-గా పెరిగిపోతున్నాయి. For example, America-ని తీసుకోండి, World War-లు తర్వాత economy improve అవుతూ వచ్చింది. And ఇదే time-లో US-లో fast food chain-లు like McDonald's, KFC, Pizza Hut, Domino's ఇవన్నీ కూడా 1940, 1960 మధ్యలో పుట్టుకొని వచ్చాయి. అంటే World War-లు complete అయ్యి economic development మొదలయ్యాక ఇవి 20 ఏళ్లలోనే impact-ని చూపించడం మొదలుపెట్టాయి. 1980s వచ్చేసరికి America-లో obesity అనేది ఒక ఎప్పుడు మీకు అయిపోయింది? Same goes with India too. 1991 liberalization తర్వాత Indian economy foreign brand-లకు స్వాగతం పలికింది. And ఈ foreign brand-లలో చాలా శాతం soft drink-లు, junk food-లు ఉన్నాయి like McDonald's, Pizza Hut, Domino's, KFC etc. etc. ఈ company-లు అన్నీ కూడా India-లో ఒక్కసారిగా enter అయ్యాయి all in the name of economic development. And ఈ company-లు enter అవ్వడానికి ముందు India-లో diabetes patient-ల సంఖ్య 26 million-గా ఉండేది కానీ 1900 90 తర్వాత నుంచి 2016 వరకు ఈ సంఖ్య 65 million-కి చేరుకుంది. సో economic development మంచిదే కానీ దాని మాయలో పడిపోయి మనం diabetes-కి లొంగిపోతున్నాం అని ఎవరు గ్రహించట్లేదు."
+    },
+    {
+      "clip_id": "-OetXsp7xdI_c4",
+      "start": 199.28,
+      "end": 219.5,
+      "duration": 20.22,
+      "segments": [
+        {
+          "start_sent_id": 51,
+          "end_sent_id": 55
+        }
+      ],
+      "confidence_rank": 6,
+      "confidence_note": "Shocking Fact: Classifies diabetes as one of the deadliest diseases, grabbing immediate attention.",
+      "hook_text": "ఈ ప్రపంచంలో ఉన్న 10 most dangerous diseases list-లో diabetes-కి కూడా చోటు దక్కింది.",
+      "payoff_text": "ప్రతి సంవత్సరం diabetes వల్ల ప్రపంచవ్యాప్తంగా 34 లక్షల మంది చనిపోతున్నారు.",
+      "why": "Highlights diabetes as a deadly disease with global death toll.",
+      "visual_note": "The speaker's tone is serious, and the screen displays a list of '10 Deadliest Diseases' with 'Diabetes' highlighted, followed by the statistic of 3.4 million deaths globally.",
+      "engagement_type": "Emotional",
+      "hook_score": 9.0,
+      "coherence_score": 9.0,
+      "cultural_score": 8.0,
+      "engagement_score": 8.0,
+      "psychological_trigger": "Fear, Urgency, Shocking Fact",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "",
+      "virality_score": 9.2,
+      "para_id": 51,
+      "anchor_text": "ప్రతి సంవత్సరం diabetes వల్ల ప్రపంచవ్యాప్తంగా 34 లక్షల మంది చనిపోతున్నారు.",
+      "anchor_score": 9.2,
+      "transcript_text": "అందుకే ఈ ప్రపంచంలో ఉన్న 10 most dangerous diseases list-లో diabetes-కి కూడా చోటు దక్కింది. ఈ list-లో heart disease, lung disease, cancer లాంటి life-taking disease-లు ఉన్నాయి. So అర్థం చేసుకోండి diabetes ఎంత డేంజరో. ప్రతి సంవత్సరం diabetes వల్ల ప్రపంచవ్యాప్తంగా 34 లక్షల మంది చనిపోతున్నారు."
+    },
+    {
+      "clip_id": "-OetXsp7xdI_c9",
+      "start": 760.96,
+      "end": 804.06,
+      "duration": 43.1,
+      "segments": [
+        {
+          "start_sent_id": 171,
+          "end_sent_id": 178
+        }
+      ],
+      "confidence_rank": 7,
+      "confidence_note": "Relatability: Compares rural and urban lifestyles, highlighting how urbanization leads to diabetes.",
+      "hook_text": "Village-లో ఉండే వాళ్ళని చూడండి వాళ్ళు 4-5-కే లేస్తారు.",
+      "payoff_text": "saturated fats ఇంకా sugar consumption అనేది బాగా పెరిగిపోయి final-గా diabetes-కి దారి తీస్తుంది.",
+      "why": "Contrasts rural and urban lifestyles, linking urbanization to diabetes.",
+      "visual_note": "The speaker uses hand gestures to compare lifestyles. The video shows images of rural life (people working) versus urban life (people on screens), illustrating the lifestyle shift and its health implications.",
+      "engagement_type": "Relatable",
+      "hook_score": 8.0,
+      "coherence_score": 9.0,
+      "cultural_score": 9.0,
+      "engagement_score": 8.0,
+      "psychological_trigger": "Relatability, Social Comparison",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "",
+      "virality_score": 9.0,
+      "para_id": 171,
+      "anchor_text": "saturated fats ఇంకా sugar consumption అనేది బాగా పెరిగిపోయి final-గా diabetes-కి దారి తీస్తుంది.",
+      "anchor_score": 9.0,
+      "transcript_text": "ఎవరైనా village-లో ఉండే వాళ్ళని చూడండి వాళ్ళు 4-5-కే లేస్తారు. లేచిన దగ్గర నుంచి ఏదో ఒక పని చేస్తూనే ఉంటారు. afternoon ఒక 1 hour అలా rest తీసుకుంటారేమో అంతే బట్ రోజంతా ఏదో ఒక పని చేస్తూనే ఉంటారు. ఏ పని లేకపోతే ఏదో ఒక fun physical activity-లో participate చేస్తారు. Of course, ఈ lifestyle అందరికీ set అవ్వదు అనుకోండి, but నా point ఏంటంటే villages-లో ఉండే వాళ్ళకి, cities-లో ఉండే వాళ్ళకి lifestyle-లో చాలా తేడా ఉంటుంది. urbanization పేరుతో cities-కి వచ్చేసి గంటలు గంటలు screen ముందు కూర్చోవడం direct-గా obesity ఇంకా diabetes-కి కారణం అవుతుంది. urbanization జరిగినప్పుడు జనాల lifestyle-లో చాలా మార్పులు వస్తాయి. saturated fats ఇంకా sugar consumption అనేది బాగా పెరిగిపోయి final-గా diabetes-కి దారి తీస్తుంది."
+    },
+    {
+      "clip_id": "-OetXsp7xdI_c10",
+      "start": 804.4,
+      "end": 827.9,
+      "duration": 23.5,
+      "segments": [
+        {
+          "start_sent_id": 179,
+          "end_sent_id": 186
+        }
+      ],
+      "confidence_rank": 7,
+      "confidence_note": "Fear/Empowerment: Starts with the alarming truth of no cure, then empowers with control strategies.",
+      "hook_text": "medical science-లో as of now diabetes-కి cure లేదు.",
+      "payoff_text": "Diabetes-ని దూరంగా పెట్టొచ్చు.",
+      "why": "States no cure for diabetes but emphasizes control through healthy lifestyle.",
+      "visual_note": "The speaker's tone is serious but then becomes encouraging. The video shows images of healthy food and exercise, reinforcing the actionable advice for diabetes management.",
+      "engagement_type": "Wisdom",
+      "hook_score": 9.0,
+      "coherence_score": 9.0,
+      "cultural_score": 8.0,
+      "engagement_score": 8.0,
+      "psychological_trigger": "Fear, Empowerment, Practical Advice",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "",
+      "virality_score": 8.7,
+      "para_id": 179,
+      "anchor_text": "Diabetes-ని దూరంగా పెట్టొచ్చు.",
+      "anchor_score": 8.7,
+      "transcript_text": "medical science-లో as of now diabetes-కి cure లేదు. ఇంకా రాలేదు. Of course, scientist-లు cure-ని కనుక్కోవడానికి చాలా try చేస్తున్నారు. Research-లు జరుగుతున్నాయి. Maybe త్వరలో cure కనుక్కునే chance-లు ఉన్నాయి. But అప్పటివరకు diabetes-ని control-లో పెట్టుకోవడం, diabetes రాకుండా చూసుకోవడం మన చేతుల్లోనే ఉంది. ఏమీ లేదు just healthy food తీసుకుంటూ healthy lifestyle-ని maintain చేస్తే చాలు. Diabetes-ని దూరంగా పెట్టొచ్చు."
+    },
+    {
+      "clip_id": "-OetXsp7xdI_c5",
+      "start": 226.12,
+      "end": 257.46,
+      "duration": 31.34,
+      "segments": [
+        {
+          "start_sent_id": 57,
+          "end_sent_id": 61
+        }
+      ],
+      "confidence_rank": 8,
+      "confidence_note": "Curiosity Gap: Reveals a unique ancient Indian method of diabetes detection using ants.",
+      "hook_text": "India-లో 300 and 400 AD మధ్యలో diabetic అనే disease ఒకటి వస్తుంది అని తెలుసుకున్నారు.",
+      "payoff_text": "ఆ spray చేసిన దాని దగ్గరికి ants వస్తే patient-లు blood-లో high sugar level-లు ఉన్నట్లు and అతను diabetes-తో బాధపడుతున్నట్లు physician-లు confirm చేసేవాళ్ళు.",
+      "why": "Explores ancient Indian diabetes detection methods using ants.",
+      "visual_note": "The video shows ancient Indian physicians (gurus) observing ants around a urine sample, with the speaker explaining the process of detection.",
+      "engagement_type": "Historical Insight",
+      "hook_score": 8.0,
+      "coherence_score": 9.0,
+      "cultural_score": 9.0,
+      "engagement_score": 8.0,
+      "psychological_trigger": "Curiosity, Historical Insight",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "",
+      "virality_score": 8.5,
+      "para_id": 57,
+      "anchor_text": "ఆ spray చేసిన దాని దగ్గరికి ants వస్తే patient-లు blood-లో high sugar level-లు ఉన్నట్లు and అతను diabetes-తో బాధపడుతున్నట్లు physician-లు confirm చేసేవాళ్ళు.",
+      "anchor_score": 8.5,
+      "transcript_text": "India-లో 300 and 400 AD మధ్యలో diabetic అనే disease ఒకటి వస్తుంది అని తెలుసుకున్నారు. ఆ time-లో ఒక మనిషికి diabetes ఉందో లేదో తెలుసుకోవడానికి చీమలు అంటే ant ని use చేసేవాళ్ళు. diabetes ఉందో లేదో తెలుసుకోవడం కోసం patient urine-ని collect చేసి ఆ urine-ని ants-కి దగ్గరలో spray చేసేవాళ్ళు అన్నమాట. ఆ spray చేసిన దాని దగ్గరికి ants వస్తే patient-లు blood-లో high sugar level-లు ఉన్నట్లు and అతను diabetes-తో బాధపడుతున్నట్లు physician-లు confirm చేసేవాళ్ళు."
+    },
+    {
+      "clip_id": "-OetXsp7xdI_c3",
+      "start": 92.04,
+      "end": 198.96,
+      "duration": 106.92,
+      "segments": [
+        {
+          "start_sent_id": 27,
+          "end_sent_id": 50
+        }
+      ],
+      "confidence_rank": 9,
+      "confidence_note": "Knowledge Gap: Addresses a common lack of understanding about diabetes with a clear, simple explanation.",
+      "hook_text": "To be frank చాలా మంది Indians-కి అసలు diabetes అంటే ఏంటి అది ఎలా attack అవుతుందో కూడా తెలియదు.",
+      "payoff_text": "And ఈ dangerous condition-నే diabetes అంటారు.",
+      "why": "Explains diabetes basics, glucose, insulin, and how the disease develops.",
+      "visual_note": "The speaker uses hand gestures to illustrate concepts like sugar levels and insulin. Animated graphics are used to show glucose, cells, pancreas, and insulin as a key, followed by a serious tone when discussing the dangerous condition.",
+      "engagement_type": "Educational",
+      "hook_score": 8.0,
+      "coherence_score": 9.0,
+      "cultural_score": 8.0,
+      "engagement_score": 7.0,
+      "psychological_trigger": "Knowledge Gap, Education",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "Slightly long but dense educational content.",
+      "virality_score": 8.2,
+      "para_id": 27,
+      "anchor_text": "And ఈ dangerous condition-నే diabetes అంటారు.",
+      "anchor_score": 8.2,
+      "transcript_text": "To be frank చాలా మంది Indians-కి అసలు diabetes అంటే ఏంటి అది ఎలా attack అవుతుందో కూడా తెలియదు. So ముందు diabetes గురించి simple-గా explain చేస్తాను చూడండి. Diabetes-కి మనం blood-లో ఉండే sugar level ఇంకా insulin-తో direct link ఉంటుంది కానీ చాలా మందికి అసలు blood-లో sugar level అంటే ఏంటో కూడా తెలీదు. See, అందరి blood-లో sugar ఉంటుంది. ఇక్కడ sugar అంటే glucose అని అర్థం అన్నమాట. మన body run అవ్వడానికి ఈ glucose కావాలి. blood-లో sugar ఎక్కువ అయింది తక్కువ అయింది అంటే అర్థం మీ blood-లో ఎంత glucose ఉందో చెప్పినట్లు. ఈ glucose అనేది మన body cells-కి fuel లాంటిది అన్నమాట. So మనం carbohydrates-ని తీసుకున్నప్పుడు మన body ఆ carbohydrates-ని break చేసి చేసి glucose-లోకి మారుస్తుంది. కానీ ఇలా break అయిన glucose మన body cells-లోకి వెళ్లకుండా blood-లోకి release అవుతుంది. అందుకే మనం food తిన్న వెంటనే check చేస్తే మన blood-లో sugar levels అనేవి ఎక్కువ ఉంటాయి. నిజమేనయ్యా పోలారా. So మన blood-లో ఉండే glucose-ని మన body cells-లోకి పంపించడం కోసం మన body-లో ఉండే pancreas insulin అనే hormone-ని release చేస్తుంది. For example, cells-ని engines అనుకుందాం, glucose-ని fuel అనుకుందాం and insulin-ని key అనుకుందాం. So ఈ insulin అనే key వెళ్లి cells అనే engines-ని open చేసినప్పుడు ఈ glucose అనే fuel cells లోపలికి వెళ్తుంది. అప్పుడు cells పనిచేస్తాయి. So problem ఎక్కడ వస్తుంది అంటే కొంతమందిలో insulin అనేది సరిగ్గా produce అవ్వదు. ఇంకొంతమందిలో produce అయినా కానీ మన body ఆ insulin-కి సరిగ్గా respond అవ్వదు. So అలాంటి situation-లో మన body-లో ఉన్న glucose cells దగ్గరికి వెళ్లకుండా blood-లోనే ఉండిపోతుంది. దాంతో blood sugar levels అనేవి rise అయ్యి over the time dangerous-గా మారుతుంది. And ఈ dangerous condition-నే diabetes అంటారు."
+    }
+  ],
+  "metadata": {
+    "pipeline": "ClipForge-v16-TwoCallVision",
+    "approach": "junk-detection → video-upload → context-cache → rough-cut (Call1) → fine-cut (Call2) → segments-array",
+    "language": "Telugu/Codemix",
+    "gemini_model": "gemini-2.5-flash",
+    "call_1": "rough cut — find all genuine Reel moments",
+    "call_2": "fine cut — perfect hooks, payoffs, trim, score, rank",
+    "caching": "context cache reuses video tokens across both calls",
+    "clip_count_rule": "quality decides count, no min/max in prompts",
+    "file_uri": "https://generativelanguage.googleapis.com/v1beta/files/cnyq52vw2vua"
+  }
+}

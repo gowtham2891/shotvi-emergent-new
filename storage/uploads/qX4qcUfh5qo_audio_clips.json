@@ -1,0 +1,478 @@
+{
+  "video_id": "qX4qcUfh5qo",
+  "video_duration": 1200.4,
+  "total_sentences": 279,
+  "total_segments": 20,
+  "clips": [
+    {
+      "clip_id": "qX4qcUfh5qo_c1",
+      "start": 503.94,
+      "end": 546.62,
+      "duration": 42.68,
+      "segments": [
+        {
+          "start_sent_id": 122,
+          "end_sent_id": 128
+        }
+      ],
+      "confidence_rank": 1,
+      "confidence_note": "Record Massacre: The 'they didn't know' hook combined with the Hardik Pandya visual is highly engaging for Telugu fans.",
+      "hook_text": "ground-లోకి అడుగు పెట్టారు కానీ వాళ్ళకి తెలీదు మనం cricket match ఆడటానికి రావట్లేదు ఒక historical record కింద నలిగిపోవడానికి వస్తున్నామని.",
+      "payoff_text": "ఆ అపోహలు పోవటానికి ఎంతో time పట్టలేదు.",
+      "why": "Narrative of dismantling Mumbai Indians and shattering long-standing records in T20 cricket.",
+      "visual_note": "Hardik Pandya leads MI through fire and smoke as the narrator predicts destruction.",
+      "engagement_type": "Story",
+      "hook_score": 9.0,
+      "coherence_score": 8.0,
+      "cultural_score": 9.0,
+      "engagement_score": 9.0,
+      "psychological_trigger": "Curiosity Gap",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "",
+      "virality_score": 9.2,
+      "para_id": 122,
+      "anchor_text": "ఆ అపోహలు పోవటానికి ఎంతో time పట్టలేదు.",
+      "anchor_score": 9.2,
+      "transcript": [
+        {
+          "start": 503.94,
+          "end": 512.34,
+          "text": "ground-లోకి అడుగు పెట్టారు కానీ వాళ్ళకి తెలీదు మనం cricket match ఆడటానికి రావట్లేదు ఒక historical record కింద నలిగిపోవడానికి వస్తున్నామని."
+        },
+        {
+          "start": 512.78,
+          "end": 513.62,
+          "text": "Game start అయింది."
+        },
+        {
+          "start": 513.96,
+          "end": 524.78,
+          "text": "Travis Head batting-కి వచ్చాడు 18 ball-లలో 50 run-లు ఇదే బీభత్సం అనుకుంటే అటు నుంచి Abhishek Sharma 16 ball-లలో 50 run-లు కొట్టాడు 20 over-లు అయ్యేసరికి score board."
+        },
+        {
+          "start": 525.16,
+          "end": 528.78,
+          "text": "numbers 277 for 3 అది score కాదు."
+        },
+        {
+          "start": 528.8,
+          "end": 537.12,
+          "text": "2013 నుంచి RCB పేరు మీద ఉన్న 223 runs record ని ముక్కలు ముక్కలు చేసి SRH సృష్టించిన tsunami."
+        },
+        {
+          "start": 537.4,
+          "end": 543.88,
+          "text": "Hyderabad లో 277 runs కొట్టినప్పుడు అందరూ home ground లో ఏదో ఒక match లో జరిగిన అద్భుతం అనుకున్నారు."
+        },
+        {
+          "start": 544.08,
+          "end": 546.62,
+          "text": "ఆ అపోహలు పోవటానికి ఎంతో time పట్టలేదు."
+        }
+      ],
+      "transcript_text": "ground-లోకి అడుగు పెట్టారు కానీ వాళ్ళకి తెలీదు మనం cricket match ఆడటానికి రావట్లేదు ఒక historical record కింద నలిగిపోవడానికి వస్తున్నామని. Game start అయింది. Travis Head batting-కి వచ్చాడు 18 ball-లలో 50 run-లు ఇదే బీభత్సం అనుకుంటే అటు నుంచి Abhishek Sharma 16 ball-లలో 50 run-లు కొట్టాడు 20 over-లు అయ్యేసరికి score board. numbers 277 for 3 అది score కాదు. 2013 నుంచి RCB పేరు మీద ఉన్న 223 runs record ని ముక్కలు ముక్కలు చేసి SRH సృష్టించిన tsunami. Hyderabad లో 277 runs కొట్టినప్పుడు అందరూ home ground లో ఏదో ఒక match లో జరిగిన అద్భుతం అనుకున్నారు. ఆ అపోహలు పోవటానికి ఎంతో time పట్టలేదు."
+    },
+    {
+      "clip_id": "qX4qcUfh5qo_c2",
+      "start": 16.48,
+      "end": 61.18,
+      "duration": 44.7,
+      "segments": [
+        {
+          "start_sent_id": 6,
+          "end_sent_id": 15
+        }
+      ],
+      "confidence_rank": 2,
+      "confidence_note": "Bowler's Nightmare: Shocking stats hook that perfectly sets up the 'New SRH' destructive identity narrative.",
+      "hook_text": "Ground-లోకి దిగిన కొంచెం సేపటి తర్వాత score board వైపు చూస్తే అక్కడ score 105 run-లు.",
+      "payoff_text": "SRH ఎలా rise అయింది, ఎలా పడిపోయింది, ఆ తర్వాత తన identity మొత్తం మార్చేసి T20 cricket-లో ఒక dangerous batting team-గా ఎలా మారింది, ఇవన్నీ ఈరోజు మనం discuss చేద్దాం.",
+      "why": "Transformation of SRH from a balanced side to a dangerous batting-first powerhouse.",
+      "visual_note": "Narrator points to a scoreboard showing a shocking 105/0 in 6 overs.",
+      "engagement_type": "Insight",
+      "hook_score": 8.0,
+      "coherence_score": 9.0,
+      "cultural_score": 9.0,
+      "engagement_score": 8.0,
+      "psychological_trigger": "Shock Value",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "",
+      "virality_score": 8.5,
+      "para_id": 6,
+      "anchor_text": "SRH ఎలా rise అయింది, ఎలా పడిపోయింది, ఆ తర్వాత తన identity మొత్తం మార్చేసి T20 cricket-లో ఒక dangerous batting team-గా ఎలా మారింది, ఇవన్నీ ఈరోజు మనం discuss చేద్దాం.",
+      "anchor_score": 8.5,
+      "transcript": [
+        {
+          "start": 16.48,
+          "end": 22.86,
+          "text": "కానీ ground-లోకి దిగిన కొంచెం సేపటి తర్వాత score board వైపు చూస్తే అక్కడ score 105 run-లు."
+        },
+        {
+          "start": 23.22,
+          "end": 24.26,
+          "text": "wicket-లు 0."
+        },
+        {
+          "start": 24.44,
+          "end": 26.16,
+          "text": "అది కూడా just 6 over-లలో."
+        },
+        {
+          "start": 26.54,
+          "end": 27.8,
+          "text": "మీరు captain వైపు చూస్తారు."
+        },
+        {
+          "start": 28.0,
+          "end": 29.4,
+          "text": "captain కూడా మీ వైపు చూస్తారు."
+        },
+        {
+          "start": 29.52,
+          "end": 32.1,
+          "text": "కానీ ఇద్దరి దగ్గర answer మాత్రం ఉండదు."
+        },
+        {
+          "start": 32.28,
+          "end": 34.6,
+          "text": "ఎందుకంటే అక్కడ ఆడుతుంది player-లు కాదు."
+        },
+        {
+          "start": 35.04,
+          "end": 42.74,
+          "text": "ద్వంసానికి brand ambassador-లు, new SRH ఒక bowler-కి అంతకంటే పెద్ద nightmare ఈ ప్రపంచంలో ఇంకోటి ఉండదు."
+        },
+        {
+          "start": 43.12,
+          "end": 49.42,
+          "text": "చరిత్ర తిరగరాయటం అంటే పాత పేజీలు చించటం కాదు, కొత్త record-లతో ఒక కొత్త పుస్తకాన్ని సృష్టించడం."
+        },
+        {
+          "start": 49.92,
+          "end": 61.18,
+          "text": "SRH ఎలా rise అయింది, ఎలా పడిపోయింది, ఆ తర్వాత తన identity మొత్తం మార్చేసి T20 cricket-లో ఒక dangerous batting team-గా ఎలా మారింది, ఇవన్నీ ఈరోజు మనం discuss చేద్దాం."
+        }
+      ],
+      "transcript_text": "కానీ ground-లోకి దిగిన కొంచెం సేపటి తర్వాత score board వైపు చూస్తే అక్కడ score 105 run-లు. wicket-లు 0. అది కూడా just 6 over-లలో. మీరు captain వైపు చూస్తారు. captain కూడా మీ వైపు చూస్తారు. కానీ ఇద్దరి దగ్గర answer మాత్రం ఉండదు. ఎందుకంటే అక్కడ ఆడుతుంది player-లు కాదు. ద్వంసానికి brand ambassador-లు, new SRH ఒక bowler-కి అంతకంటే పెద్ద nightmare ఈ ప్రపంచంలో ఇంకోటి ఉండదు. చరిత్ర తిరగరాయటం అంటే పాత పేజీలు చించటం కాదు, కొత్త record-లతో ఒక కొత్త పుస్తకాన్ని సృష్టించడం. SRH ఎలా rise అయింది, ఎలా పడిపోయింది, ఆ తర్వాత తన identity మొత్తం మార్చేసి T20 cricket-లో ఒక dangerous batting team-గా ఎలా మారింది, ఇవన్నీ ఈరోజు మనం discuss చేద్దాం."
+    },
+    {
+      "clip_id": "qX4qcUfh5qo_c3",
+      "start": 284.82,
+      "end": 386.48,
+      "duration": 101.66,
+      "segments": [
+        {
+          "start_sent_id": 75,
+          "end_sent_id": 93
+        }
+      ],
+      "confidence_rank": 3,
+      "confidence_note": "Phoenix Rise: Emotional arc from dark times to a radical identity change resonates with hardcore fans.",
+      "hook_text": "Golden Light-తో మెరిసిపోతున్న SRH నెమ్మదిగా చీకట్లోకి జారిపోవటం start అయింది.",
+      "payoff_text": "ఈసారి వచ్చేది మామూలు fire కాదు అది bowlers-ని కాల్చి బూడిద చేసే wild fire.",
+      "why": "Detailed story arc of SRH's fall to the bottom and their 'Wildfire' rebirth.",
+      "visual_note": "Dramatic title card 'THE DARK PHASE' over dejected players on the field.",
+      "engagement_type": "Emotional",
+      "hook_score": 7.0,
+      "coherence_score": 9.0,
+      "cultural_score": 8.0,
+      "engagement_score": 7.0,
+      "psychological_trigger": "Consequence-First Hook",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "",
+      "virality_score": 8.3,
+      "para_id": 75,
+      "anchor_text": "ఈసారి వచ్చేది మామూలు fire కాదు అది bowlers-ని కాల్చి బూడిద చేసే wild fire.",
+      "anchor_score": 8.3,
+      "transcript": [
+        {
+          "start": 284.82,
+          "end": 289.9,
+          "text": "Golden Light-తో మెరిసిపోతున్న SRH నెమ్మదిగా చీకట్లోకి జారిపోవటం start అయింది."
+        },
+        {
+          "start": 290.18,
+          "end": 300.48,
+          "text": "ఒకప్పుడు opponent batsman-కి నిద్ర లేకుండా చేసిన Orange Army వరుసగా 3 సంవత్సరాలు 2021, 22, 23 points table-లో bottom 6-లో ఉంది."
+        },
+        {
+          "start": 300.84,
+          "end": 302.22,
+          "text": "Cricket game మారిపోయింది."
+        },
+        {
+          "start": 302.36,
+          "end": 306.14,
+          "text": "T20 అంటే ఒకప్పట్లా 160 run-లను defend చేయడం కాదు."
+        },
+        {
+          "start": 306.16,
+          "end": 310.48,
+          "text": "200 run-లను కూడా అవలీలగా chase చేసే bullet train-లా మారిపోయింది."
+        },
+        {
+          "start": 310.72,
+          "end": 317.84,
+          "text": "అన్ని team-లు explosive batting-తో విరుచుకు పడుతుంటే SRH మాత్రం ఇంకా old fashion game-ని పట్టుకొని వేలాడింది."
+        },
+        {
+          "start": 318.18,
+          "end": 322.94,
+          "text": "captain-లు మారారు, coach-లు మారారు, plan-లు మారాయి కానీ result మాత్రం మారలేదు."
+        },
+        {
+          "start": 323.18,
+          "end": 330.98,
+          "text": "దీపం ఆరిపోయే ముందు వెలుగు పెరుగుతుందో లేదో తెలీదు కానీ ఒక సామ్రాజ్యం కూలిపోయే ముందు మాత్రం నిశ్శబ్దం రాజ్యం ఏలుతుంది."
+        },
+        {
+          "start": 331.38,
+          "end": 335.88,
+          "text": "same అలాగే Orange Army-ని చూస్తే opponent-లో వచ్చే ఆ భయం కూడా మాయమైపోయింది."
+        },
+        {
+          "start": 335.9,
+          "end": 344.46,
+          "text": "2016 నుంచి 2020 వరకు వరుసగా 5 సంవత్సరాలు play off-లకు వచ్చిన ఒక champion team-కి అంతకంటే అవమానం."
+        },
+        {
+          "start": 344.66,
+          "end": 351.56,
+          "text": "ఇంకోటి ఉండదు కానీ ఆ defeat-లు వెనక ఆ అవమానాలు వెనక management room-లలో ఒక silent movement start అయింది."
+        },
+        {
+          "start": 351.66,
+          "end": 354.3,
+          "text": "వాళ్ళు తాము ఆడే విధానాన్ని మార్చాలి అనుకున్నారు."
+        },
+        {
+          "start": 354.78,
+          "end": 357.62,
+          "text": "SRH DNA-ని change చేయాలి అని decide అయ్యారు."
+        },
+        {
+          "start": 357.82,
+          "end": 364.24,
+          "text": "bowling మన strength-ని నమ్మిన చోటే batting-ని mass destruction-గా మార్చాలి అని ఒక dangerous decision తీసుకున్నారు."
+        },
+        {
+          "start": 364.66,
+          "end": 367.44,
+          "text": "ఆ decision పేరే The New SRH Era."
+        },
+        {
+          "start": 367.76,
+          "end": 372.72,
+          "text": "ఓటమి అంటే ఆగిపోవటం కాదు కొత్త వేగాన్ని అందుకోవడానికి తీసుకునే విరామం మాత్రమే."
+        },
+        {
+          "start": 373.18,
+          "end": 374.8,
+          "text": "SRH మళ్ళీ ఉదయించడానికి."
+        },
+        {
+          "start": 374.84,
+          "end": 375.38,
+          "text": "కి రెడీ అయింది."
+        },
+        {
+          "start": 375.66,
+          "end": 386.48,
+          "text": "ఈసారి వచ్చేది మామూలు fire కాదు అది bowlers-ని కాల్చి బూడిద చేసే wild fire."
+        }
+      ],
+      "transcript_text": "Golden Light-తో మెరిసిపోతున్న SRH నెమ్మదిగా చీకట్లోకి జారిపోవటం start అయింది. ఒకప్పుడు opponent batsman-కి నిద్ర లేకుండా చేసిన Orange Army వరుసగా 3 సంవత్సరాలు 2021, 22, 23 points table-లో bottom 6-లో ఉంది. Cricket game మారిపోయింది. T20 అంటే ఒకప్పట్లా 160 run-లను defend చేయడం కాదు. 200 run-లను కూడా అవలీలగా chase చేసే bullet train-లా మారిపోయింది. అన్ని team-లు explosive batting-తో విరుచుకు పడుతుంటే SRH మాత్రం ఇంకా old fashion game-ని పట్టుకొని వేలాడింది. captain-లు మారారు, coach-లు మారారు, plan-లు మారాయి కానీ result మాత్రం మారలేదు. దీపం ఆరిపోయే ముందు వెలుగు పెరుగుతుందో లేదో తెలీదు కానీ ఒక సామ్రాజ్యం కూలిపోయే ముందు మాత్రం నిశ్శబ్దం రాజ్యం ఏలుతుంది. same అలాగే Orange Army-ని చూస్తే opponent-లో వచ్చే ఆ భయం కూడా మాయమైపోయింది. 2016 నుంచి 2020 వరకు వరుసగా 5 సంవత్సరాలు play off-లకు వచ్చిన ఒక champion team-కి అంతకంటే అవమానం. ఇంకోటి ఉండదు కానీ ఆ defeat-లు వెనక ఆ అవమానాలు వెనక management room-లలో ఒక silent movement start అయింది. వాళ్ళు తాము ఆడే విధానాన్ని మార్చాలి అనుకున్నారు. SRH DNA-ని change చేయాలి అని decide అయ్యారు. bowling మన strength-ని నమ్మిన చోటే batting-ని mass destruction-గా మార్చాలి అని ఒక dangerous decision తీసుకున్నారు. ఆ decision పేరే The New SRH Era. ఓటమి అంటే ఆగిపోవటం కాదు కొత్త వేగాన్ని అందుకోవడానికి తీసుకునే విరామం మాత్రమే. SRH మళ్ళీ ఉదయించడానికి. కి రెడీ అయింది. ఈసారి వచ్చేది మామూలు fire కాదు అది bowlers-ని కాల్చి బూడిద చేసే wild fire."
+    },
+    {
+      "clip_id": "qX4qcUfh5qo_c4",
+      "start": 581.28,
+      "end": 642.46,
+      "duration": 61.18,
+      "segments": [
+        {
+          "start_sent_id": 141,
+          "end_sent_id": 155
+        }
+      ],
+      "confidence_rank": 4,
+      "confidence_note": "Mind Block Stats: High-speed stats delivery makes this very saveable and shareable for cricket enthusiasts.",
+      "hook_text": "ఒక్కసారి ఈ list చూడండి మీకు mind block అవుతుంది.",
+      "payoff_text": "అది కూడా single wicket కూడా పడకుండా ఇప్పటికీ IPL history-లో అదే highest power play score.",
+      "why": "Rapid-fire list of SRH's historic high scores and record-breaking powerplay dominance.",
+      "visual_note": "Stats table highlighting multiple 270+ scores scrolling quickly on screen.",
+      "engagement_type": "Educational",
+      "hook_score": 6.0,
+      "coherence_score": 7.0,
+      "cultural_score": 8.0,
+      "engagement_score": 8.0,
+      "psychological_trigger": "Listicle Hook",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "",
+      "virality_score": 6.9,
+      "para_id": 141,
+      "anchor_text": "అది కూడా single wicket కూడా పడకుండా ఇప్పటికీ IPL history-లో అదే highest power play score.",
+      "anchor_score": 6.9,
+      "transcript": [
+        {
+          "start": 581.28,
+          "end": 583.82,
+          "text": "ఒక్కసారి ఈ list చూడండి మీకు mind block అవుతుంది."
+        },
+        {
+          "start": 583.84,
+          "end": 587.18,
+          "text": "2020 4-లో RCB మీద 287 runs."
+        },
+        {
+          "start": 588.52,
+          "end": 590.38,
+          "text": "2025-లో RR మీద 286."
+        },
+        {
+          "start": 591.74,
+          "end": 593.52,
+          "text": "2025-లో KKR మీద 278."
+        },
+        {
+          "start": 595.22,
+          "end": 596.34,
+          "text": "2024-లో MI మీద 277."
+        },
+        {
+          "start": 598.56,
+          "end": 600.68,
+          "text": "2024-లో DC మీద 266."
+        },
+        {
+          "start": 600.96,
+          "end": 605.6,
+          "text": "IPL history-లో top 5 score-లలో 4 score-లు just ఒక్క team పేరు మీదే ఉన్నాయి."
+        },
+        {
+          "start": 605.8,
+          "end": 607.3,
+          "text": "అదే Orange Army."
+        },
+        {
+          "start": 607.6,
+          "end": 610.82,
+          "text": "అది చరిత్ర చదవటం మానేసి చరిత్ర రాయటం start చేసింది."
+        },
+        {
+          "start": 611.14,
+          "end": 618.6,
+          "text": "cricket-లో power play అంటే అందరికీ తెలుసు కానీ అసలైన power play అంటే ఏంటో ప్రపంచానికి చూపించింది మాత్రం SRH batting-ఏ."
+        },
+        {
+          "start": 618.92,
+          "end": 622.28,
+          "text": "అన్ని team-లు 6 over-లలో 50 run-లు కొడితే good start అనుకుంటారు."
+        },
+        {
+          "start": 622.34,
+          "end": 626.96,
+          "text": "కానీ SRH-కి 50 run-లు అంటే అది just 3 over-ల score మాత్రమే."
+        },
+        {
+          "start": 628.38,
+          "end": 634.14,
+          "text": "2024-లో Delhi Capitals మీద Travis Head అండ్ Abhishek Sharma కలిసి 6 over-లలో 125 run-లు కొట్టారు."
+        },
+        {
+          "start": 634.46,
+          "end": 636.4,
+          "text": "అప్పట్లో అది highest power play score."
+        },
+        {
+          "start": 636.7,
+          "end": 642.46,
+          "text": "అది కూడా single wicket కూడా పడకుండా ఇప్పటికీ IPL history-లో అదే highest power play score."
+        }
+      ],
+      "transcript_text": "ఒక్కసారి ఈ list చూడండి మీకు mind block అవుతుంది. 2020 4-లో RCB మీద 287 runs. 2025-లో RR మీద 286. 2025-లో KKR మీద 278. 2024-లో MI మీద 277. 2024-లో DC మీద 266. IPL history-లో top 5 score-లలో 4 score-లు just ఒక్క team పేరు మీదే ఉన్నాయి. అదే Orange Army. అది చరిత్ర చదవటం మానేసి చరిత్ర రాయటం start చేసింది. cricket-లో power play అంటే అందరికీ తెలుసు కానీ అసలైన power play అంటే ఏంటో ప్రపంచానికి చూపించింది మాత్రం SRH batting-ఏ. అన్ని team-లు 6 over-లలో 50 run-లు కొడితే good start అనుకుంటారు. కానీ SRH-కి 50 run-లు అంటే అది just 3 over-ల score మాత్రమే. 2024-లో Delhi Capitals మీద Travis Head అండ్ Abhishek Sharma కలిసి 6 over-లలో 125 run-లు కొట్టారు. అప్పట్లో అది highest power play score. అది కూడా single wicket కూడా పడకుండా ఇప్పటికీ IPL history-లో అదే highest power play score."
+    },
+    {
+      "clip_id": "qX4qcUfh5qo_c5",
+      "start": 717.3,
+      "end": 750.54,
+      "duration": 33.24,
+      "segments": [
+        {
+          "start_sent_id": 172,
+          "end_sent_id": 177
+        }
+      ],
+      "confidence_rank": 5,
+      "confidence_note": "Destruction Mindset: Focuses on Travis Head's unique aggression which is a hot topic among Telugu fans.",
+      "hook_text": "Travis Head T20 cricket ఆడటానికి ground-లోకి అడుగు పెట్టినప్పుడు survival అనే ఇతని mind-లో ఉండదు.",
+      "payoff_text": "Travis Head ఈ season-లో పెద్దగా ఆడట్లేదు కానీ last 2 year-లలో SRH-కి destruction అనే serum-ని inject చేసింది మాత్రం Travis Head-ఏ.",
+      "why": "Analysis of how Travis Head's aggressive mindset injected a destructive philosophy into SRH.",
+      "visual_note": "Montage of Travis Head smashing boundaries with energetic on-screen graphics.",
+      "engagement_type": "Insight",
+      "hook_score": 7.0,
+      "coherence_score": 8.0,
+      "cultural_score": 8.0,
+      "engagement_score": 7.0,
+      "psychological_trigger": "Controversial Take",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "",
+      "virality_score": 7.5,
+      "para_id": 172,
+      "anchor_text": "Travis Head ఈ season-లో పెద్దగా ఆడట్లేదు కానీ last 2 year-లలో SRH-కి destruction అనే serum-ని inject చేసింది మాత్రం Travis Head-ఏ.",
+      "anchor_score": 7.5,
+      "transcript": [
+        {
+          "start": 717.3,
+          "end": 723.72,
+          "text": "Travis Head T20 cricket ఆడటానికి ground-లోకి అడుగు పెట్టినప్పుడు survival అనే ఇతని mind-లో ఉండదు."
+        },
+        {
+          "start": 724.06,
+          "end": 726.54,
+          "text": "ఇతని mind-లో ఉండేది ఒక్కటే destruction."
+        },
+        {
+          "start": 726.84,
+          "end": 733.16,
+          "text": "opposition ఏదైనా bowler ఎవరైనా pitch ఎలా ఉన్నా Travis Head-కి తెలిసింది ఒక్కటే చెత్త కొట్టడం."
+        },
+        {
+          "start": 734.38,
+          "end": 738.24,
+          "text": "2024-లో కొన్ని game-లలో Travis Head strike rate ఎంతో తెలుసా?"
+        },
+        {
+          "start": 738.26,
+          "end": 741.46,
+          "text": "287 అంటే ప్రతి ball-కి 3 run-లు కొడుతున్నాడు."
+        },
+        {
+          "start": 741.72,
+          "end": 750.54,
+          "text": "Travis Head ఈ season-లో పెద్దగా ఆడట్లేదు కానీ last 2 year-లలో SRH-కి destruction అనే serum-ని inject చేసింది మాత్రం Travis Head-ఏ."
+        }
+      ],
+      "transcript_text": "Travis Head T20 cricket ఆడటానికి ground-లోకి అడుగు పెట్టినప్పుడు survival అనే ఇతని mind-లో ఉండదు. ఇతని mind-లో ఉండేది ఒక్కటే destruction. opposition ఏదైనా bowler ఎవరైనా pitch ఎలా ఉన్నా Travis Head-కి తెలిసింది ఒక్కటే చెత్త కొట్టడం. 2024-లో కొన్ని game-లలో Travis Head strike rate ఎంతో తెలుసా? 287 అంటే ప్రతి ball-కి 3 run-లు కొడుతున్నాడు. Travis Head ఈ season-లో పెద్దగా ఆడట్లేదు కానీ last 2 year-లలో SRH-కి destruction అనే serum-ని inject చేసింది మాత్రం Travis Head-ఏ."
+    }
+  ],
+  "metadata": {
+    "pipeline": "ClipForge-v17-ThreeCallVision",
+    "approach": "junk-detection (incl. sentence-level CTA flagging) → video-upload → context-cache → rough-cut (Call1) → fine-cut (Call2) → trim-long-clips (Call3, conditional) → segments-array",
+    "language": "Telugu/Codemix",
+    "gemini_model": "gemini-3-flash-preview",
+    "thinking_level": "HIGH",
+    "call_1": "rough cut — find all genuine Reel moments",
+    "call_2": "fine cut — perfect hooks, payoffs, trim, score, rank",
+    "call_3": "trim-long-clips — fires only on clips > 90s",
+    "trim_trigger_sec": 90,
+    "trim_target_sec": 75,
+    "caching": "context cache reuses video tokens across all calls",
+    "clip_count_rule": "quality decides count, no min/max in prompts",
+    "file_uri": "https://generativelanguage.googleapis.com/v1beta/files/f5i553gk0g5p"
+  }
+}

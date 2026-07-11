@@ -1,0 +1,174 @@
+/**
+ * Pixel-consistency regression suite.
+ *
+ * The editor stores canvas element positions as 0–1 fractions of canvas
+ * size, and outgoing EditDocument payloads must keep them normalized so the
+ * FFmpeg export and the browser preview stay aligned. Any regression to
+ * pixel values must fail here.
+ */
+import {
+  collectCoordinateViolations,
+  assertEditDocumentNormalized,
+  isEditDocumentNormalized,
+} from "@/lib/editDocumentValidation";
+import { INITIAL_ELEMENTS } from "@/data/mockData";
+import { useAppStore } from "@/store/useAppStore";
+import { buildRerenderRequest, DEFAULT_STYLE_ID, CAPTION_DEFAULT_POSITION } from "@/api/renders";
+
+describe("EditDocument coordinate normalization", () => {
+  test("the store's outgoing EditDocument has all coordinates within [0, 1]", () => {
+    const doc = useAppStore.getState().getEditDocument();
+    expect(doc.elements.length).toBeGreaterThan(0);
+    expect(collectCoordinateViolations(doc)).toEqual([]);
+    expect(() => assertEditDocumentNormalized(doc)).not.toThrow();
+  });
+
+  test("every default canvas element ships with normalized coordinates", () => {
+    const doc = { elements: INITIAL_ELEMENTS, captionY: 0.82 };
+    expect(collectCoordinateViolations(doc)).toEqual([]);
+  });
+
+  test("elements moved through store actions stay normalized", () => {
+    const store = useAppStore.getState();
+    const captionId = store.getCaptionElement().id;
+    store.updateElement(captionId, { x: 0.31, y: 0.9 });
+    store.applyPositionPreset("bottom-safe");
+    const doc = useAppStore.getState().getEditDocument();
+    expect(collectCoordinateViolations(doc)).toEqual([]);
+  });
+
+  test("pixel-valued coordinates are rejected", () => {
+    const bad = {
+      elements: [
+        { id: "el_x", type: "caption", x: 540, y: 0.5, props: {} }, // 540px, not a fraction
+      ],
+    };
+    const violations = collectCoordinateViolations(bad);
+    expect(violations).toHaveLength(1);
+    expect(violations[0].path).toContain(".x");
+    expect(isEditDocumentNormalized(bad)).toBe(false);
+    expect(() => assertEditDocumentNormalized(bad)).toThrow(/never pixels/);
+  });
+
+  test("negative and non-numeric coordinates are rejected", () => {
+    const bad = {
+      elements: [{ id: "a", type: "logo", x: -0.1, y: "0.5", props: {} }],
+    };
+    expect(collectCoordinateViolations(bad)).toHaveLength(2);
+  });
+
+  test("crop box fractions are validated", () => {
+    expect(
+      collectCoordinateViolations({ elements: [], cropBox: { x: 0.1, y: 0, w: 0.8, h: 1 } })
+    ).toEqual([]);
+    expect(
+      collectCoordinateViolations({ elements: [], cropBox: { x: 120, y: 0, w: 0.8, h: 1 } })
+    ).toHaveLength(1);
+  });
+});
+
+describe("buildRerenderRequest (EditDocument → backend schema)", () => {
+  test("caption at default position omits caption_x/caption_y (untouched → backend default path)", () => {
+    const req = buildRerenderRequest({
+      captionX: CAPTION_DEFAULT_POSITION.x,
+      captionY: CAPTION_DEFAULT_POSITION.y,
+    });
+    expect(req).not.toHaveProperty("caption_x");
+    expect(req).not.toHaveProperty("caption_y");
+    expect(req).not.toHaveProperty("caption_position"); // old field removed
+  });
+
+  test("dragged caption sends both caption_x/caption_y as 0–1 fractions (never pixels, never percent)", () => {
+    const req = buildRerenderRequest({ captionX: 0.31, captionY: 0.7 });
+    expect(req.caption_x).toBeCloseTo(0.31);
+    expect(req.caption_y).toBeCloseTo(0.7);
+    for (const v of [req.caption_x, req.caption_y]) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+
+  test("sub-epsilon nudge from default stays on the default path (no path flip on float noise)", () => {
+    const req = buildRerenderRequest({
+      captionX: CAPTION_DEFAULT_POSITION.x + 0.0005,
+      captionY: CAPTION_DEFAULT_POSITION.y - 0.0005,
+    });
+    expect(req).not.toHaveProperty("caption_x");
+    expect(req).not.toHaveProperty("caption_y");
+  });
+
+  test("moving only one axis still sends both coords (backend requires the pair)", () => {
+    const req = buildRerenderRequest({ captionX: 0.5, captionY: 0.4 });
+    expect(req.caption_x).toBeCloseTo(0.5);
+    expect(req.caption_y).toBeCloseTo(0.4);
+  });
+
+  test("crop_box passes through as 0–1 fractions untouched", () => {
+    const cropBox = { x: 0.05, y: 0.1, w: 0.9, h: 0.8 };
+    const req = buildRerenderRequest({ cropBox, cropMode: "manual" });
+    expect(req.crop_box).toEqual(cropBox);
+    expect(Object.values(req.crop_box).every((v) => v >= 0 && v <= 1)).toBe(true);
+  });
+
+  test("unknown styles/formats fall back to backend-supported values", () => {
+    const req = buildRerenderRequest({ style: "does-not-exist", format: "4:5" });
+    expect(req.style).toBe(DEFAULT_STYLE_ID);
+    expect(req.format).toBe("9:16");
+  });
+
+  test("omits optional fields the user did not set", () => {
+    const req = buildRerenderRequest({});
+    expect(req).not.toHaveProperty("crop_box");
+    expect(req).not.toHaveProperty("transcript_edits");
+    expect(req).not.toHaveProperty("caption_position");
+    expect(req).not.toHaveProperty("caption_x");
+    expect(req).not.toHaveProperty("caption_y");
+    expect(req).not.toHaveProperty("elements");
+  });
+
+  test("captions-only draft (no visible overlays) omits elements entirely", () => {
+    // caption is excluded by design; hidden overlays don't count
+    const elements = [
+      { id: "c", type: "caption", x: 0.5, y: 0.82, visible: true, props: {} },
+      { id: "p", type: "progress", x: 0.5, y: 0.95, visible: false, props: {} },
+    ];
+    const req = buildRerenderRequest({ elements });
+    expect(req).not.toHaveProperty("elements");
+  });
+
+  test("visible overlay elements are serialized (caption + hidden excluded), coords stay 0–1", () => {
+    const elements = [
+      { id: "c", type: "caption", x: 0.5, y: 0.82, visible: true, props: {} },
+      { id: "p", type: "progress", x: 0.5, y: 0.96, visible: true, props: { color: "#7c3aed" } },
+      { id: "s", type: "sticker", x: 0.82, y: 0.2, visible: true, props: { emoji: "🔥" } },
+      { id: "l", type: "logo", x: 0.2, y: 0.1, visible: false, props: {} }, // hidden
+    ];
+    const req = buildRerenderRequest({ elements });
+    expect(req.elements.map((e) => e.type)).toEqual(["progress", "sticker"]);
+    // normalized 0–1 preserved, never pixels
+    expect(collectCoordinateViolations({ elements: req.elements })).toEqual([]);
+    // pass-through: the serialized element is the original (coords untouched)
+    expect(req.elements[0]).toEqual(elements[1]);
+  });
+});
+
+describe("Commit 4 — untouched-caption anchor matches export contract", () => {
+  // Regression gate for Known Issue 1: preview and export must center the
+  // untouched caption at the SAME normalized (0.5, 0.82) point. This test asserts
+  // the frontend half — the constants + INITIAL_ELEMENTS defaults used by the
+  // preview. The backend half (its own defaults match these) is asserted by
+  // tests/test_caption_positioning.py :: test_frontend_default_matches_useappstore.
+  test("CAPTION_DEFAULT_POSITION is (0.5, 0.82) — the export contract anchor", () => {
+    expect(CAPTION_DEFAULT_POSITION).toEqual({ x: 0.5, y: 0.82 });
+  });
+
+  test("the INITIAL caption element sits at CAPTION_DEFAULT_POSITION", () => {
+    // Read from INITIAL_ELEMENTS (not the live store, which may have been
+    // moved by an earlier test in this file — Zustand is a singleton). The
+    // initial element is what the preview renders on a fresh /editor visit.
+    const caption = INITIAL_ELEMENTS.find((el) => el.type === "caption");
+    expect(caption).toBeTruthy();
+    expect(caption.x).toBeCloseTo(CAPTION_DEFAULT_POSITION.x);
+    expect(caption.y).toBeCloseTo(CAPTION_DEFAULT_POSITION.y);
+  });
+});

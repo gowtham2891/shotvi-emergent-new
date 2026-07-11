@@ -1,0 +1,147 @@
+{
+  "video_id": "-OetXsp7xdI",
+  "video_duration": 864.72,
+  "total_sentences": 194,
+  "total_segments": 14,
+  "clips": [
+    {
+      "clip_id": "Kranthi_Vlogger_Diabetes_c1",
+      "start": 568.8,
+      "end": 649.1,
+      "duration": 80.3,
+      "segments": [
+        {
+          "start_sent_id": 132,
+          "end_sent_id": 145
+        }
+      ],
+      "confidence_rank": 1,
+      "confidence_note": "British Blame: Linking diabetes to British-era famines is a highly controversial and shocking scroll-stopper for Telugu viewers.",
+      "hook_text": "అసలు మన genetics-లోకి diabetes అనేది ఎలా వచ్చిందంటే దానికి కారణం British వాళ్ళు.",
+      "payoff_text": "అందుకే Western countries వాళ్ళతో compare చేస్తే మనకి diabetes వచ్చే chance-లు 3 to 5 times ఎక్కువ ఉంటుంది.",
+      "why": "Blames British rule for Indian diabetes genetics through famine-induced physiological changes.",
+      "visual_note": "Bold hand gestures and a dramatic statement blaming the British immediately grab attention.",
+      "engagement_type": "Controversial",
+      "hook_score": 10.0,
+      "coherence_score": 9.0,
+      "cultural_score": 10.0,
+      "engagement_score": 9.0,
+      "psychological_trigger": "Controversial Take",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "Extremely strong hook that taps into historical sentiment to explain a modern health crisis.",
+      "virality_score": 10.0,
+      "para_id": 132,
+      "anchor_text": "అందుకే Western countries వాళ్ళతో compare చేస్తే మనకి diabetes వచ్చే chance-లు 3 to 5 times ఎక్కువ ఉంటుంది.",
+      "anchor_score": 10.0,
+      "transcript_text": "అసలు మన genetics-లోకి diabetes అనేది ఎలా వచ్చిందంటే దానికి కారణం British వాళ్ళు. Yes, India-లో diabetes వ్యాప్తి చెందడానికి British rule ఒక కారణం ఎలానో చెప్తాను చూడండి. British Raj time-లో India-లో 25 major famines వచ్చాయి. Famine అంటే కరువు అన్నమాట. ఈ 25 famines-లో దాదాపు 60 million Indians చనిపోయారు. ఒక పక్క కరువుతో కడుపులు మండుతుంటే ఇంకో పక్క British వాళ్ళు దారుణమైన tax-లు విధించడంతో పాటు మన దగ్గర ఉన్న కాస్త food-ని కూడా వాళ్ళ country-లకు export చేసుకునే వాళ్ళు. Over the years famines రావటం plus Britishers మన దగ్గర ఉన్న food-ని లాక్కోవడంతో South Asians-లో ముఖ్యంగా Indians physiology-లో fat-ని store చేసుకునే పద్ధతి అండ్ sugar-ని process చేసే పద్ధతిలో తేడా వచ్చేస్తుంది. Over the time behavior-లు అండ్ environmental changes వల్ల మన genes working అనేది change అవుతూ వచ్చింది. But underlying DNA sequence మాత్రం అలానే ఉంటుంది. సో ఈ కరువుల వల్ల వచ్చిన ఈ genes changes అనేవి generations నుంచి pass అవుతూ వచ్చి diabetes వచ్చే chance-లను పెంచాయి. మీరు గమనిస్తే same age gender body mass ఉన్న ఒక white foreigner-ని and South Asians like India, Pakistan వాళ్ళని తీసుకొని compare చేస్తే South Asians-లో insulin resistance అనేది కొద్దిగా ఎక్కువ ఉంటుంది. అందుకే Western countries వాళ్ళతో compare చేస్తే మనకి diabetes వచ్చే chance-లు 3 to 5 times ఎక్కువ ఉంటుంది."
+    },
+    {
+      "clip_id": "Kranthi_Vlogger_Diabetes_c2",
+      "start": 8.8,
+      "end": 72.34,
+      "duration": 63.54,
+      "segments": [
+        {
+          "start_sent_id": 3,
+          "end_sent_id": 18
+        }
+      ],
+      "confidence_rank": 2,
+      "confidence_note": "Myth-Busting: Busting the myth about India's rank followed by relatable family health scenarios ensures high engagement.",
+      "hook_text": "ఈ ప్రపంచంలో ఉన్న దేశాలన్నిటిలో highest diabetes patients ఉన్న దేశం ఏంటో తెలుసా?",
+      "payoff_text": "అప్పుడు మీకే అర్థమవుతుంది diabetes situation అనేది ఎలా ఉందో.",
+      "why": "Busts the myth of India being #1 in diabetes before pivoting to relatable family health checks.",
+      "visual_note": "Speaker leans forward and asks a direct, challenging question with a bright red background.",
+      "engagement_type": "Relatable",
+      "hook_score": 9.0,
+      "coherence_score": 9.0,
+      "cultural_score": 9.0,
+      "engagement_score": 8.0,
+      "psychological_trigger": "Myth Busting",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "The transition from global stats to 'WhatsApp groups' and 'family functions' is very effective.",
+      "virality_score": 9.4,
+      "para_id": 3,
+      "anchor_text": "అప్పుడు మీకే అర్థమవుతుంది diabetes situation అనేది ఎలా ఉందో.",
+      "anchor_score": 9.4,
+      "transcript_text": "ఈ ప్రపంచంలో ఉన్న దేశాలన్నిటిలో highest diabetes patients ఉన్న దేశం ఏంటో తెలుసా? చాలా మంది India అనుకుంటారు కదా? కాదు, China. India 2nd place-లో ఉంది, America 3rd place-లో ఉంది, next వచ్చేసి Pakistan ఉంది. India 2nd place-లో ఉంది, but diabetes capital of the world ఏంటి అని Google తల్లిని అడిగితే bold letter-లలో India అని చెప్తుంది. But why? Because India-లో diabetes పెరుగుతున్న speed అలాంటిది. Year 2000-లో 32.7 million adult-లకు diabetes ఉంటే 2024-కి ఆ number 90 million-కి చేరుకుంది. ఇదే కొనసాగితే 2000 50-కి India-లో diabetes patient సంఖ్య 156 million-కి చేరుకునే అవకాశం ఉంది. ఇవన్నీ కాదు మీ family WhatsApp group ఓపెన్ చేయండి. ఎంతమంది రోజు diabetes-కి medicine వేసుకుంటున్నారు? ఎంతమంది pre-diabetic అని అడగండి. పోనీ మీ family function ఏదైనా attend అయినప్పుడు మీ family-లో ఉన్న వాళ్ళందరికీ sweets offer చేయండి. ఎంతమంది ఆ sweets accept చేసి తింటారో గమనించండి. అప్పుడు మీకే అర్థమవుతుంది diabetes situation అనేది ఎలా ఉందో."
+    },
+    {
+      "clip_id": "Kranthi_Vlogger_Diabetes_c3",
+      "start": 760.96,
+      "end": 804.06,
+      "duration": 43.1,
+      "segments": [
+        {
+          "start_sent_id": 171,
+          "end_sent_id": 178
+        }
+      ],
+      "confidence_rank": 3,
+      "confidence_note": "Village vs City: The classic comparison of active village life vs sedentary city life is highly relatable for urban Telugu youth.",
+      "hook_text": "Village-లో ఉండే వాళ్ళని చూడండి వాళ్ళు 4-5-కే లేస్తారు.",
+      "payoff_text": "saturated fats ఇంకా sugar consumption అనేది బాగా పెరిగిపోయి final-గా diabetes-కి దారి తీస్తుంది.",
+      "why": "Contrasts active village routines with sedentary urban habits to explain rising diabetes rates.",
+      "visual_note": "Conversational storytelling tone while contrasting the '4 AM' village routine with modern city habits.",
+      "engagement_type": "Relatable",
+      "hook_score": 8.0,
+      "coherence_score": 8.0,
+      "cultural_score": 9.0,
+      "engagement_score": 8.0,
+      "psychological_trigger": "Middle-Class Relatability",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "Strong cultural resonance regarding the shift in lifestyle over the last generation.",
+      "virality_score": 8.7,
+      "para_id": 171,
+      "anchor_text": "saturated fats ఇంకా sugar consumption అనేది బాగా పెరిగిపోయి final-గా diabetes-కి దారి తీస్తుంది.",
+      "anchor_score": 8.7,
+      "transcript_text": "ఎవరైనా village-లో ఉండే వాళ్ళని చూడండి వాళ్ళు 4-5-కే లేస్తారు. లేచిన దగ్గర నుంచి ఏదో ఒక పని చేస్తూనే ఉంటారు. afternoon ఒక 1 hour అలా rest తీసుకుంటారేమో అంతే బట్ రోజంతా ఏదో ఒక పని చేస్తూనే ఉంటారు. ఏ పని లేకపోతే ఏదో ఒక fun physical activity-లో participate చేస్తారు. Of course, ఈ lifestyle అందరికీ set అవ్వదు అనుకోండి, but నా point ఏంటంటే villages-లో ఉండే వాళ్ళకి, cities-లో ఉండే వాళ్ళకి lifestyle-లో చాలా తేడా ఉంటుంది. urbanization పేరుతో cities-కి వచ్చేసి గంటలు గంటలు screen ముందు కూర్చోవడం direct-గా obesity ఇంకా diabetes-కి కారణం అవుతుంది. urbanization జరిగినప్పుడు జనాల lifestyle-లో చాలా మార్పులు వస్తాయి. saturated fats ఇంకా sugar consumption అనేది బాగా పెరిగిపోయి final-గా diabetes-కి దారి తీస్తుంది."
+    },
+    {
+      "clip_id": "Kranthi_Vlogger_Diabetes_c4",
+      "start": 219.72,
+      "end": 263.86,
+      "duration": 44.14,
+      "segments": [
+        {
+          "start_sent_id": 56,
+          "end_sent_id": 63
+        }
+      ],
+      "confidence_rank": 4,
+      "confidence_note": "Ant Diagnosis: The shocking fact about using ants to diagnose diabetes in ancient times is a great curiosity hook.",
+      "hook_text": "ఈ diabetes-ని మొట్టమొదటిసారిగా 3000 సంవత్సరాల క్రితం ancient Egyptians కనుగొన్నారు అన్నమాట.",
+      "payoff_text": "అంటే meaning honey urine అని అర్థం అన్నమాట.",
+      "why": "Explains the historical discovery of diabetes and the ancient method of using ants for diagnosis.",
+      "visual_note": "Transitions to high-quality AI-generated historical scenes of ancient Egypt and India.",
+      "engagement_type": "Educational",
+      "hook_score": 7.0,
+      "coherence_score": 8.0,
+      "cultural_score": 7.0,
+      "engagement_score": 7.0,
+      "psychological_trigger": "Curiosity Gap",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "While educational, the 'ant' part provides a strong 'did you know' factor.",
+      "virality_score": 7.3,
+      "para_id": 56,
+      "anchor_text": "అంటే meaning honey urine అని అర్థం అన్నమాట.",
+      "anchor_score": 7.3,
+      "transcript_text": "ఈ diabetes-ని మొట్టమొదటిసారిగా 3000 సంవత్సరాల క్రితం ancient Egyptians కనుగొన్నారు అన్నమాట. India-లో 300 and 400 AD మధ్యలో diabetic అనే disease ఒకటి వస్తుంది అని తెలుసుకున్నారు. ఆ time-లో ఒక మనిషికి diabetes ఉందో లేదో తెలుసుకోవడానికి చీమలు అంటే ant ని use చేసేవాళ్ళు. diabetes ఉందో లేదో తెలుసుకోవడం కోసం patient urine-ని collect చేసి ఆ urine-ని ants-కి దగ్గరలో spray చేసేవాళ్ళు అన్నమాట. ఆ spray చేసిన దాని దగ్గరికి ants వస్తే patient-లు blood-లో high sugar level-లు ఉన్నట్లు and అతను diabetes-తో బాధపడుతున్నట్లు physician-లు confirm చేసేవాళ్ళు. అందుకే హిందీలో diabetes-ని మధుమేహ అంటారు. అంటే meaning honey urine అని అర్థం అన్నమాట."
+    }
+  ],
+  "metadata": {
+    "pipeline": "ClipForge-v16-TwoCallVision",
+    "approach": "junk-detection → video-upload → context-cache → rough-cut (Call1) → fine-cut (Call2) → segments-array",
+    "language": "Telugu/Codemix",
+    "gemini_model": "gemini-3-flash-preview",
+    "call_1": "rough cut — find all genuine Reel moments",
+    "call_2": "fine cut — perfect hooks, payoffs, trim, score, rank",
+    "caching": "context cache reuses video tokens across both calls",
+    "clip_count_rule": "quality decides count, no min/max in prompts",
+    "file_uri": "https://generativelanguage.googleapis.com/v1beta/files/plf3zfsxuar6"
+  }
+}

@@ -1,0 +1,493 @@
+{
+  "video_id": "Oyf2X9ePshY",
+  "video_duration": 1014.56,
+  "total_sentences": 196,
+  "total_segments": 14,
+  "clips": [
+    {
+      "clip_id": "Oyf2X9ePshY_c1",
+      "start": 272.58,
+      "end": 302.46,
+      "duration": 29.88,
+      "segments": [
+        {
+          "start_sent_id": 55,
+          "end_sent_id": 61
+        }
+      ],
+      "confidence_rank": 1,
+      "confidence_note": "Morning Phone Habit: Targets a universal modern struggle with social media addiction and brain damage.",
+      "hook_text": "ఉదయం లేవగానే మనలో 99% మంది చేసే మొదటి పని ఏంటి?",
+      "payoff_text": "ఈ prefrontal cortex అనేది మన life-లో సరైన నిర్ణయాలు తీసుకోవడానికి, decision making-కి అలాగే 100% focus పెట్టి పని చేయడానికి ఉపయోగపడే most powerful area.",
+      "why": "Setup of phone addiction leads to scientific explanation of the prefrontal cortex.",
+      "visual_note": "Host looks directly into camera asking a highly relatable question about habits.",
+      "engagement_type": "Relatable",
+      "hook_score": 9.0,
+      "coherence_score": 9.0,
+      "cultural_score": 9.0,
+      "engagement_score": 9.0,
+      "psychological_trigger": "Middle-Class Relatability",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "The strongest clip due to extreme relatability and clear scientific payoff for 18-35 age group.",
+      "virality_score": 9.5,
+      "para_id": 55,
+      "anchor_text": "ఈ prefrontal cortex అనేది మన life-లో సరైన నిర్ణయాలు తీసుకోవడానికి, decision making-కి అలాగే 100% focus పెట్టి పని చేయడానికి ఉపయోగపడే most powerful area.",
+      "anchor_score": 9.5,
+      "transcript": [
+        {
+          "start": 272.58,
+          "end": 276.0,
+          "text": "ఉదయం లేవగానే మనలో 99% మంది చేసే మొదటి పని ఏంటి?"
+        },
+        {
+          "start": 276.28,
+          "end": 277.6,
+          "text": "కళ్ళు కూడా పూర్తిగా తెరవకముందే."
+        },
+        {
+          "start": 277.88,
+          "end": 282.6,
+          "text": "bed పక్కన ఉన్న phone తీసి WhatsApp message-లు, Instagram reel-లు scroll చేయడం."
+        },
+        {
+          "start": 282.7,
+          "end": 285.5,
+          "text": "ఈ ఒక్క చిన్న అలవాటు మనల్ని ఎంత damage చేస్తుందో తెలుసా?"
+        },
+        {
+          "start": 285.7,
+          "end": 291.84,
+          "text": "మనం నిద్ర లేచిన వెంటనే 30 నిమిషాల్లో మన brain-లోని prefrontal cortex అనే భాగం peak clarity-తో ఉంటుంది."
+        },
+        {
+          "start": 292.18,
+          "end": 293.28,
+          "text": "అత్యంత active-గా ఉంటుంది."
+        },
+        {
+          "start": 293.6,
+          "end": 302.46,
+          "text": "ఈ prefrontal cortex అనేది మన life-లో సరైన నిర్ణయాలు తీసుకోవడానికి, decision making-కి అలాగే 100% focus పెట్టి పని చేయడానికి ఉపయోగపడే most powerful area."
+        }
+      ],
+      "transcript_text": "ఉదయం లేవగానే మనలో 99% మంది చేసే మొదటి పని ఏంటి? కళ్ళు కూడా పూర్తిగా తెరవకముందే. bed పక్కన ఉన్న phone తీసి WhatsApp message-లు, Instagram reel-లు scroll చేయడం. ఈ ఒక్క చిన్న అలవాటు మనల్ని ఎంత damage చేస్తుందో తెలుసా? మనం నిద్ర లేచిన వెంటనే 30 నిమిషాల్లో మన brain-లోని prefrontal cortex అనే భాగం peak clarity-తో ఉంటుంది. అత్యంత active-గా ఉంటుంది. ఈ prefrontal cortex అనేది మన life-లో సరైన నిర్ణయాలు తీసుకోవడానికి, decision making-కి అలాగే 100% focus పెట్టి పని చేయడానికి ఉపయోగపడే most powerful area."
+    },
+    {
+      "clip_id": "Oyf2X9ePshY_c2",
+      "start": 90.8,
+      "end": 149.98,
+      "duration": 59.18,
+      "segments": [
+        {
+          "start_sent_id": 18,
+          "end_sent_id": 28
+        }
+      ],
+      "confidence_rank": 2,
+      "confidence_note": "Natural Body Clock: Solves the mystery of morning fatigue by busting the alarm clock myth.",
+      "hook_text": "మన body-కి మనం బయట పెట్టే ఈ clock-లు మన digital clock-ల కంటే కూడా లోపల ఒక powerful natural clock ఉంది.",
+      "payoff_text": "దాంతో ఆ రోజంతా కూడా ఒక రకమైన చిరాకు, బద్ధకం మనల్ని వెంటాడుతూనే ఉంటాయి.",
+      "why": "Explains internal circadian rhythms vs alarm shocks and their daily productivity impact.",
+      "visual_note": "Host explains biological clock concepts with energetic hand gestures and dynamic lighting.",
+      "engagement_type": "Educational",
+      "hook_score": 8.0,
+      "coherence_score": 9.0,
+      "cultural_score": 7.0,
+      "engagement_score": 8.0,
+      "psychological_trigger": "Myth Busting",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "Excellent scientific hook that challenges traditional morning habits.",
+      "virality_score": 8.1,
+      "para_id": 18,
+      "anchor_text": "దాంతో ఆ రోజంతా కూడా ఒక రకమైన చిరాకు, బద్ధకం మనల్ని వెంటాడుతూనే ఉంటాయి.",
+      "anchor_score": 8.1,
+      "transcript": [
+        {
+          "start": 90.8,
+          "end": 97.12,
+          "text": "మన body-కి మనం బయట పెట్టే ఈ clock-లు మన digital clock-ల కంటే కూడా లోపల ఒక powerful natural clock ఉంది."
+        },
+        {
+          "start": 97.42,
+          "end": 100.34,
+          "text": "దాన్నే science భాషలో circadian rhythm అని అంటారు."
+        },
+        {
+          "start": 100.54,
+          "end": 101.94,
+          "text": "మనం చేయాల్సిన simple పని ఒకటే."
+        },
+        {
+          "start": 102.12,
+          "end": 106.04,
+          "text": "ప్రతిరోజు రాత్రి నిద్రపోయే timing-ని 100% fix చేసుకోవాలి."
+        },
+        {
+          "start": 106.5,
+          "end": 116.96,
+          "text": "ఎప్పుడైతే మనం రోజు ఒకే time-కి పడుకోవడం అలవాటు చేసుకుంటామో అప్పుడు మన body clock automatic-గా re- set అయ్యి alarm-తో పని లేకుండా మనల్ని చాలా ప్రశాంతంగా నిద్ర పుచ్చుతుంది."
+        },
+        {
+          "start": 117.24,
+          "end": 123.28,
+          "text": "అలా natural-గా లేవడం వల్ల ఆ ఉదయం మన alertness, మన mood అలాగే మన energy level-లు peak-లలో ఉంటాయి."
+        },
+        {
+          "start": 123.6,
+          "end": 125.76,
+          "text": "దీని వెనకాల ఉన్న అసలైన science ఏంటో తెలుసా?"
+        },
+        {
+          "start": 126.1,
+          "end": 130.8,
+          "text": "మన brain-లో Cortisol Awakening Response CAR అని ఒక system ఉంటుంది."
+        },
+        {
+          "start": 131.18,
+          "end": 139.84,
+          "text": "మనం పక్కా timing-లు maintain చేసినప్పుడు మన brain ఉదయాన్నే ఈ Cortisol hormone-ని natural-గా release చేసి మన body-కి ఒక అద్భుతమైన energy kick ఇస్తుంది."
+        },
+        {
+          "start": 140.08,
+          "end": 145.92,
+          "text": "అదే మనం ఒక భయంకరమైన alarm sound-ని విని ఒక్కసారి ఉలిక్కిపడి లేచామనుకోండి, మన brain shock-కి గురవుతుంది."
+        },
+        {
+          "start": 146.02,
+          "end": 149.98,
+          "text": "దాంతో ఆ రోజంతా కూడా ఒక రకమైన చిరాకు, బద్ధకం మనల్ని వెంటాడుతూనే ఉంటాయి."
+        }
+      ],
+      "transcript_text": "మన body-కి మనం బయట పెట్టే ఈ clock-లు మన digital clock-ల కంటే కూడా లోపల ఒక powerful natural clock ఉంది. దాన్నే science భాషలో circadian rhythm అని అంటారు. మనం చేయాల్సిన simple పని ఒకటే. ప్రతిరోజు రాత్రి నిద్రపోయే timing-ని 100% fix చేసుకోవాలి. ఎప్పుడైతే మనం రోజు ఒకే time-కి పడుకోవడం అలవాటు చేసుకుంటామో అప్పుడు మన body clock automatic-గా re- set అయ్యి alarm-తో పని లేకుండా మనల్ని చాలా ప్రశాంతంగా నిద్ర పుచ్చుతుంది. అలా natural-గా లేవడం వల్ల ఆ ఉదయం మన alertness, మన mood అలాగే మన energy level-లు peak-లలో ఉంటాయి. దీని వెనకాల ఉన్న అసలైన science ఏంటో తెలుసా? మన brain-లో Cortisol Awakening Response CAR అని ఒక system ఉంటుంది. మనం పక్కా timing-లు maintain చేసినప్పుడు మన brain ఉదయాన్నే ఈ Cortisol hormone-ని natural-గా release చేసి మన body-కి ఒక అద్భుతమైన energy kick ఇస్తుంది. అదే మనం ఒక భయంకరమైన alarm sound-ని విని ఒక్కసారి ఉలిక్కిపడి లేచామనుకోండి, మన brain shock-కి గురవుతుంది. దాంతో ఆ రోజంతా కూడా ఒక రకమైన చిరాకు, బద్ధకం మనల్ని వెంటాడుతూనే ఉంటాయి."
+    },
+    {
+      "clip_id": "Oyf2X9ePshY_c3",
+      "start": 438.06,
+      "end": 512.12,
+      "duration": 74.06,
+      "segments": [
+        {
+          "start_sent_id": 87,
+          "end_sent_id": 103
+        }
+      ],
+      "confidence_rank": 3,
+      "confidence_note": "Hydration Stat: Dramatic 20% drop statistic paired with Virat Kohli's routine makes it viral.",
+      "hook_text": "ఈ scientific research ఏం చెప్తుందంటే మన body-లో కేవలం 1% to 2% water levels తగ్గినా సరే అది మన cognitive performance-ని అంటే ఆలోచించే శక్తిని జ్ఞాపక శక్తిని ఏకంగా 20% వరకు పడేస్తుంది.",
+      "payoff_text": "దాన్ని 100% hydrate చేయడం చాలా important.",
+      "why": "Shocking hydration fact leads to actionable health advice and celebrity routine proof.",
+      "visual_note": "A graphic illustration shows the correlation between hydration levels and brain function.",
+      "engagement_type": "Insight",
+      "hook_score": 8.0,
+      "coherence_score": 8.0,
+      "cultural_score": 8.0,
+      "engagement_score": 8.0,
+      "psychological_trigger": "Curiosity Gap",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "The Virat Kohli mention provides massive cultural weight for the Telugu audience.",
+      "virality_score": 8.0,
+      "para_id": 87,
+      "anchor_text": "దాన్ని 100% hydrate చేయడం చాలా important.",
+      "anchor_score": 8.0,
+      "transcript": [
+        {
+          "start": 438.06,
+          "end": 450.14,
+          "text": "ఈ scientific research ఏం చెప్తుందంటే మన body-లో కేవలం 1% to 2% water levels తగ్గినా సరే అది మన cognitive performance-ని అంటే ఆలోచించే శక్తిని జ్ఞాపక శక్తిని ఏకంగా 20% వరకు పడేస్తుంది."
+        },
+        {
+          "start": 450.38,
+          "end": 453.92,
+          "text": "అందుకే చాలా మందికి ఉదయం పూట headache గాని బద్ధకంగా ఉండడం గాని జరుగుతుంది."
+        },
+        {
+          "start": 454.32,
+          "end": 455.7,
+          "text": "దానికి కారణం intelligence."
+        },
+        {
+          "start": 455.94,
+          "end": 457.98,
+          "text": "ఉండడం కాదు, body dehydrate అవ్వడం."
+        },
+        {
+          "start": 458.3,
+          "end": 463.3,
+          "text": "ప్రపంచంలోనే ultimate energy-ని maintain చేసే peak performers ఈ rule-ని పక్కాగా follow అవుతారు."
+        },
+        {
+          "start": 463.42,
+          "end": 470.42,
+          "text": "మన Indian cricketing legend, fitness icon Virat Kohli, ఈయన ప్రతిరోజు ఉదయాన్నే గోరువెచ్చని నిమ్మరసం నీళ్లు తాగుతారంట."
+        },
+        {
+          "start": 470.58,
+          "end": 474.84,
+          "text": "తాగి తన metabolism-ని అలాగే తన energy-ని next level-కి తీసుకెళ్తున్నారు."
+        },
+        {
+          "start": 475.02,
+          "end": 482.88,
+          "text": "Global motivational speaker and legend Tony Robbins, ఈయన ప్రతిరోజు ఉదయం లేవగానే ఒక పెద్ద glass room temperature water తాగడం ఒక పక్కా అలవాటుగా పెట్టుకున్నారు."
+        },
+        {
+          "start": 483.06,
+          "end": 485.54,
+          "text": "అలాగే Tony Robbins రాసిన world famous పుస్తకం."
+        },
+        {
+          "start": 485.98,
+          "end": 487.1,
+          "text": "Awaken the giant within."
+        },
+        {
+          "start": 487.36,
+          "end": 488.92,
+          "text": "ఇందులో దీని గురించి clear-గా చెప్తారు."
+        },
+        {
+          "start": 489.1,
+          "end": 492.02,
+          "text": "If you want to change your life, you must change your energy."
+        },
+        {
+          "start": 492.4,
+          "end": 498.84,
+          "text": "Your physical body is the engine of your success and the simplest way to fuel it every morning is to hydrate it completely."
+        },
+        {
+          "start": 499.2,
+          "end": 504.24,
+          "text": "అంటే మనం గనక మన life-ని మార్చాలి అని అనుకుంటే మొదట మన energy-ని మార్చాలి."
+        },
+        {
+          "start": 504.56,
+          "end": 507.94,
+          "text": "మన physical body-నే మన success-కి ఒక main engine లాంటిది."
+        },
+        {
+          "start": 508.04,
+          "end": 509.68,
+          "text": "అందుకే దానికి ఉదయాన్నే fuel ఇవ్వాలి."
+        },
+        {
+          "start": 509.98,
+          "end": 512.12,
+          "text": "దాన్ని 100% hydrate చేయడం చాలా important."
+        }
+      ],
+      "transcript_text": "ఈ scientific research ఏం చెప్తుందంటే మన body-లో కేవలం 1% to 2% water levels తగ్గినా సరే అది మన cognitive performance-ని అంటే ఆలోచించే శక్తిని జ్ఞాపక శక్తిని ఏకంగా 20% వరకు పడేస్తుంది. అందుకే చాలా మందికి ఉదయం పూట headache గాని బద్ధకంగా ఉండడం గాని జరుగుతుంది. దానికి కారణం intelligence. ఉండడం కాదు, body dehydrate అవ్వడం. ప్రపంచంలోనే ultimate energy-ని maintain చేసే peak performers ఈ rule-ని పక్కాగా follow అవుతారు. మన Indian cricketing legend, fitness icon Virat Kohli, ఈయన ప్రతిరోజు ఉదయాన్నే గోరువెచ్చని నిమ్మరసం నీళ్లు తాగుతారంట. తాగి తన metabolism-ని అలాగే తన energy-ని next level-కి తీసుకెళ్తున్నారు. Global motivational speaker and legend Tony Robbins, ఈయన ప్రతిరోజు ఉదయం లేవగానే ఒక పెద్ద glass room temperature water తాగడం ఒక పక్కా అలవాటుగా పెట్టుకున్నారు. అలాగే Tony Robbins రాసిన world famous పుస్తకం. Awaken the giant within. ఇందులో దీని గురించి clear-గా చెప్తారు. If you want to change your life, you must change your energy. Your physical body is the engine of your success and the simplest way to fuel it every morning is to hydrate it completely. అంటే మనం గనక మన life-ని మార్చాలి అని అనుకుంటే మొదట మన energy-ని మార్చాలి. మన physical body-నే మన success-కి ఒక main engine లాంటిది. అందుకే దానికి ఉదయాన్నే fuel ఇవ్వాలి. దాన్ని 100% hydrate చేయడం చాలా important."
+    },
+    {
+      "clip_id": "Oyf2X9ePshY_c4",
+      "start": 762.42,
+      "end": 846.4,
+      "duration": 83.98,
+      "segments": [
+        {
+          "start_sent_id": 149,
+          "end_sent_id": 160
+        }
+      ],
+      "confidence_rank": 4,
+      "confidence_note": "RAS Success Hack: Offers a clear psychological mechanism for achieving career and life goals.",
+      "hook_text": "ఈ చిన్న practice మన success rate-ని ఎలా పెంచుతుందో తెలుసా?",
+      "payoff_text": "మనలో ఉండే clarity లేని కోరికలను కూడా తిరుగులేని పక్కా execution plan-లు లా మార్చి చూపిస్తుంది.",
+      "why": "Writing goals activates the brain's RAS filter to find success opportunities automatically.",
+      "visual_note": "Cinematic shot of journaling combined with brain visuals explaining internal goal filtering.",
+      "engagement_type": "Wisdom",
+      "hook_score": 7.0,
+      "coherence_score": 9.0,
+      "cultural_score": 7.0,
+      "engagement_score": 8.0,
+      "psychological_trigger": "Success Gap",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "Highly effective for viewers interested in personal growth and productivity hacks.",
+      "virality_score": 7.7,
+      "para_id": 149,
+      "anchor_text": "మనలో ఉండే clarity లేని కోరికలను కూడా తిరుగులేని పక్కా execution plan-లు లా మార్చి చూపిస్తుంది.",
+      "anchor_score": 7.7,
+      "transcript": [
+        {
+          "start": 762.42,
+          "end": 765.6,
+          "text": "ఈ చిన్న practice మన success rate-ని ఎలా పెంచుతుందో తెలుసా?"
+        },
+        {
+          "start": 766.16,
+          "end": 774.64,
+          "text": "మనం ఉదయాన్నే ఆ ఒక్క main ని paper మీద రాసినప్పుడు మన brain-లో ఉండే RAS అంటే Reticular Activating System ఒక్కసారిగా alert అవుతుంది."
+        },
+        {
+          "start": 775.0,
+          "end": 777.84,
+          "text": "ఈ RAS అనేది ఒక powerful filter లాంటిది."
+        },
+        {
+          "start": 777.96,
+          "end": 789.28,
+          "text": "ఇది ఏం చేస్తుందంటే బయట ఉన్న వందల distractions-ని cut చేసి ఆ రోజు మనం అనుకున్న ఒకే ఒక్క goal-ని reach అవ్వడానికి కావలసిన idea-ల్ని, opportunities-ని వెతికి పట్టుకుని మన brain-కి చూపిస్తూ ఉంటుంది."
+        },
+        {
+          "start": 789.62,
+          "end": 799.34,
+          "text": "అలాగే gratitude కృతజ్ఞత రాయడం వల్ల మన brain-లోని hypothalamus activate అయ్యి stress levels-ని తగ్గించి happy hormone అయిన dopamine-ని Natural-గా release చేస్తుంది."
+        },
+        {
+          "start": 800.0,
+          "end": 808.08,
+          "text": "2003-లో జరిగిన ఒక scientific research ప్రకారం ప్రతిరోజు ఇలా journaling చేయడం వల్ల మన overall well-being score ఏకంగా 25% పెరుగుతుందంట."
+        },
+        {
+          "start": 808.36,
+          "end": 812.62,
+          "text": "ప్రపంచంలోనే most productivity minds ఈ journaling-ని పక్కాగా follow అవుతారు."
+        },
+        {
+          "start": 813.02,
+          "end": 820.28,
+          "text": "Global author నాకు బాగా ఇష్టమైన author Tim Ferriss ప్రతిరోజు ఉదయాన్నే తన 5 minute journal-ని రాయకుండా అస్సలు day-ని start చేయడం చెప్తాడు."
+        },
+        {
+          "start": 820.68,
+          "end": 824.52,
+          "text": "అది తన mind-లోని గందరగోళాన్ని complete-గా clear చేస్తుందని ఆయన చెప్తారు."
+        },
+        {
+          "start": 824.9,
+          "end": 832.98,
+          "text": "అలాగే leadership legend అయిన Robin Sharma గారు కూడా తన జీవితం జీవితంలో కొన్ని దశాబ్దాలుగా morning journaling-ని ఒక non-negotiable అలవాటుగా మార్చుకున్నారు."
+        },
+        {
+          "start": 833.18,
+          "end": 840.62,
+          "text": "So ప్రతిరోజు ఉదయాన్నే journal రాయడం అనేది మనల్ని ఈ digital గోల నుండి వేరు చేసి మన mind-ని పక్కాగా structuralize చేస్తుంది."
+        },
+        {
+          "start": 840.96,
+          "end": 846.4,
+          "text": "మనలో ఉండే clarity లేని కోరికలను కూడా తిరుగులేని పక్కా execution plan-లు లా మార్చి చూపిస్తుంది."
+        }
+      ],
+      "transcript_text": "ఈ చిన్న practice మన success rate-ని ఎలా పెంచుతుందో తెలుసా? మనం ఉదయాన్నే ఆ ఒక్క main ని paper మీద రాసినప్పుడు మన brain-లో ఉండే RAS అంటే Reticular Activating System ఒక్కసారిగా alert అవుతుంది. ఈ RAS అనేది ఒక powerful filter లాంటిది. ఇది ఏం చేస్తుందంటే బయట ఉన్న వందల distractions-ని cut చేసి ఆ రోజు మనం అనుకున్న ఒకే ఒక్క goal-ని reach అవ్వడానికి కావలసిన idea-ల్ని, opportunities-ని వెతికి పట్టుకుని మన brain-కి చూపిస్తూ ఉంటుంది. అలాగే gratitude కృతజ్ఞత రాయడం వల్ల మన brain-లోని hypothalamus activate అయ్యి stress levels-ని తగ్గించి happy hormone అయిన dopamine-ని Natural-గా release చేస్తుంది. 2003-లో జరిగిన ఒక scientific research ప్రకారం ప్రతిరోజు ఇలా journaling చేయడం వల్ల మన overall well-being score ఏకంగా 25% పెరుగుతుందంట. ప్రపంచంలోనే most productivity minds ఈ journaling-ని పక్కాగా follow అవుతారు. Global author నాకు బాగా ఇష్టమైన author Tim Ferriss ప్రతిరోజు ఉదయాన్నే తన 5 minute journal-ని రాయకుండా అస్సలు day-ని start చేయడం చెప్తాడు. అది తన mind-లోని గందరగోళాన్ని complete-గా clear చేస్తుందని ఆయన చెప్తారు. అలాగే leadership legend అయిన Robin Sharma గారు కూడా తన జీవితం జీవితంలో కొన్ని దశాబ్దాలుగా morning journaling-ని ఒక non-negotiable అలవాటుగా మార్చుకున్నారు. So ప్రతిరోజు ఉదయాన్నే journal రాయడం అనేది మనల్ని ఈ digital గోల నుండి వేరు చేసి మన mind-ని పక్కాగా structuralize చేస్తుంది. మనలో ఉండే clarity లేని కోరికలను కూడా తిరుగులేని పక్కా execution plan-లు లా మార్చి చూపిస్తుంది."
+    },
+    {
+      "clip_id": "Oyf2X9ePshY_c5",
+      "start": 540.0,
+      "end": 615.98,
+      "duration": 75.98,
+      "segments": [
+        {
+          "start_sent_id": 108,
+          "end_sent_id": 120
+        }
+      ],
+      "confidence_rank": 5,
+      "confidence_note": "Meditation Science: Features Ratan Tata and Steve Jobs to validate meditation as a leader's tool.",
+      "hook_text": "Harvard scientific study ఏం చెప్తుందంటే ఎవరైతే continuous-గా ఒక 8 వారాల పాటు ప్రతిరోజు మీరు meditation చేస్తారో వాళ్ళ brain-లోని prefrontal cortex area-లో grey matter volume పెరుగుతుంది.",
+      "payoff_text": "ఈ ప్రశాంతత వల్లే మనల్ని మనం నాశనం చేసుకోకుండా అలాగే వేరే వాళ్ళని disturb చేయకుండా మనల్ని మనం కాపాడుకోగలం.",
+      "why": "Harvard study proves meditation physically alters the brain for better stress management.",
+      "visual_note": "Brain anatomy animation showing grey matter volume increases in the frontal lobe.",
+      "engagement_type": "Educational",
+      "hook_score": 6.0,
+      "coherence_score": 8.0,
+      "cultural_score": 7.0,
+      "engagement_score": 7.0,
+      "psychological_trigger": "Scientific Validation",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "Solid informational content, though the hook is slightly more clinical than others.",
+      "virality_score": 6.9,
+      "para_id": 108,
+      "anchor_text": "ఈ ప్రశాంతత వల్లే మనల్ని మనం నాశనం చేసుకోకుండా అలాగే వేరే వాళ్ళని disturb చేయకుండా మనల్ని మనం కాపాడుకోగలం.",
+      "anchor_score": 6.9,
+      "transcript": [
+        {
+          "start": 540.0,
+          "end": 550.14,
+          "text": "Harvard scientific study ఏం చెప్తుందంటే ఎవరైతే continuous-గా ఒక 8 వారాల పాటు ప్రతిరోజు మీరు meditation చేస్తారో వాళ్ళ brain-లోని prefrontal cortex area-లో grey matter volume పెరుగుతుంది."
+        },
+        {
+          "start": 550.5,
+          "end": 555.7,
+          "text": "మనం ఇందాక చెప్పుకున్నాం కదా ఈ prefrontal cortex అనేది మన decision making-ని మన focus-ని control చేస్తుంది."
+        },
+        {
+          "start": 555.78,
+          "end": 559.98,
+          "text": "అంటే meditation చేయడం వల్ల మన brain power physical-గా strong అవుతుంది."
+        },
+        {
+          "start": 560.4,
+          "end": 563.66,
+          "text": "ప్రపంచంలోనే most intelligent minds ఈ meditation చేస్తూ ఉంటారు."
+        },
+        {
+          "start": 563.8,
+          "end": 566.34,
+          "text": "అందులో మనందరికీ బాగా ఇష్టమైన Apple founder Steve Jobs."
+        },
+        {
+          "start": 566.66,
+          "end": 570.54,
+          "text": "ఈయన life-లో ప్రతిరోజు Zen meditation-ని పక్కగా practice చేసేవాడు."
+        },
+        {
+          "start": 570.64,
+          "end": 574.86,
+          "text": "ఈ నిశబ్దం నుండే ఆయనకి iPhone లాంటి revolutionary products design చేసే ideas వచ్చాయి."
+        },
+        {
+          "start": 575.22,
+          "end": 585.26,
+          "text": "అలాగే మన Indian legend Ratan Tata గారు కూడా రోజంతా వందల company-ల decision-లు తీసుకునే ఆ stress-ని handle చేయడానికి ప్రతిరోజు ఉదయం mindfulness-ని practice చేయడం ఒక ritual-గా పెట్టుకున్నారు."
+        },
+        {
+          "start": 585.46,
+          "end": 592.18,
+          "text": "World famous Zen Master Thich Nhat Hanh ఈయన రాసిన The Miracle of Mindfulness అనే పుస్తకంలో ఒక point చెప్తారు."
+        },
+        {
+          "start": 592.54,
+          "end": 598.38,
+          "text": "Mindfulness shows us what is happening in our bodies, our emotions, our minds and in the world."
+        },
+        {
+          "start": 598.86,
+          "end": 602.28,
+          "text": "Through mindfulness we avoid harming ourselves and others."
+        },
+        {
+          "start": 602.54,
+          "end": 609.16,
+          "text": "అంటే mindfulness అనేది మన body-లో మన emotions-లో మన mind-లో అసలు ఏం జరుగుతుందో మనకి clear-గా చూపిస్తుంది."
+        },
+        {
+          "start": 609.56,
+          "end": 615.98,
+          "text": "ఈ ప్రశాంతత వల్లే మనల్ని మనం నాశనం చేసుకోకుండా అలాగే వేరే వాళ్ళని disturb చేయకుండా మనల్ని మనం కాపాడుకోగలం."
+        }
+      ],
+      "transcript_text": "Harvard scientific study ఏం చెప్తుందంటే ఎవరైతే continuous-గా ఒక 8 వారాల పాటు ప్రతిరోజు మీరు meditation చేస్తారో వాళ్ళ brain-లోని prefrontal cortex area-లో grey matter volume పెరుగుతుంది. మనం ఇందాక చెప్పుకున్నాం కదా ఈ prefrontal cortex అనేది మన decision making-ని మన focus-ని control చేస్తుంది. అంటే meditation చేయడం వల్ల మన brain power physical-గా strong అవుతుంది. ప్రపంచంలోనే most intelligent minds ఈ meditation చేస్తూ ఉంటారు. అందులో మనందరికీ బాగా ఇష్టమైన Apple founder Steve Jobs. ఈయన life-లో ప్రతిరోజు Zen meditation-ని పక్కగా practice చేసేవాడు. ఈ నిశబ్దం నుండే ఆయనకి iPhone లాంటి revolutionary products design చేసే ideas వచ్చాయి. అలాగే మన Indian legend Ratan Tata గారు కూడా రోజంతా వందల company-ల decision-లు తీసుకునే ఆ stress-ని handle చేయడానికి ప్రతిరోజు ఉదయం mindfulness-ని practice చేయడం ఒక ritual-గా పెట్టుకున్నారు. World famous Zen Master Thich Nhat Hanh ఈయన రాసిన The Miracle of Mindfulness అనే పుస్తకంలో ఒక point చెప్తారు. Mindfulness shows us what is happening in our bodies, our emotions, our minds and in the world. Through mindfulness we avoid harming ourselves and others. అంటే mindfulness అనేది మన body-లో మన emotions-లో మన mind-లో అసలు ఏం జరుగుతుందో మనకి clear-గా చూపిస్తుంది. ఈ ప్రశాంతత వల్లే మనల్ని మనం నాశనం చేసుకోకుండా అలాగే వేరే వాళ్ళని disturb చేయకుండా మనల్ని మనం కాపాడుకోగలం."
+    }
+  ],
+  "metadata": {
+    "pipeline": "ClipForge-v17-ThreeCallVision",
+    "approach": "junk-detection (incl. sentence-level CTA flagging) → video-upload → context-cache → rough-cut (Call1) → fine-cut (Call2) → trim-long-clips (Call3, conditional) → segments-array",
+    "language": "Telugu/Codemix",
+    "gemini_model": "gemini-3-flash-preview",
+    "thinking_level": "HIGH",
+    "call_1": "rough cut — find all genuine Reel moments",
+    "call_2": "fine cut — perfect hooks, payoffs, trim, score, rank",
+    "call_3": "trim-long-clips — fires only on clips > 90s",
+    "trim_trigger_sec": 90,
+    "trim_target_sec": 75,
+    "caching": "context cache reuses video tokens across all calls",
+    "clip_count_rule": "quality decides count, no min/max in prompts",
+    "file_uri": "https://generativelanguage.googleapis.com/v1beta/files/cp4hhibfkkxq"
+  }
+}

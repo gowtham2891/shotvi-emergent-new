@@ -1,0 +1,221 @@
+{
+  "video_id": "-OetXsp7xdI",
+  "video_duration": 864.72,
+  "total_sentences": 194,
+  "total_segments": 14,
+  "clips": [
+    {
+      "clip_id": "v1_c1",
+      "start": 568.8,
+      "end": 649.1,
+      "duration": 80.3,
+      "segments": [
+        {
+          "start_sent_id": 132,
+          "end_sent_id": 145
+        }
+      ],
+      "confidence_rank": 1,
+      "confidence_note": "Controversial historical hook linking British rule to Indian genetics is extremely high-engagement for Telugu audiences.",
+      "hook_text": "అసలు మన genetics-లోకి diabetes అనేది ఎలా వచ్చిందంటే దానికి కారణం British వాళ్ళు.",
+      "payoff_text": "అందుకుంటే Western countries వాళ్ళతో compare చేస్తే మనకి diabetes వచ్చే chance-లు 3 to 5 times ఎక్కువ ఉంటుంది.",
+      "why": "Explains how British-era famines permanently altered Indian genetics, increasing diabetes susceptibility.",
+      "visual_note": "Host points aggressively while stylized DNA animations and historical famine maps appear on screen.",
+      "engagement_type": "Controversial",
+      "hook_score": 10.0,
+      "coherence_score": 10.0,
+      "cultural_score": 10.0,
+      "engagement_score": 10.0,
+      "psychological_trigger": "Controversial Take",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "One of the strongest sections of the video; perfectly suited for a viral Reel.",
+      "virality_score": 10.0,
+      "para_id": 132,
+      "anchor_text": "అందుకుంటే Western countries వాళ్ళతో compare చేస్తే మనకి diabetes వచ్చే chance-లు 3 to 5 times ఎక్కువ ఉంటుంది.",
+      "anchor_score": 10.0,
+      "transcript": [
+        {
+          "start": 568.8,
+          "end": 574.44,
+          "text": "అసలు మన genetics-లోకి diabetes అనేది ఎలా వచ్చిందంటే దానికి కారణం British వాళ్ళు."
+        },
+        {
+          "start": 574.3,
+          "end": 580.3,
+          "text": "Yes, India-లో diabetes వ్యాప్తి చెందడానికి British rule ఒక కారణం ఎలానో చెప్తాను చూడండి."
+        },
+        {
+          "start": 580.14,
+          "end": 583.96,
+          "text": "British Raj time-లో India-లో 25 major famines వచ్చాయి."
+        },
+        {
+          "start": 583.76,
+          "end": 585.44,
+          "text": "Famine అంటే కరువు అన్నమాట."
+        },
+        {
+          "start": 585.78,
+          "end": 589.06,
+          "text": "ఈ 25 famines-లో దాదాపు 60 million Indians చనిపోయారు."
+        },
+        {
+          "start": 589.28,
+          "end": 597.52,
+          "text": "ఒక పక్క కరువుతో కడుపులు మండుతుంటే ఇంకో పక్క British వాళ్ళు దారుణమైన tax-లు విధించడంతో పాటు మన దగ్గర ఉన్న కాస్త food-ని కూడా"
+        },
+        {
+          "start": 597.56,
+          "end": 600.14,
+          "text": "వాళ్ళ country-లకు export చేసుకునే వాళ్ళు."
+        },
+        {
+          "start": 600.08,
+          "end": 613.12,
+          "text": "Over the years famines రావటం plus Britishers మన దగ్గర ఉన్న food-ని లాక్కోవడంతో South Asians-లో ముఖ్యంగా Indians physiology-లో fat-ని store చేసుకునే పద్ధతి అండ్ sugar-ని process చేసే పద్ధతిలో తేడా వచ్చేస్తుంది."
+        },
+        {
+          "start": 613.08,
+          "end": 619.76,
+          "text": "Over the time behavior-లు అండ్ environmental changes వల్ల మన genes working అనేది change అవుతూ వచ్చింది."
+        },
+        {
+          "start": 619.88,
+          "end": 622.46,
+          "text": "But underlying DNA sequence మాత్రం అలానే ఉంటుంది."
+        },
+        {
+          "start": 622.58,
+          "end": 627.92,
+          "text": "సో ఈ కరువుల వల్ల వచ్చిన ఈ genes changes అనేవి generations నుంచి pass అవుతూ వచ్చి"
+        },
+        {
+          "start": 627.3,
+          "end": 629.66,
+          "text": "diabetes వచ్చే chance-లను పెంచాయి."
+        },
+        {
+          "start": 629.72,
+          "end": 642.34,
+          "text": "మీరు గమనిస్తే same age gender body mass ఉన్న ఒక white foreigner-ని and South Asians like India, Pakistan వాళ్ళని తీసుకొని compare చేస్తే South Asians-లో insulin resistance అనేది కొద్దిగా ఎక్కువ ఉంటుంది."
+        },
+        {
+          "start": 642.46,
+          "end": 649.1,
+          "text": "అందుకే Western countries వాళ్ళతో compare చేస్తే మనకి diabetes వచ్చే chance-లు 3 to 5 times ఎక్కువ ఉంటుంది."
+        }
+      ],
+      "transcript_text": "అసలు మన genetics-లోకి diabetes అనేది ఎలా వచ్చిందంటే దానికి కారణం British వాళ్ళు. Yes, India-లో diabetes వ్యాప్తి చెందడానికి British rule ఒక కారణం ఎలానో చెప్తాను చూడండి. British Raj time-లో India-లో 25 major famines వచ్చాయి. Famine అంటే కరువు అన్నమాట. ఈ 25 famines-లో దాదాపు 60 million Indians చనిపోయారు. ఒక పక్క కరువుతో కడుపులు మండుతుంటే ఇంకో పక్క British వాళ్ళు దారుణమైన tax-లు విధించడంతో పాటు మన దగ్గర ఉన్న కాస్త food-ని కూడా వాళ్ళ country-లకు export చేసుకునే వాళ్ళు. Over the years famines రావటం plus Britishers మన దగ్గర ఉన్న food-ని లాక్కోవడంతో South Asians-లో ముఖ్యంగా Indians physiology-లో fat-ని store చేసుకునే పద్ధతి అండ్ sugar-ని process చేసే పద్ధతిలో తేడా వచ్చేస్తుంది. Over the time behavior-లు అండ్ environmental changes వల్ల మన genes working అనేది change అవుతూ వచ్చింది. But underlying DNA sequence మాత్రం అలానే ఉంటుంది. సో ఈ కరువుల వల్ల వచ్చిన ఈ genes changes అనేవి generations నుంచి pass అవుతూ వచ్చి diabetes వచ్చే chance-లను పెంచాయి. మీరు గమనిస్తే same age gender body mass ఉన్న ఒక white foreigner-ని and South Asians like India, Pakistan వాళ్ళని తీసుకొని compare చేస్తే South Asians-లో insulin resistance అనేది కొద్దిగా ఎక్కువ ఉంటుంది. అందుకే Western countries వాళ్ళతో compare చేస్తే మనకి diabetes వచ్చే chance-లు 3 to 5 times ఎక్కువ ఉంటుంది."
+    },
+    {
+      "clip_id": "v1_c2",
+      "start": 22.22,
+      "end": 72.34,
+      "duration": 50.12,
+      "segments": [
+        {
+          "start_sent_id": 7,
+          "end_sent_id": 18
+        }
+      ],
+      "confidence_rank": 2,
+      "confidence_note": "Shocking 'diabetes capital' claim combined with a relatable family WhatsApp check is highly shareable.",
+      "hook_text": "India 2nd place-లో ఉంది, but diabetes capital of the world ఏంటి అని Google తల్లిని అడిగితే bold letter-లలో India అని చెప్తుంది.",
+      "payoff_text": "అప్పుడు మీకే అర్థమవుతుంది diabetes situation అనేది ఎలా ఉందో.",
+      "why": "Reveals India's status as the global diabetes capital and suggests a family check.",
+      "visual_note": "Host gestures towards a graphic showing India as the diabetes capital with rising bar charts.",
+      "engagement_type": "Relatable",
+      "hook_score": 8.0,
+      "coherence_score": 9.0,
+      "cultural_score": 9.0,
+      "engagement_score": 8.0,
+      "psychological_trigger": "Shocking Fact",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "Great middle-class appeal by mentioning WhatsApp groups and family functions.",
+      "virality_score": 9.0,
+      "para_id": 7,
+      "anchor_text": "అప్పుడు మీకే అర్థమవుతుంది diabetes situation అనేది ఎలా ఉందో.",
+      "anchor_score": 9.0,
+      "transcript": [
+        {
+          "start": 22.22,
+          "end": 31.5,
+          "text": "India 2nd place-లో ఉంది, but diabetes capital of the world ఏంటి అని Google తల్లిని అడిగితే bold letter-లలో India అని చెప్తుంది."
+        },
+        {
+          "start": 31.6,
+          "end": 32.1,
+          "text": "But why?"
+        },
+        {
+          "start": 32.22,
+          "end": 35.84,
+          "text": "Because India-లో diabetes పెరుగుతున్న speed అలాంటిది."
+        },
+        {
+          "start": 35.98,
+          "end": 42.18,
+          "text": "Year 2000-లో 32.7 million adult-లకు diabetes ఉంటే 2024-కి ఆ number 90 million-కి చేరుకుంది."
+        },
+        {
+          "start": 42.24,
+          "end": 43.64,
+          "text": "ఇదే కొనసాగితే 2000"
+        },
+        {
+          "start": 43.98,
+          "end": 48.96,
+          "text": "50-కి India-లో diabetes patient సంఖ్య 156 million-కి చేరుకునే అవకాశం ఉంది."
+        },
+        {
+          "start": 49.1,
+          "end": 52.26,
+          "text": "ఇవన్నీ కాదు మీ family WhatsApp group ఓపెన్ చేయండి."
+        },
+        {
+          "start": 52.34,
+          "end": 55.88,
+          "text": "ఎంతమంది రోజు diabetes-కి medicine వేసుకుంటున్నారు?"
+        },
+        {
+          "start": 56.32,
+          "end": 58.26,
+          "text": "ఎంతమంది pre-diabetic అని అడగండి."
+        },
+        {
+          "start": 57.9,
+          "end": 65.24,
+          "text": "పోనీ మీ family function ఏదైనా attend అయినప్పుడు మీ family-లో ఉన్న వాళ్ళందరికీ sweets offer చేయండి."
+        },
+        {
+          "start": 64.7,
+          "end": 67.98,
+          "text": "ఎంతమంది ఆ sweets accept చేసి తింటారో గమనించండి."
+        },
+        {
+          "start": 68.3,
+          "end": 72.34,
+          "text": "అప్పుడు మీకే అర్థమవుతుంది diabetes situation అనేది ఎలా ఉందో."
+        }
+      ],
+      "transcript_text": "India 2nd place-లో ఉంది, but diabetes capital of the world ఏంటి అని Google తల్లిని అడిగితే bold letter-లలో India అని చెప్తుంది. But why? Because India-లో diabetes పెరుగుతున్న speed అలాంటిది. Year 2000-లో 32.7 million adult-లకు diabetes ఉంటే 2024-కి ఆ number 90 million-కి చేరుకుంది. ఇదే కొనసాగితే 2000 50-కి India-లో diabetes patient సంఖ్య 156 million-కి చేరుకునే అవకాశం ఉంది. ఇవన్నీ కాదు మీ family WhatsApp group ఓపెన్ చేయండి. ఎంతమంది రోజు diabetes-కి medicine వేసుకుంటున్నారు? ఎంతమంది pre-diabetic అని అడగండి. పోనీ మీ family function ఏదైనా attend అయినప్పుడు మీ family-లో ఉన్న వాళ్ళందరికీ sweets offer చేయండి. ఎంతమంది ఆ sweets accept చేసి తింటారో గమనించండి. అప్పుడు మీకే అర్థమవుతుంది diabetes situation అనేది ఎలా ఉందో."
+    }
+  ],
+  "metadata": {
+    "pipeline": "ClipForge-v17-ThreeCallVision",
+    "approach": "junk-detection (incl. sentence-level CTA flagging) → video-upload → context-cache → rough-cut (Call1) → fine-cut (Call2) → trim-long-clips (Call3, conditional) → segments-array",
+    "language": "Telugu/Codemix",
+    "gemini_model": "gemini-3-flash-preview",
+    "thinking_level": "HIGH",
+    "call_1": "rough cut — find all genuine Reel moments",
+    "call_2": "fine cut — perfect hooks, payoffs, trim, score, rank",
+    "call_3": "trim-long-clips — fires only on clips > 90s",
+    "trim_trigger_sec": 90,
+    "trim_target_sec": 75,
+    "caching": "context cache reuses video tokens across all calls",
+    "clip_count_rule": "quality decides count, no min/max in prompts",
+    "file_uri": "https://generativelanguage.googleapis.com/v1beta/files/npbzvdb9sfse"
+  }
+}

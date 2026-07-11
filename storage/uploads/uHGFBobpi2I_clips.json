@@ -1,0 +1,280 @@
+{
+  "video_duration": 539.26,
+  "total_sentences": 145,
+  "total_paragraphs": 9,
+  "clips": [
+    {
+      "title": "New Petrol Rules: Ethanol Warning",
+      "start": 110.8,
+      "end": 191.1,
+      "duration": 80.3,
+      "para_id": 31,
+      "hook_word_offset": 3,
+      "anchor_text": "అదే మీ బైకు లేదా కారు 2023 తర్వాత అనుకోండి, అనగా 23, 24, 25 మోడల్ అనుకోండి, ఎటువంటి ప్రాబ్లం లేదు.",
+      "anchor_score": 9.5,
+      "hook": "April 1st నుండి ప్రతి petrol bunk-లో E20 petrol మాత్రమే ఉంటుంది.",
+      "hook_transcript": "1st April నుండి ప్రతి petrol bunk-లో Mostly E20 petrol మాత్రమే",
+      "reason": "Direct impact on vehicle health and mileage.",
+      "virality_score": 9.5,
+      "engagement_type": "Insight",
+      "transcript": [
+        {
+          "start": 110.8,
+          "end": 116.0,
+          "text": "1st April నుండి ప్రతి petrol bunk-లో Mostly E20 petrol మాత్రమే ఉంటుంది."
+        },
+        {
+          "start": 116.16,
+          "end": 116.74,
+          "text": "అర్థమైందా అండి?"
+        },
+        {
+          "start": 117.16,
+          "end": 120.66,
+          "text": "E20 అంటే దీంట్లో 80% pure petrol ఉంటుంది."
+        },
+        {
+          "start": 120.92,
+          "end": 123.34,
+          "text": "Remaining 20% ethanol ఉంటుందన్నమాట."
+        },
+        {
+          "start": 123.52,
+          "end": 125.0,
+          "text": "అంటే ethanol-ని కలుపుతారు."
+        },
+        {
+          "start": 125.2,
+          "end": 126.28,
+          "text": "అసలు ethanol అంటే ఏంటి?"
+        },
+        {
+          "start": 126.46,
+          "end": 128.2,
+          "text": "దీనికి మండే స్వభావం ఉంటుంది."
+        },
+        {
+          "start": 128.38,
+          "end": 131.22,
+          "text": "దీన్ని agriculture waste ద్వారా తయారు చేస్తూ ఉంటారు."
+        },
+        {
+          "start": 131.32,
+          "end": 135.0,
+          "text": "Mostly ఈ sugar cane waste ద్వారా ఇదైతే produce అవుతుందన్నమాట."
+        },
+        {
+          "start": 135.12,
+          "end": 135.78,
+          "text": "అర్థమైందా అండి?"
+        },
+        {
+          "start": 135.96,
+          "end": 139.38,
+          "text": "అసలు E20 petrol-ని ఎందుకు తీసుకొచ్చింది ప్రభుత్వం?"
+        },
+        {
+          "start": 139.56,
+          "end": 145.98,
+          "text": "మనందరికీ తెలిసిందే మన India 88% of Crude oil-ని విదేశాల నుంచి import చేసుకుంటూ ఉంది."
+        },
+        {
+          "start": 146.28,
+          "end": 151.9,
+          "text": "So ఈ import-ని కాస్త తగ్గించాలనే ఉద్దేశంతో petrol-లో ethanol-ని కలుపుతూ ఉన్నారన్నమాట."
+        },
+        {
+          "start": 152.08,
+          "end": 153.52,
+          "text": "Clear మీకు doubt వచ్చే ఉంటుంది."
+        },
+        {
+          "start": 153.78,
+          "end": 159.66,
+          "text": "మా bike లేదా car-లో ఇటువంటి petrol-ని కొట్టించడం వల్ల ఏమైనా mileage తగ్గుతుందా?"
+        },
+        {
+          "start": 159.9,
+          "end": 161.54,
+          "text": "ఏమైనా damage అవుతుందా లోపల?"
+        },
+        {
+          "start": 161.84,
+          "end": 162.82,
+          "text": "Maybe అవ్వచ్చు."
+        },
+        {
+          "start": 163.1,
+          "end": 175.9,
+          "text": "ఎప్పుడు ఒకవేళ మీ bike లేదా car 2023 కంటే ముందుదనుకోండి అంటే 2022, 2021, 20 ఇలాంటి మోడల్ అనుకోండి, maybe మైలేజ్ తగ్గొచ్చు."
+        },
+        {
+          "start": 176.2,
+          "end": 182.04,
+          "text": "అండ్ అదే విధంగా లోపల కాస్త డామేజ్, for example, రబ్బర్ పైపులు ఇలాంటివి డామేజ్ కావడానికి ఛాన్స్ ఉంది."
+        },
+        {
+          "start": 182.22,
+          "end": 191.1,
+          "text": "అదే మీ బైకు లేదా కారు 2023 తర్వాత అనుకోండి, అనగా 23, 24, 25 మోడల్ అనుకోండి, ఎటువంటి ప్రాబ్లం లేదు."
+        }
+      ],
+      "transcript_text": "1st April నుండి ప్రతి petrol bunk-లో Mostly E20 petrol మాత్రమే ఉంటుంది. అర్థమైందా అండి? E20 అంటే దీంట్లో 80% pure petrol ఉంటుంది. Remaining 20% ethanol ఉంటుందన్నమాట. అంటే ethanol-ని కలుపుతారు. అసలు ethanol అంటే ఏంటి? దీనికి మండే స్వభావం ఉంటుంది. దీన్ని agriculture waste ద్వారా తయారు చేస్తూ ఉంటారు. Mostly ఈ sugar cane waste ద్వారా ఇదైతే produce అవుతుందన్నమాట. అర్థమైందా అండి? అసలు E20 petrol-ని ఎందుకు తీసుకొచ్చింది ప్రభుత్వం? మనందరికీ తెలిసిందే మన India 88% of Crude oil-ని విదేశాల నుంచి import చేసుకుంటూ ఉంది. So ఈ import-ని కాస్త తగ్గించాలనే ఉద్దేశంతో petrol-లో ethanol-ని కలుపుతూ ఉన్నారన్నమాట. Clear మీకు doubt వచ్చే ఉంటుంది. మా bike లేదా car-లో ఇటువంటి petrol-ని కొట్టించడం వల్ల ఏమైనా mileage తగ్గుతుందా? ఏమైనా damage అవుతుందా లోపల? Maybe అవ్వచ్చు. ఎప్పుడు ఒకవేళ మీ bike లేదా car 2023 కంటే ముందుదనుకోండి అంటే 2022, 2021, 20 ఇలాంటి మోడల్ అనుకోండి, maybe మైలేజ్ తగ్గొచ్చు. అండ్ అదే విధంగా లోపల కాస్త డామేజ్, for example, రబ్బర్ పైపులు ఇలాంటివి డామేజ్ కావడానికి ఛాన్స్ ఉంది. అదే మీ బైకు లేదా కారు 2023 తర్వాత అనుకోండి, అనగా 23, 24, 25 మోడల్ అనుకోండి, ఎటువంటి ప్రాబ్లం లేదు."
+    },
+    {
+      "title": "Bad News For Stock Traders",
+      "start": 322.22,
+      "end": 373.24,
+      "duration": 51.02,
+      "para_id": 86,
+      "hook_word_offset": 3,
+      "anchor_text": "సో ఎవరైతే trading చేస్తూ ఉంటారో వాళ్ళు కాస్త ఎక్కువ STT-ని pay చేయాలి April 1st నుండి.",
+      "anchor_score": 8.2,
+      "hook": "ఎవరైతే stock market-లో trading చేస్తూ ఉంటారో వాళ్ళకి bad news.",
+      "hook_transcript": "ఎవరైతే stock market market-లో trading చేస్తూ ఉంటారో వాళ్ళకి చిన్న bad",
+      "reason": "Tax hikes directly affect trader profits.",
+      "virality_score": 8.2,
+      "engagement_type": "Insight",
+      "transcript": [
+        {
+          "start": 322.22,
+          "end": 325.9,
+          "text": "ఎవరైతే stock market market-లో trading చేస్తూ ఉంటారో వాళ్ళకి చిన్న bad news."
+        },
+        {
+          "start": 326.14,
+          "end": 329.64,
+          "text": "ఎందుకంటే April 1st నుండి ప్రభుత్వం STT-ని పెంచింది."
+        },
+        {
+          "start": 329.92,
+          "end": 332.96,
+          "text": "STT అంటే Securities Transaction Tax అన్నమాట."
+        },
+        {
+          "start": 333.12,
+          "end": 336.92,
+          "text": "trading చేసిన ప్రతిసారి ఇది మనమైతే indirect-గా ప్రభుత్వానికి కడతాం."
+        },
+        {
+          "start": 337.06,
+          "end": 341.7,
+          "text": "So ఇన్ని రోజులు futures మీద STT 0.02% ఉండేది."
+        },
+        {
+          "start": 341.84,
+          "end": 346.88,
+          "text": "కానీ April 1st నుండి దీన్ని ప్రభుత్వం 0.05%-కి పెంచింది."
+        },
+        {
+          "start": 347.04,
+          "end": 347.48,
+          "text": "అర్థమైందా?"
+        },
+        {
+          "start": 347.64,
+          "end": 348.72,
+          "text": "So కాస్త burden-ఏ."
+        },
+        {
+          "start": 348.88,
+          "end": 354.66,
+          "text": "అదే విధంగా options-లో premium మీద ఇంతకుముందు 0.10 percentage STT ఉండేది."
+        },
+        {
+          "start": 354.78,
+          "end": 359.18,
+          "text": "దాన్ని April 1st నుండి 0.15%-కి పెంచింది ప్రభుత్వం."
+        },
+        {
+          "start": 359.34,
+          "end": 364.08,
+          "text": "అండ్ exercise మీద ఇంతకుముందు 0.125% STT ఉండేది."
+        },
+        {
+          "start": 364.22,
+          "end": 367.86,
+          "text": "ఇప్పుడు దాన్ని 0.15%-కి పెంచింది ప్రభుత్వం."
+        },
+        {
+          "start": 367.98,
+          "end": 373.24,
+          "text": "సో ఎవరైతే trading చేస్తూ ఉంటారో వాళ్ళు కాస్త ఎక్కువ STT-ని pay చేయాలి April 1st నుండి."
+        }
+      ],
+      "transcript_text": "ఎవరైతే stock market market-లో trading చేస్తూ ఉంటారో వాళ్ళకి చిన్న bad news. ఎందుకంటే April 1st నుండి ప్రభుత్వం STT-ని పెంచింది. STT అంటే Securities Transaction Tax అన్నమాట. trading చేసిన ప్రతిసారి ఇది మనమైతే indirect-గా ప్రభుత్వానికి కడతాం. So ఇన్ని రోజులు futures మీద STT 0.02% ఉండేది. కానీ April 1st నుండి దీన్ని ప్రభుత్వం 0.05%-కి పెంచింది. అర్థమైందా? So కాస్త burden-ఏ. అదే విధంగా options-లో premium మీద ఇంతకుముందు 0.10 percentage STT ఉండేది. దాన్ని April 1st నుండి 0.15%-కి పెంచింది ప్రభుత్వం. అండ్ exercise మీద ఇంతకుముందు 0.125% STT ఉండేది. ఇప్పుడు దాన్ని 0.15%-కి పెంచింది ప్రభుత్వం. సో ఎవరైతే trading చేస్తూ ఉంటారో వాళ్ళు కాస్త ఎక్కువ STT-ని pay చేయాలి April 1st నుండి."
+    },
+    {
+      "title": "PNB Daily Withdrawal Limit Slashed",
+      "start": 477.58,
+      "end": 523.02,
+      "duration": 45.44,
+      "para_id": 126,
+      "hook_word_offset": 2,
+      "anchor_text": "కానీ ఈ limit-ని 1st April నుండి 75,000-కి తగ్గించింది.",
+      "anchor_score": 8.0,
+      "hook": "Punjab National Bank customer-లకు కూడా bad news ఉంది.",
+      "hook_transcript": "Punjab National Bank customer-లకు కూడా bad news ఉంది.",
+      "reason": "Major reduction in daily cash access limits.",
+      "virality_score": 8.0,
+      "engagement_type": "Insight",
+      "transcript": [
+        {
+          "start": 477.58,
+          "end": 480.6,
+          "text": "Punjab National Bank customer-లకు కూడా bad news ఉంది."
+        },
+        {
+          "start": 480.76,
+          "end": 485.08,
+          "text": "అదేంటంటే ఈ bank ATM withdrawal limit-ని తగ్గించేసింది."
+        },
+        {
+          "start": 485.32,
+          "end": 491.96,
+          "text": "For example కొన్ని card-లు ఉన్నాయి RuPay Platinum, Visa Gold, MasterCard Platinum, Women Power or Business Card-లు ఉన్నాయి కదా."
+        },
+        {
+          "start": 492.2,
+          "end": 498.26,
+          "text": "ఈ card-ల ద్వారా ఇన్ని రోజులు ATM నుంచి ఒక రోజుకి ₹1,00,000 వరకు మనమైతే withdraw చేసుకునే వాళ్ళం."
+        },
+        {
+          "start": 498.28,
+          "end": 503.38,
+          "text": "₹1,00,000 వరకు limit కానీ 1st April నుండి ఈ card-ల ద్వారా ₹1,00,000 వరకు తీసుకునే వాళ్ళం."
+        },
+        {
+          "start": 503.42,
+          "end": 506.98,
+          "text": "లేదు Max వచ్చేసి 50,000 మాత్రమే అర్థమైందా అండి?"
+        },
+        {
+          "start": 507.18,
+          "end": 509.02,
+          "text": "అదే విధంగా కొన్ని premium card-లు ఉంటాయి."
+        },
+        {
+          "start": 509.06,
+          "end": 518.66,
+          "text": "For example, RuPay Select, Visa Signature, business debit card-లు ఉంటాయి కదా వీటికి ఇన్ని రోజులు ATM-కి వెళ్లి ₹1,50,000 వరకు తీసుకోవడానికి chance ఉండేది రోజుకి."
+        },
+        {
+          "start": 518.86,
+          "end": 523.02,
+          "text": "కానీ ఈ limit-ని 1st April నుండి 75,000-కి తగ్గించింది."
+        }
+      ],
+      "transcript_text": "Punjab National Bank customer-లకు కూడా bad news ఉంది. అదేంటంటే ఈ bank ATM withdrawal limit-ని తగ్గించేసింది. For example కొన్ని card-లు ఉన్నాయి RuPay Platinum, Visa Gold, MasterCard Platinum, Women Power or Business Card-లు ఉన్నాయి కదా. ఈ card-ల ద్వారా ఇన్ని రోజులు ATM నుంచి ఒక రోజుకి ₹1,00,000 వరకు మనమైతే withdraw చేసుకునే వాళ్ళం. ₹1,00,000 వరకు limit కానీ 1st April నుండి ఈ card-ల ద్వారా ₹1,00,000 వరకు తీసుకునే వాళ్ళం. లేదు Max వచ్చేసి 50,000 మాత్రమే అర్థమైందా అండి? అదే విధంగా కొన్ని premium card-లు ఉంటాయి. For example, RuPay Select, Visa Signature, business debit card-లు ఉంటాయి కదా వీటికి ఇన్ని రోజులు ATM-కి వెళ్లి ₹1,50,000 వరకు తీసుకోవడానికి chance ఉండేది రోజుకి. కానీ ఈ limit-ని 1st April నుండి 75,000-కి తగ్గించింది."
+    }
+  ],
+  "metadata": {
+    "pipeline": "ClipForge-v12-GlobalStream",
+    "approach": "embeddings-segmentation (junk only) → gemini-global-selection",
+    "language": "Telugu/Codemix",
+    "segmentation": "9 segments (junk detection only)",
+    "embedding_model": "l3cube-pune/telugu-sentence-similarity-sbert",
+    "scorer": "gemini/gemini-3-flash-preview",
+    "gemini_role": "global selection + metadata (single call)"
+  }
+}

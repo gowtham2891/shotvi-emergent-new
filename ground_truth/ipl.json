@@ -1,0 +1,146 @@
+{
+  "clips": [
+    {
+      "clip_id": "clip_c1",
+      "start": "33.4",
+      "end": "65.56",
+      "duration": "32.16",
+      "segments": [
+        {"start_sent_id": 8, "end_sent_id": 11},
+        {"start_sent_id": 13, "end_sent_id": 15}
+      ],
+      "confidence_rank": 1,
+      "confidence_note": "Curiosity Gap + Middle-Class Relatability: Opens with a number everyone knows (₹27cr) and immediately reframes it into per-ball math that makes the viewer feel they've been missing something obvious. The payoff — 'IPL-ఏ మిమ్మల్ని enjoy చేస్తుంది' — is a punchy reversal that triggers share instinct.",
+      "hook_text": "27 crore-లు అంటే ఒక్క ball face చేస్తే minimum-లో minimum ₹9,00,000.",
+      "payoff_text": "మీరు IPL-ని enjoy చేస్తున్నాను అనుకుంటారు but IPL-ఏ మిమ్మల్ని enjoy చేస్తుంది.",
+      "why": "Takes the viral Rishabh Pant number, reframes it as per-ball math, then flips the audience's self-image — from viewer to product — creating maximum scroll-stop and share motivation.",
+      "engagement_type": "Controversial",
+      "hook_score": 9,
+      "coherence_score": 8,
+      "cultural_score": 9,
+      "engagement_score": 9,
+      "psychological_trigger": "Curiosity Gap + Myth Busting",
+      "trimmed": true,
+      "trim_reason": "Dropped S12 ('తో link అయి ఉన్నాయి') — orphan sentence fragment that breaks continuity without adding meaning.",
+      "notes": "Hook is very strong. Payoff lands well but the clip is short (~8 sentences). Works as a pure hook reel designed to drive profile visits."
+    },
+    {
+      "clip_id": "clip_c2",
+      "start": "101.84",
+      "end": "275.58",
+      "duration": "173.74",
+      "segments": [
+        {"start_sent_id": 24, "end_sent_id": 31},
+        {"start_sent_id": 52, "end_sent_id": 57}
+      ],
+      "confidence_rank": 2,
+      "confidence_note": "Myth Busting + Social Proof: Opens on the 'high profile circus' dismissal that many older viewers actually said — instant recognition — then delivers a cascade of credibility beats (NFL > EPL > NBA) before landing the ₹50L per ball reframe. The toilet break line is culturally gold.",
+      "hook_text": "కొంతమంది ఇది cricket కాదు ఇది ఒక high profile circus అని అన్నారు కానీ 18 years fast forward చేసి చూస్తే ఈ high profile circus ప్రపంచంలోనే Most valuable sports league-లో 2nd place-లో ఉంది.",
+      "payoff_text": "ఒక్క ball cost ₹50,00,000.",
+      "why": "Validates the skeptic's old take, then destroys it with a 18-year timeline, global rank reveal, and ends on the most visceral number in the video — cost per ball.",
+      "engagement_type": "Educational",
+      "hook_score": 8,
+      "coherence_score": 9,
+      "cultural_score": 8,
+      "engagement_score": 8,
+      "psychological_trigger": "Myth Busting + Aspirational",
+      "trimmed": true,
+      "trim_reason": "Dropped S32 ('And I promise you...') — meta-CTA about the video itself, kills cold-open viability. Dropped S51 ('ఈ నంబర్స్ చూడడానికి') — orphan sentence fragment with no standalone meaning. The jump from S31 to S52 is coherent: 'explain చేస్తానండి' → 'IPL just grow అవ్వలేదు' flows naturally as a continuation.",
+      "notes": "Slightly long after trimming (~14 sentences). The toilet break line (S56) is culturally relatable and should not be cut — it's the emotional peak before the hard payoff."
+    },
+    {
+      "clip_id": "clip_c3",
+      "start": "329.26",
+      "end": "407.6",
+      "duration": "78.34",
+      "segments": [
+        {"start_sent_id": 68, "end_sent_id": 73},
+        {"start_sent_id": 77, "end_sent_id": 85}
+      ],
+      "confidence_rank": 4,
+      "confidence_note": "Shocking Fact + FOMO: '₹4,800 crore just from ads' is a number that breaks comprehension, then the payoff escalates to 'India-లో ఏ platform-కి ఇంత reach లేదు' — which triggers both regional pride and awe.",
+      "hook_text": "IPL 2025-లో just ఇలా ads display చేయడం ద్వారా వచ్చిన revenue ఎంతో తెలుసా?",
+      "payoff_text": "అందుకే brand-లు ఎంతైనా pay చేయడానికి ready అవుతాయి.",
+      "why": "Opens with a curiosity question on ad revenue, walks through why brands pay insane amounts, then lands on India's unmatched IPL reach as the logical conclusion.",
+      "engagement_type": "Insight",
+      "hook_score": 7,
+      "coherence_score": 8,
+      "cultural_score": 7,
+      "engagement_score": 7,
+      "psychological_trigger": "Curiosity Gap + Social Proof",
+      "trimmed": true,
+      "trim_reason": "Dropped S74-76 (Connected TV 10s = ₹8.5L and mobile CPM specifics) — granular rate-card details that slow the arc without adding emotional value. Jump from S73 to S77 stays coherent: 'TV packages ₹40–240cr' → 'ఎందుకు brands ఇంత pay చేస్తున్నాయి అంటే'.",
+      "notes": "Hook is a question format — works well for Telugu audience but slightly lower scroll-stop than a statement. Payoff is soft. Strongest part is S82-84 ('India-లో ఏ platform-కి ఇంత reach లేదు / Nothing comes close to IPL')."
+    },
+    {
+      "clip_id": "clip_c4",
+      "start": "501.48",
+      "end": "544.7",
+      "duration": "43.22",
+      "segments": [
+        {"start_sent_id": 111, "end_sent_id": 114},
+        {"start_sent_id": 116, "end_sent_id": 119}
+      ],
+      "confidence_rank": 5,
+      "confidence_note": "Controversial Take + Cultural Commentary: The 'hoarding board' metaphor for jerseys is instantly visual and relatable — every Telugu viewer has seen those jerseys and never thought this way. The payoff ('commercial event మధ్యలో cricket') is a genuine perspective shift that drives saves and comments.",
+      "hook_text": "పై నుంచి కింద దాకా hoarding board లాగా రకరకాల brand-లు ఉంటాయి.",
+      "payoff_text": "ఉండ ఒక పెద్ద commercial event మధ్యలో cricket జరుగుతున్నట్లు అయిపోయింది.",
+      "why": "Reframes the familiar IPL jersey as a walking billboard, extends it to every inch of the broadcast, and lands on the 'cricket is the sideshow' conclusion that provokes both agreement and debate.",
+      "engagement_type": "Controversial",
+      "hook_score": 7,
+      "coherence_score": 8,
+      "cultural_score": 9,
+      "engagement_score": 8,
+      "psychological_trigger": "Controversial Take + Negative Visualization",
+      "trimmed": true,
+      "trim_reason": "Dropped S115 ('Next time IPL match చూసేటప్పుడు ఒకటి ఖచ్చితంగా గుర్తుపెట్టుకోండి') — transitional filler that breaks the clip's cold-open integrity if ever reused. S116 ('Everything has a price tag in IPL') connects directly to S114 without needing S115.",
+      "notes": "Short clip (~7 sentences) but punchy. Hook is visual and works. The payoff at S119 is the strongest editorial line in the entire video."
+    },
+    {
+      "clip_id": "clip_c5",
+      "start": "614.96",
+      "end": "650.86",
+      "duration": "35.9",
+      "segments": [
+        {"start_sent_id": 140, "end_sent_id": 147}
+      ],
+      "confidence_rank": 3,
+      "confidence_note": "Counter-Intuitive Insight + Middle-Class Relatability: Every fan thinks IPL = players = big money. The '15 paisa per rupee' reveal is the exact kind of counter-intuitive math that Telugu edu-content viewers screenshot and share. The hook is a budget number that sounds big until the math breaks it.",
+      "hook_text": "See ప్రతి franchise-కి auction-లో ₹120 crore-లు budget ఉంటుంది.",
+      "payoff_text": "అంటే franchise-లు తమకు వచ్చే ప్రతి ₹1-లో 15 పైసా మాత్రమే player-ల కోసం ఖర్చు పెడుతుంది.",
+      "why": "Starts with the auction budget that sounds large, walks through the income vs spend math, and lands on the '15 paisa per rupee' stat that completely dismantles the 'IPL is about players' narrative.",
+      "engagement_type": "Educational",
+      "hook_score": 6,
+      "coherence_score": 9,
+      "cultural_score": 8,
+      "engagement_score": 8,
+      "psychological_trigger": "Counter-Intuitive Insight + Myth Busting",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "Hook is the weakest in this selection — 'See ప్రతి franchise-కి...' is functional but not scroll-stopping. Consider adding a verbal hook as B-roll text overlay in edit: something like 'IPL-లో players కి ఎంత వస్తుందో తెలుసా?' The math arc (S140-147) is tight and cannot be cut without losing the payoff."
+    },
+    {
+      "clip_id": "clip_c6",
+      "start": "807.0",
+      "end": "869.94",
+      "duration": "62.94",
+      "segments": [
+        {"start_sent_id": 184, "end_sent_id": 196}
+      ],
+      "confidence_rank": 6,
+      "confidence_note": "Controversy + Negative Visualization: 'Inside job' is a trigger phrase that stops scrolling instantly. The Hyderabad Cricket Association president arrest makes it locally relevant for the Hyderabad audience specifically. The crore-estimate math at the end makes it feel like an expose.",
+      "hook_text": "ఇక్కడ problem ఏంటంటే ఈ black ticket market అనేది inside job.",
+      "payoff_text": "అంటే ఒక IPL season-లో black ticket turnover minimum-లో minimum 100 crore-లు ఉంటుంది which is all black money.",
+      "why": "Opens with the 'inside job' reveal, names the Hyderabad Cricket Association president arrest for local credibility, then quantifies the black market at ₹100cr+ to give the expose a scale.",
+      "engagement_type": "Controversial",
+      "hook_score": 8,
+      "coherence_score": 7,
+      "cultural_score": 8,
+      "engagement_score": 8,
+      "psychological_trigger": "Controversy + Fear of Missing Out",
+      "trimmed": true,
+      "trim_reason": "Dropped S162-183 entirely — the legal/Jaipur backstory and Rajesh Vishnoi arrest context is useful in the full video but ruins the cold-open. Starting at S184 ('inside job') creates immediate intrigue without needing the setup. The clip is self-contained: inside job → who runs it → real arrest → scale estimate.",
+      "notes": "Clip is on the longer side (~13 sentences) due to the math walkthrough. The walkthrough (S189-196) is necessary — cutting it loses the payoff scale. Coherence is slightly weaker than other clips because the jump from S186 (HCA president arrest) to S187 (invisible money flow) feels abrupt — editor may want to keep S187-188 as bridging lines, which is already included in this segment."
+    }
+  ]
+}

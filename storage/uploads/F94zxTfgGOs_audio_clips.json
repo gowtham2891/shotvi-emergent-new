@@ -1,0 +1,103 @@
+{
+  "video_id": "F94zxTfgGOs",
+  "video_duration": 860.38,
+  "total_sentences": 207,
+  "total_segments": 18,
+  "clips": [
+    {
+      "clip_id": "F94zxTfgGOs_c1",
+      "start": 64.0,
+      "end": 104.44,
+      "duration": 40.44,
+      "segments": [
+        {
+          "start_sent_id": 17,
+          "end_sent_id": 26
+        }
+      ],
+      "confidence_rank": 1,
+      "confidence_note": "Consequence-first hook about dopamine destruction, relatable modern habits, and a clear solution with an aspirational outcome ('Monk Mode').",
+      "hook_text": "నిజానికి ఈ అలవాటే మీ brain-లోని dopamine level-లను నాశనం చేస్తుంది.",
+      "payoff_text": "దీన్నే Monk Mode అని అంటారు.",
+      "why": "Common habits destroy dopamine; Zanshin (Monk Mode) boosts focus and productivity.",
+      "visual_note": "Speaker leans in with serious expression, uses emphatic hand gestures.",
+      "engagement_type": "Educational",
+      "hook_score": 9.0,
+      "coherence_score": 9.0,
+      "cultural_score": 8.0,
+      "engagement_score": 8.0,
+      "psychological_trigger": "Consequence-first, Problem/Solution, Aspirational",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "",
+      "virality_score": 8.7,
+      "para_id": 17,
+      "anchor_text": "దీన్నే Monk Mode అని అంటారు.",
+      "anchor_score": 8.7,
+      "transcript": [
+        {
+          "start": 64.0,
+          "end": 69.54,
+          "text": "కానీ నిజానికి ఈ అలవాటే మీ brain-లోని dopamine level-లను నాశనం చేస్తుంది."
+        },
+        {
+          "start": 69.88,
+          "end": 72.16,
+          "text": "మీ concentration power-ను చంపేస్తుంది."
+        },
+        {
+          "start": 72.64,
+          "end": 76.14,
+          "text": "Jan Sheen అంటే చేసే ప్రతి పనిలో దైవత్వాన్ని చూడటం."
+        },
+        {
+          "start": 76.44,
+          "end": 81.32,
+          "text": "మీరు గిన్నెలు కడుగుతున్నారా ఆ నీటిష్ person ఆ సబ్బు వాసనని పూర్తిగా feel అవ్వండి."
+        },
+        {
+          "start": 81.58,
+          "end": 85.3,
+          "text": "మీరు workout చేస్తున్నారా మీ muscle ఎలా కదులుతుందో గమనించండి."
+        },
+        {
+          "start": 85.7,
+          "end": 95.84,
+          "text": "ఎప్పుడైతే మీరు మీ మనసుని పక్కకి పోనీయకుండా 100% focus-తో కేవలం ఒక్క పని మీద మాత్రమే లగ్నం చేస్తారో అప్పుడే మీ brain ఒక super computer-లా మారిపోతుంది."
+        },
+        {
+          "start": 96.32,
+          "end": 99.44,
+          "text": "ఏ పనైనా సరే చాలా ఈజీగా తక్కువ time-లో అయిపోయేలా చేస్తుంది."
+        },
+        {
+          "start": 99.58,
+          "end": 100.74,
+          "text": "మీరు ఎక్కువ కష్టపడక్కర్లేదు."
+        },
+        {
+          "start": 101.0,
+          "end": 102.2,
+          "text": "ఆ పనే మిమ్మల్ని నడిపిస్తుంది."
+        },
+        {
+          "start": 102.4,
+          "end": 104.44,
+          "text": "దీన్నే Monk Mode అని అంటారు."
+        }
+      ],
+      "transcript_text": "కానీ నిజానికి ఈ అలవాటే మీ brain-లోని dopamine level-లను నాశనం చేస్తుంది. మీ concentration power-ను చంపేస్తుంది. Jan Sheen అంటే చేసే ప్రతి పనిలో దైవత్వాన్ని చూడటం. మీరు గిన్నెలు కడుగుతున్నారా ఆ నీటిష్ person ఆ సబ్బు వాసనని పూర్తిగా feel అవ్వండి. మీరు workout చేస్తున్నారా మీ muscle ఎలా కదులుతుందో గమనించండి. ఎప్పుడైతే మీరు మీ మనసుని పక్కకి పోనీయకుండా 100% focus-తో కేవలం ఒక్క పని మీద మాత్రమే లగ్నం చేస్తారో అప్పుడే మీ brain ఒక super computer-లా మారిపోతుంది. ఏ పనైనా సరే చాలా ఈజీగా తక్కువ time-లో అయిపోయేలా చేస్తుంది. మీరు ఎక్కువ కష్టపడక్కర్లేదు. ఆ పనే మిమ్మల్ని నడిపిస్తుంది. దీన్నే Monk Mode అని అంటారు."
+    }
+  ],
+  "metadata": {
+    "pipeline": "ClipForge-v16-TwoCallVision",
+    "approach": "junk-detection → video-upload → context-cache → rough-cut (Call1) → fine-cut (Call2) → segments-array",
+    "language": "Telugu/Codemix",
+    "gemini_model": "gemini-2.5-flash",
+    "call_1": "rough cut — find all genuine Reel moments",
+    "call_2": "fine cut — perfect hooks, payoffs, trim, score, rank",
+    "caching": "context cache reuses video tokens across both calls",
+    "clip_count_rule": "quality decides count, no min/max in prompts",
+    "file_uri": "https://generativelanguage.googleapis.com/v1beta/files/0vaabokap15s"
+  }
+}

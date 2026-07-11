@@ -1,0 +1,517 @@
+{
+  "video_id": "CC8V0PwlQ4o",
+  "video_duration": 692.9,
+  "total_sentences": 189,
+  "total_segments": 11,
+  "clips": [
+    {
+      "clip_id": "CC8V0PwlQ4o_c1",
+      "start": 435.92,
+      "end": 507.82,
+      "duration": 71.18,
+      "segments": [
+        {
+          "start_sent_id": 121,
+          "end_sent_id": 121
+        },
+        {
+          "start_sent_id": 123,
+          "end_sent_id": 140
+        }
+      ],
+      "confidence_rank": 1,
+      "confidence_note": "Political Hypocrisy: This 'flip the script' test exposing double standards is high-engagement political commentary for Telugu youth.",
+      "hook_text": "ఈ game-కి నేను పెట్టే పేరు ఏంటంటే Religion and Party Change Test అని.",
+      "payoff_text": "Beti Bachao Beti Padhao అంటారు కానీ ఇక్కడ జరుగుతుంది Beti Bachao కాదు Beta Bachao.",
+      "why": "A thought experiment exposing political double standards regarding crimes against women.",
+      "visual_note": "A vibrant blue and orange graphic titled 'Religion and Party Change Test' flashes.",
+      "engagement_type": "Controversial",
+      "hook_score": 10.0,
+      "coherence_score": 9.0,
+      "cultural_score": 10.0,
+      "engagement_score": 10.0,
+      "psychological_trigger": "Controversial Take",
+      "trimmed": true,
+      "trim_reason": "Removed sentence 122 which was a short filler word ('annamata') to improve flow.",
+      "notes": "",
+      "virality_score": 10.0,
+      "para_id": 121,
+      "anchor_text": "Beti Bachao Beti Padhao అంటారు కానీ ఇక్కడ జరుగుతుంది Beti Bachao కాదు Beta Bachao.",
+      "anchor_score": 10.0,
+      "transcript": [
+        {
+          "start": 435.92,
+          "end": 439.94,
+          "text": "ఈ game-కి నేను పెట్టే పేరు ఏంటంటే Religion and Party Change Test అని."
+        },
+        {
+          "start": -1,
+          "end": -1,
+          "text": "[CUT]"
+        },
+        {
+          "start": 440.66,
+          "end": 442.52,
+          "text": "script మొత్తం తిప్పేద్దాం అంటే flip చేద్దాం."
+        },
+        {
+          "start": 442.66,
+          "end": 447.12,
+          "text": "exact-గా same case ఇటు case అటు honey trapping case everything same."
+        },
+        {
+          "start": 447.38,
+          "end": 453.96,
+          "text": "కానీ ఇక్కడ accused BJP Minister son కాకుండా accused వచ్చేసి వేరే religion లేదా వేరే political party అనుకుందాం."
+        },
+        {
+          "start": 454.06,
+          "end": 458.5,
+          "text": "ఇప్పుడు ఆ batch అంతా అమ్మాయిని question చేసి accused-ని defend చేస్తారా?"
+        },
+        {
+          "start": 458.96,
+          "end": 459.84,
+          "text": "ప్రాణం పోయినా చేయరు."
+        },
+        {
+          "start": 460.22,
+          "end": 462.54,
+          "text": "రాత్రికి రాత్రి దీన్ని national issue చేసేస్తారు."
+        },
+        {
+          "start": 462.66,
+          "end": 464.78,
+          "text": "social media-లో hashtag-లు trend అవుతాయి."
+        },
+        {
+          "start": 464.82,
+          "end": 466.18,
+          "text": "prime time debate-లు జరుగుతాయి."
+        },
+        {
+          "start": 466.46,
+          "end": 467.6,
+          "text": "candle march-లు జరుగుతాయి."
+        },
+        {
+          "start": 467.92,
+          "end": 470.0,
+          "text": "just fair investigation చేయండి అని."
+        },
+        {
+          "start": 470.06,
+          "end": 474.98,
+          "text": "ఎవరైనా opposition leader అడిగితే వాళ్ళని anti-Hindu, anti-Indian అని ముద్ర వేస్తారు."
+        },
+        {
+          "start": 475.14,
+          "end": 481.92,
+          "text": "BJP women leader-లు రోడ్ల మీదకు వచ్చి కన్నీరు మున్నీరై ఆడబిడ్డల్ని కాపాడటానికి మేము పుట్టింది అన్నట్లు పెద్ద పెద్ద dialogue-లు చెప్తారు."
+        },
+        {
+          "start": 481.96,
+          "end": 487.0,
+          "text": "కానీ ఇక్కడ ఉంది BJP leader కొడుకు కాబట్టి investigation జరగనివ్వండి అప్పుడే ఎందుకు conclusion-లకు వస్తారు?"
+        },
+        {
+          "start": 487.2,
+          "end": 489.62,
+          "text": "ఇదంతా honey trap అబ్బా డబ్బుల కోసం చేస్తున్నారు అంటారు."
+        },
+        {
+          "start": 490.12,
+          "end": 492.0,
+          "text": "దీన్ని English-లో double standards అంటారు."
+        },
+        {
+          "start": 492.2,
+          "end": 497.86,
+          "text": "మనకి convenient-గా ఉన్నప్పుడు #MeToo అని మన ఇంటికి వస్తే మాత్రం #honeytrap అంటే కష్టం."
+        },
+        {
+          "start": 498.14,
+          "end": 502.54,
+          "text": "బాధితులు justice అడిగినప్పుడు వాళ్ళు మాత్రం ఆ party వాళ్ళ వేరే party వాళ్ళ అని చూడటం తప్పు."
+        },
+        {
+          "start": 502.86,
+          "end": 507.82,
+          "text": "Beti Bachao Beti Padhao అంటారు కానీ ఇక్కడ జరుగుతుంది Beti Bachao కాదు Beta Bachao."
+        }
+      ],
+      "transcript_text": "ఈ game-కి నేను పెట్టే పేరు ఏంటంటే Religion and Party Change Test అని. script మొత్తం తిప్పేద్దాం అంటే flip చేద్దాం. exact-గా same case ఇటు case అటు honey trapping case everything same. కానీ ఇక్కడ accused BJP Minister son కాకుండా accused వచ్చేసి వేరే religion లేదా వేరే political party అనుకుందాం. ఇప్పుడు ఆ batch అంతా అమ్మాయిని question చేసి accused-ని defend చేస్తారా? ప్రాణం పోయినా చేయరు. రాత్రికి రాత్రి దీన్ని national issue చేసేస్తారు. social media-లో hashtag-లు trend అవుతాయి. prime time debate-లు జరుగుతాయి. candle march-లు జరుగుతాయి. just fair investigation చేయండి అని. ఎవరైనా opposition leader అడిగితే వాళ్ళని anti-Hindu, anti-Indian అని ముద్ర వేస్తారు. BJP women leader-లు రోడ్ల మీదకు వచ్చి కన్నీరు మున్నీరై ఆడబిడ్డల్ని కాపాడటానికి మేము పుట్టింది అన్నట్లు పెద్ద పెద్ద dialogue-లు చెప్తారు. కానీ ఇక్కడ ఉంది BJP leader కొడుకు కాబట్టి investigation జరగనివ్వండి అప్పుడే ఎందుకు conclusion-లకు వస్తారు? ఇదంతా honey trap అబ్బా డబ్బుల కోసం చేస్తున్నారు అంటారు. దీన్ని English-లో double standards అంటారు. మనకి convenient-గా ఉన్నప్పుడు #MeToo అని మన ఇంటికి వస్తే మాత్రం #honeytrap అంటే కష్టం. బాధితులు justice అడిగినప్పుడు వాళ్ళు మాత్రం ఆ party వాళ్ళ వేరే party వాళ్ళ అని చూడటం తప్పు. Beti Bachao Beti Padhao అంటారు కానీ ఇక్కడ జరుగుతుంది Beti Bachao కాదు Beta Bachao."
+    },
+    {
+      "clip_id": "CC8V0PwlQ4o_c2",
+      "start": 265.54,
+      "end": 348.42,
+      "duration": 82.88,
+      "segments": [
+        {
+          "start_sent_id": 75,
+          "end_sent_id": 91
+        }
+      ],
+      "confidence_rank": 2,
+      "confidence_note": "Cultural Reference: Mentioning the infamous 'Fun Bucket Bhargav' case provides massive cultural context and legal clarity.",
+      "hook_text": "ఏమరా Balraj నీకు ఇంకా బాగా అర్థమయ్యేలాగా నీకు ఒక మంచి example చెప్తాను చూడు.",
+      "payoff_text": "ఇలాంటి వారి వల్ల ఈ దేశంలో అన్యాయానికి గురైన అమ్మాయిలు ధైర్యంగా పైకి చెప్పుకోలేక silent అయిపోతారు.",
+      "why": "Explaining the irrelevance of consent in minor-assault cases using a famous precedent.",
+      "visual_note": "The speaker addresses 'Balraj' directly, leaning into the camera with intensity.",
+      "engagement_type": "Educational",
+      "hook_score": 9.0,
+      "coherence_score": 10.0,
+      "cultural_score": 10.0,
+      "engagement_score": 9.0,
+      "psychological_trigger": "Myth Busting",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "The Bhargav case is a very strong anchor for Telugu social media audiences.",
+      "virality_score": 9.5,
+      "para_id": 75,
+      "anchor_text": "ఇలాంటి వారి వల్ల ఈ దేశంలో అన్యాయానికి గురైన అమ్మాయిలు ధైర్యంగా పైకి చెప్పుకోలేక silent అయిపోతారు.",
+      "anchor_score": 9.5,
+      "transcript": [
+        {
+          "start": 265.54,
+          "end": 269.2,
+          "text": "ఏమరా Balraj నీకు ఇంకా బాగా అర్థమయ్యేలాగా నీకు ఒక మంచి example చెప్తాను చూడు."
+        },
+        {
+          "start": 269.82,
+          "end": 271.78,
+          "text": "Fun Bucket Bhargav అని అప్పట్లో ఒకడు ఉండేవాడు."
+        },
+        {
+          "start": 272.28,
+          "end": 274.28,
+          "text": "ఏకంగా minor అమ్మాయికి కడుపు చేశాడన్నమాట."
+        },
+        {
+          "start": 274.66,
+          "end": 281.78,
+          "text": "Just imagine ఆ అమ్మాయి నుంచి cooperation లేకుండా అంత easy-గా కడుపు చేయగలడా but still అతనికి 20 సంవత్సరాల jail శిక్ష పడింది."
+        },
+        {
+          "start": 281.9,
+          "end": 286.48,
+          "text": "So ఇక్కడ case-లో అమ్మాయికి ఇష్టం ఉన్నా లేకపోయినా అనేది doesn't matter అన్నమాట."
+        },
+        {
+          "start": 286.58,
+          "end": 290.28,
+          "text": "ఇలాంటి వాళ్ళకి ఎంత చెప్పినా అర్థం కావట్లేదు ఈ point వాళ్ళ mind-కి ఎక్కడ లేదు."
+        },
+        {
+          "start": 290.74,
+          "end": 292.2,
+          "text": "సోలో consent-తో పని లేదు."
+        },
+        {
+          "start": 292.6,
+          "end": 297.32,
+          "text": "అమ్మ ఇష్టంతో చేసినా ఇష్టం లేకుండా చేసినా under 18 అయితే సో act కింద లోపల వేస్తారు."
+        },
+        {
+          "start": 297.6,
+          "end": 298.86,
+          "text": "ఆ విషయం బాగా అర్థం చేసుకోండి."
+        },
+        {
+          "start": 298.98,
+          "end": 301.28,
+          "text": "అర్థం చేసుకోలేని వాళ్ళకి కొంచెం చెప్పడానికి try చేయండి."
+        },
+        {
+          "start": 301.58,
+          "end": 303.58,
+          "text": "వాడు video మొత్తం సారాంశం ఏంటో తెలుసా?"
+        },
+        {
+          "start": 304.02,
+          "end": 312.1,
+          "text": "అతనితో తిన్నావు తిరిగావు parties-కి వెళ్ళావు ఇంటికి invite చేసావు కాబట్టి maybe this 17 year old girl deserves it అన్నట్లు project చేశాడు."
+        },
+        {
+          "start": 312.26,
+          "end": 314.18,
+          "text": "Brother దాన్ని victim shaming అంటారు."
+        },
+        {
+          "start": 314.66,
+          "end": 317.42,
+          "text": "ఇలాంటి వాళ్ళని చూస్తే నాకు football team fans గుర్తొస్తున్నారు."
+        },
+        {
+          "start": 317.54,
+          "end": 320.2,
+          "text": "ఒక player clear-గా foul అయినప్పుడు red card ఇస్తాడు."
+        },
+        {
+          "start": 320.44,
+          "end": 329.44,
+          "text": "అందరికీ clear-గా కనిపిస్తుంది but fan-లు మాత్రం అతను ఏం చేయలేదు వేరే player-ఏ కావాలని dive చేశాడు ఇదొక conspiracy అంటారు దీన్నే English-లో blind loyalty అంటారు."
+        },
+        {
+          "start": 329.68,
+          "end": 348.42,
+          "text": "support వేరు blind loyalty వేరు blind loyalty అనేది చాలా dangerous thing ఎందుకంటే investigation start అవ్వకముందే నువ్వు accused-ని defend చేస్తున్నావ్ నువ్వు ఇక్కడ ఒక party-కో ఒక person-కో supporter-లా కాదు justice-కి enemy-లా ఉన్నావ్ ఇలాంటి వారి వల్ల ఈ దేశంలో అన్యాయానికి గురైన అమ్మాయిలు ధైర్యంగా పైకి చెప్పుకోలేక silent అయిపోతారు."
+        }
+      ],
+      "transcript_text": "ఏమరా Balraj నీకు ఇంకా బాగా అర్థమయ్యేలాగా నీకు ఒక మంచి example చెప్తాను చూడు. Fun Bucket Bhargav అని అప్పట్లో ఒకడు ఉండేవాడు. ఏకంగా minor అమ్మాయికి కడుపు చేశాడన్నమాట. Just imagine ఆ అమ్మాయి నుంచి cooperation లేకుండా అంత easy-గా కడుపు చేయగలడా but still అతనికి 20 సంవత్సరాల jail శిక్ష పడింది. So ఇక్కడ case-లో అమ్మాయికి ఇష్టం ఉన్నా లేకపోయినా అనేది doesn't matter అన్నమాట. ఇలాంటి వాళ్ళకి ఎంత చెప్పినా అర్థం కావట్లేదు ఈ point వాళ్ళ mind-కి ఎక్కడ లేదు. సోలో consent-తో పని లేదు. అమ్మ ఇష్టంతో చేసినా ఇష్టం లేకుండా చేసినా under 18 అయితే సో act కింద లోపల వేస్తారు. ఆ విషయం బాగా అర్థం చేసుకోండి. అర్థం చేసుకోలేని వాళ్ళకి కొంచెం చెప్పడానికి try చేయండి. వాడు video మొత్తం సారాంశం ఏంటో తెలుసా? అతనితో తిన్నావు తిరిగావు parties-కి వెళ్ళావు ఇంటికి invite చేసావు కాబట్టి maybe this 17 year old girl deserves it అన్నట్లు project చేశాడు. Brother దాన్ని victim shaming అంటారు. ఇలాంటి వాళ్ళని చూస్తే నాకు football team fans గుర్తొస్తున్నారు. ఒక player clear-గా foul అయినప్పుడు red card ఇస్తాడు. అందరికీ clear-గా కనిపిస్తుంది but fan-లు మాత్రం అతను ఏం చేయలేదు వేరే player-ఏ కావాలని dive చేశాడు ఇదొక conspiracy అంటారు దీన్నే English-లో blind loyalty అంటారు. support వేరు blind loyalty వేరు blind loyalty అనేది చాలా dangerous thing ఎందుకంటే investigation start అవ్వకముందే నువ్వు accused-ని defend చేస్తున్నావ్ నువ్వు ఇక్కడ ఒక party-కో ఒక person-కో supporter-లా కాదు justice-కి enemy-లా ఉన్నావ్ ఇలాంటి వారి వల్ల ఈ దేశంలో అన్యాయానికి గురైన అమ్మాయిలు ధైర్యంగా పైకి చెప్పుకోలేక silent అయిపోతారు."
+    },
+    {
+      "clip_id": "CC8V0PwlQ4o_c3",
+      "start": 16.34,
+      "end": 59.82,
+      "duration": 43.48,
+      "segments": [
+        {
+          "start_sent_id": 3,
+          "end_sent_id": 13
+        }
+      ],
+      "confidence_rank": 3,
+      "confidence_note": "Social Relatability: The contrast between ideal support and societal victim-blaming is a powerful emotional hook.",
+      "hook_text": "ఒక 17 సంవత్సరాల minor అమ్మాయి ముందుకు వచ్చి నన్ను assault చేశారు, ఇష్టం లేకుండా alcohol ఇచ్చారు, harassment చేశారు అని చెప్తే మీరు చేసే first పని ఏంటి?",
+      "payoff_text": "Remember ఇది normal case అయితే ఈ logic-లు work అవుతాయి but so case-లో కాదు first remember that point.",
+      "why": "Critiquing the toxic 'logical' excuses society makes to blame victims of assault.",
+      "visual_note": "Speaker in a maroon blazer leaning forward with a concerned, serious expression.",
+      "engagement_type": "Relatable",
+      "hook_score": 8.0,
+      "coherence_score": 9.0,
+      "cultural_score": 8.0,
+      "engagement_score": 8.0,
+      "psychological_trigger": "Middle-Class Relatability",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "",
+      "virality_score": 8.8,
+      "para_id": 3,
+      "anchor_text": "Remember ఇది normal case అయితే ఈ logic-లు work అవుతాయి but so case-లో కాదు first remember that point.",
+      "anchor_score": 8.8,
+      "transcript": [
+        {
+          "start": 16.34,
+          "end": 25.66,
+          "text": "ఒక 17 సంవత్సరాల minor అమ్మాయి ముందుకు వచ్చి నన్ను assault చేశారు, ఇష్టం లేకుండా alcohol ఇచ్చారు, harassment చేశారు అని చెప్తే మీరు చేసే first పని ఏంటి?"
+        },
+        {
+          "start": 26.1,
+          "end": 29.48,
+          "text": "ఆ అమ్మాయికి support ఇస్తారు, న్యాయం జరగాలి అని demand చేస్తారు."
+        },
+        {
+          "start": 29.62,
+          "end": 31.06,
+          "text": "fair-గా investigate చేయండి."
+        },
+        {
+          "start": 31.2,
+          "end": 38.56,
+          "text": "In case అవతల వాళ్ళది తప్పు లేదు, ఇది fake case అంటే అమ్మాయి మీద Action తీసుకోండి లేదంటే అమ్మాయికి న్యాయం చేయండి అని అడుగుతారు."
+        },
+        {
+          "start": 38.82,
+          "end": 39.26,
+          "text": "అవునా కాదా?"
+        },
+        {
+          "start": 39.42,
+          "end": 41.46,
+          "text": "కానీ మన సమాజంలో కొంతమంది ఉంటారు."
+        },
+        {
+          "start": 41.92,
+          "end": 44.6,
+          "text": "అమ్మాయి పక్షాన నిలబడకుండా అతనితో ఎందుకు తిరిగింది?"
+        },
+        {
+          "start": 44.8,
+          "end": 46.18,
+          "text": "అతనితో function-లకు ఎందుకు వెళ్ళింది?"
+        },
+        {
+          "start": 46.56,
+          "end": 48.78,
+          "text": "అతను వాళ్ళ family-తో అంత close-గా ఎందుకు ఉన్నాడు?"
+        },
+        {
+          "start": 49.14,
+          "end": 54.02,
+          "text": "ఇది political conspiracy, honey trap చేసి డబ్బులు demand చేస్తున్నారు అని పిచ్చి పిచ్చి logic-లు చెప్తారు."
+        },
+        {
+          "start": 54.4,
+          "end": 59.82,
+          "text": "Remember ఇది normal case అయితే ఈ logic-లు work అవుతాయి but so case-లో కాదు first remember that point."
+        }
+      ],
+      "transcript_text": "ఒక 17 సంవత్సరాల minor అమ్మాయి ముందుకు వచ్చి నన్ను assault చేశారు, ఇష్టం లేకుండా alcohol ఇచ్చారు, harassment చేశారు అని చెప్తే మీరు చేసే first పని ఏంటి? ఆ అమ్మాయికి support ఇస్తారు, న్యాయం జరగాలి అని demand చేస్తారు. fair-గా investigate చేయండి. In case అవతల వాళ్ళది తప్పు లేదు, ఇది fake case అంటే అమ్మాయి మీద Action తీసుకోండి లేదంటే అమ్మాయికి న్యాయం చేయండి అని అడుగుతారు. అవునా కాదా? కానీ మన సమాజంలో కొంతమంది ఉంటారు. అమ్మాయి పక్షాన నిలబడకుండా అతనితో ఎందుకు తిరిగింది? అతనితో function-లకు ఎందుకు వెళ్ళింది? అతను వాళ్ళ family-తో అంత close-గా ఎందుకు ఉన్నాడు? ఇది political conspiracy, honey trap చేసి డబ్బులు demand చేస్తున్నారు అని పిచ్చి పిచ్చి logic-లు చెప్తారు. Remember ఇది normal case అయితే ఈ logic-లు work అవుతాయి but so case-లో కాదు first remember that point."
+    },
+    {
+      "clip_id": "CC8V0PwlQ4o_c4",
+      "start": 119.32,
+      "end": 194.7,
+      "duration": 65.44,
+      "segments": [
+        {
+          "start_sent_id": 31,
+          "end_sent_id": 43
+        },
+        {
+          "start_sent_id": 47,
+          "end_sent_id": 54
+        }
+      ],
+      "confidence_rank": 4,
+      "confidence_note": "Headline News: Starting with a high-profile case involving a minister's son creates immediate shock value.",
+      "hook_text": "సెంట్రల్ మినిస్టర్ కొడుకు మీద ఒక అమ్మాయి కేసు file చేసింది.",
+      "payoff_text": "ఒక minor అమ్మాయి involve అయిన కేసులో అలా మాట్లాడటం తప్పు కదా?",
+      "why": "Critiquing the media's biased defense of a powerful politician's son in a POCSO case.",
+      "visual_note": "Overlaying screenshots of the specific Bandi Bhagirath POCSO case news reports.",
+      "engagement_type": "Emotional",
+      "hook_score": 9.0,
+      "coherence_score": 8.0,
+      "cultural_score": 9.0,
+      "engagement_score": 7.0,
+      "psychological_trigger": "Curiosity Gap",
+      "trimmed": true,
+      "trim_reason": "Trimmed repetitive 'according to sources' filler (sentences 44-46) to tighten the delivery.",
+      "notes": "",
+      "virality_score": 9.0,
+      "para_id": 31,
+      "anchor_text": "ఒక minor అమ్మాయి involve అయిన కేసులో అలా మాట్లాడటం తప్పు కదా?",
+      "anchor_score": 9.0,
+      "transcript": [
+        {
+          "start": 119.32,
+          "end": 121.86,
+          "text": "సెంట్రల్ మినిస్టర్ కొడుకు మీద ఒక అమ్మాయి కేసు file చేసింది."
+        },
+        {
+          "start": 121.9,
+          "end": 126.88,
+          "text": "కనీసం Bandi Sanjay గారు ఆయన కొడుకు Bandi Bhagirath అని పేర్లు కూడా చెప్పట్లే."
+        },
+        {
+          "start": 126.92,
+          "end": 128.82,
+          "text": "Just Union Minister కొడుకు అంతే."
+        },
+        {
+          "start": 129.18,
+          "end": 130.48,
+          "text": "అంతా normal-గానే ఉండింది."
+        },
+        {
+          "start": 130.64,
+          "end": 131.76,
+          "text": "అంతా బాగానే నడుస్తుంది."
+        },
+        {
+          "start": 132.06,
+          "end": 132.86,
+          "text": "sudden-గా ఏమైంది?"
+        },
+        {
+          "start": 133.1,
+          "end": 134.0,
+          "text": "రాజకీయం."
+        },
+        {
+          "start": 134.26,
+          "end": 137.04,
+          "text": "డైరెక్ట్-గా accused-ని defend చేయడంతో స్టార్ట్ చేశారు."
+        },
+        {
+          "start": 137.18,
+          "end": 138.8,
+          "text": "Yes, sources అవే చెప్తున్నాయి."
+        },
+        {
+          "start": 138.98,
+          "end": 142.28,
+          "text": "వాళ్ళు నిజంగా love చేసుకునే ఉంటే ఆ అమ్మాయి ఎందుకు ఇదంతా చేస్తుంది?"
+        },
+        {
+          "start": 142.54,
+          "end": 143.72,
+          "text": "According to the sources."
+        },
+        {
+          "start": 144.08,
+          "end": 150.48,
+          "text": "ఆ పెద్ద ఆయనేమో అవును sources చెప్తున్నాయి అని అనటం వాడేమో అవునా నిజమా అని shocking face పెట్టడం."
+        },
+        {
+          "start": 150.52,
+          "end": 151.82,
+          "text": "మనం ఈ video చేయడం అవసరం."
+        },
+        {
+          "start": -1,
+          "end": -1,
+          "text": "[CUT]"
+        },
+        {
+          "start": 161.76,
+          "end": 163.72,
+          "text": "ఒకసారి ఈ screen మీద screenshot చూడండి."
+        },
+        {
+          "start": 164.1,
+          "end": 167.64,
+          "text": "POCSO case on Bandi San Bhagirath says extortion."
+        },
+        {
+          "start": 168.0,
+          "end": 175.68,
+          "text": "దాని అర్థం ఏంటంటే Bandi Sanjay గారి కొడుకు మీద POCSO case అయింది కానీ ఆ కొడుకు మాత్రం డబ్బులు demand చేశారు అని చెప్తున్నాడు."
+        },
+        {
+          "start": 176.08,
+          "end": 178.5,
+          "text": "ఒక accused చెప్పిందంట వీళ్ళకి source అంట."
+        },
+        {
+          "start": 178.68,
+          "end": 186.82,
+          "text": "ఇప్పుడు నేను ఒక murder చేశాను నా మీద case పెట్టారనుకోండి హే లేదు నేను చేతిలో కత్తి ఇలా పట్టుకొని ఉంటే అలా వచ్చి మీద పడిపోయాడు చచ్చిపోయారు అని చెప్తా."
+        },
+        {
+          "start": 187.14,
+          "end": 188.4,
+          "text": "According to source-లు."
+        },
+        {
+          "start": 188.56,
+          "end": 190.94,
+          "text": "అతనే వచ్చి కత్తి మీద పడి చచ్చిపోయాడు అని చెప్తావా?"
+        },
+        {
+          "start": 191.36,
+          "end": 194.7,
+          "text": "ఒక minor అమ్మాయి involve అయిన కేసులో అలా మాట్లాడటం తప్పు కదా?"
+        }
+      ],
+      "transcript_text": "సెంట్రల్ మినిస్టర్ కొడుకు మీద ఒక అమ్మాయి కేసు file చేసింది. కనీసం Bandi Sanjay గారు ఆయన కొడుకు Bandi Bhagirath అని పేర్లు కూడా చెప్పట్లే. Just Union Minister కొడుకు అంతే. అంతా normal-గానే ఉండింది. అంతా బాగానే నడుస్తుంది. sudden-గా ఏమైంది? రాజకీయం. డైరెక్ట్-గా accused-ని defend చేయడంతో స్టార్ట్ చేశారు. Yes, sources అవే చెప్తున్నాయి. వాళ్ళు నిజంగా love చేసుకునే ఉంటే ఆ అమ్మాయి ఎందుకు ఇదంతా చేస్తుంది? According to the sources. ఆ పెద్ద ఆయనేమో అవును sources చెప్తున్నాయి అని అనటం వాడేమో అవునా నిజమా అని shocking face పెట్టడం. మనం ఈ video చేయడం అవసరం. ఒకసారి ఈ screen మీద screenshot చూడండి. POCSO case on Bandi San Bhagirath says extortion. దాని అర్థం ఏంటంటే Bandi Sanjay గారి కొడుకు మీద POCSO case అయింది కానీ ఆ కొడుకు మాత్రం డబ్బులు demand చేశారు అని చెప్తున్నాడు. ఒక accused చెప్పిందంట వీళ్ళకి source అంట. ఇప్పుడు నేను ఒక murder చేశాను నా మీద case పెట్టారనుకోండి హే లేదు నేను చేతిలో కత్తి ఇలా పట్టుకొని ఉంటే అలా వచ్చి మీద పడిపోయాడు చచ్చిపోయారు అని చెప్తా. According to source-లు. అతనే వచ్చి కత్తి మీద పడి చచ్చిపోయాడు అని చెప్తావా? ఒక minor అమ్మాయి involve అయిన కేసులో అలా మాట్లాడటం తప్పు కదా?"
+    }
+  ],
+  "metadata": {
+    "pipeline": "ClipForge-v17-ThreeCallVision",
+    "approach": "junk-detection (incl. sentence-level CTA flagging) → video-upload → context-cache → rough-cut (Call1) → fine-cut (Call2) → trim-long-clips (Call3, conditional) → segments-array",
+    "language": "Telugu/Codemix",
+    "gemini_model": "gemini-3-flash-preview",
+    "thinking_level": "HIGH",
+    "call_1": "rough cut — find all genuine Reel moments",
+    "call_2": "fine cut — perfect hooks, payoffs, trim, score, rank",
+    "call_3": "trim-long-clips — fires only on clips > 90s",
+    "trim_trigger_sec": 90,
+    "trim_target_sec": 75,
+    "caching": "context cache reuses video tokens across all calls",
+    "clip_count_rule": "quality decides count, no min/max in prompts",
+    "file_uri": "https://generativelanguage.googleapis.com/v1beta/files/hmf97c5pfs5x"
+  }
+}

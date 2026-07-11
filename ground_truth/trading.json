@@ -1,0 +1,120 @@
+{
+  "clips": [
+    {
+      "clip_id": "clip_c1",
+      "start": "208.88",
+      "end": "248.02",
+      "duration": "39.14",
+      "segments": [
+        {"start_sent_id": 43, "end_sent_id": 51}
+      ],
+      "confidence_rank": 1,
+      "confidence_note": "Aspirational + Shocking Number: MRF ₹1000 → ₹75,000 is a visceral wealth realization moment. Telugu urban audience responds hard to 'ఈరోజు మనం కోట్లాధిపతి' framing — it's personal, not abstract.",
+      "hook_text": "MRF MRF యొక్క share 2000 సంవత్సరంలో just 1000.",
+      "payoff_text": "So ఇంత power investment-లో ఉంది కానీ trading-లో అంత power లేదు.",
+      "why": "A single concrete number (₹1000 → ₹75,000) makes the abstract power of long-term investment feel personally achievable and shocking.",
+      "engagement_type": "Insight",
+      "hook_score": 9,
+      "coherence_score": 9,
+      "cultural_score": 9,
+      "engagement_score": 9,
+      "psychological_trigger": "Aspirational + Shocking Fact",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "Sent 44-48 are fragmented (repeat, 'కానీ ఈరోజు', '75,000 చూడండి') — these will feel punchy and fast-paced on video, not broken. Keep them."
+    },
+    {
+      "clip_id": "clip_c2",
+      "start": "457.98",
+      "end": "487.96",
+      "duration": "29.98",
+      "segments": [
+        {"start_sent_id": 101, "end_sent_id": 108}
+      ],
+      "confidence_rank": 2,
+      "confidence_note": "Myth Busting + Fear: '90% of traders lose money' delivered with a coin-flip analogy directly dismantles the 'trading = easy income' myth that Telugu finance content inflates. Extremely shareable because it triggers defensiveness.",
+      "hook_text": "మీకు తెలుసా? 90% of people trading-లో daily loss-ని face చేస్తున్నారు.",
+      "payoff_text": "So మన India-లో 90% ఎవరైతే trading చేస్తున్నారో వాళ్ళు నష్టపోతూ ఉన్నారు.",
+      "why": "Uses a shocking statistic, reframes trading as a coin flip, then hammers it home — complete myth-bust arc.",
+      "engagement_type": "Controversial",
+      "hook_score": 10,
+      "coherence_score": 9,
+      "cultural_score": 8,
+      "engagement_score": 10,
+      "psychological_trigger": "Myth Busting + Negative Visualization",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "Sent 101 ('మీకు తెలుసా?') is a strong mass opener per the skill. Do not cut it."
+    },
+    {
+      "clip_id": "clip_c3",
+      "start": "527.24",
+      "end": "607.18",
+      "duration": "79.94",
+      "segments": [
+        {"start_sent_id": 117, "end_sent_id": 136}
+      ],
+      "confidence_rank": 3,
+      "confidence_note": "Conspiracy/Systemic Reveal: Exposing that TV, YouTube channels, and brokers all profit when you trade is a 'hidden agenda' reveal that Telugu audiences find extremely engaging — it validates their distrust of financial influencers.",
+      "hook_text": "అదే విధంగా recent-గా చాలా YouTube channel-లు కావచ్చు, TV వాళ్ళు కావచ్చు మొత్తం trading-నే encourage చేస్తున్నారు.",
+      "payoff_text": "ఎవరైతే stock market-లోకి వద్దాం అనుకుంటున్నారో వాళ్ళు ఖచ్చితంగా trading చేయండి అని చెప్పి వాళ్ళు చెప్తున్నారు.",
+      "why": "Reveals why the entire financial media ecosystem pushes trading — a systemic self-interest expose that makes the viewer feel informed and betrayed.",
+      "engagement_type": "Controversial",
+      "hook_score": 7,
+      "coherence_score": 8,
+      "cultural_score": 9,
+      "engagement_score": 9,
+      "psychological_trigger": "Conspiracy Reveal + Systemic Distrust",
+      "trimmed": true,
+      "trim_reason": "Sentences 122-126 ('వార్తలు చూడాలంటే TV open చేయాలి. current bill. TV కొంటారు. news. అదే విధంగా YouTube.') are fragmented filler that disrupts the flow — however, cutting them breaks the logical chain TV→YouTube→broker. Keeping full clip for coherence.",
+      "notes": "Hook at sent 117 starts with 'అదే విధంగా' which is a transition word — however no cleaner cold-open exists for this topic in the video. Accept it; the content is strong enough to carry past the opener."
+    },
+    {
+      "clip_id": "clip_c4",
+      "start": "294.88",
+      "end": "350.72",
+      "duration": "55.84",
+      "segments": [
+        {"start_sent_id": 64, "end_sent_id": 66},
+        {"start_sent_id": 71, "end_sent_id": 74}
+      ],
+      "confidence_rank": 4,
+      "confidence_note": "Middle-Class Relatability + Fear of Loss: The scenario of going to work, forgetting your trade, coming back to ₹20 loss per share is viscerally relatable to the salaried Telugu viewer tempted by intraday trading.",
+      "hook_text": "మనమే కనుక intraday trading చేయాలంటే, మన time మొత్తం అక్కడే ఉండాలి, అక్కడే చూస్తూ ఉండాలి system-ని.",
+      "payoff_text": "₹80-కి తగ్గినట్లయితే ఒక share మీద మీకు ₹20 loss.",
+      "why": "Sets up the total time commitment required for intraday → shows what happens when you leave → ends on a concrete ₹20 loss.",
+      "engagement_type": "Relatable",
+      "hook_score": 7,
+      "coherence_score": 9,
+      "cultural_score": 9,
+      "engagement_score": 8,
+      "psychological_trigger": "Middle-Class Relatability + Negative Visualization",
+      "trimmed": true,
+      "trim_reason": "Dropped sent 67-70 (3:30 square-off mechanics). After sent 66 'గోవిందా!' flows naturally into the concrete example at 71 without needing the mechanics explained.",
+      "notes": ""
+    },
+    {
+      "clip_id": "clip_c5",
+      "start": "59.78",
+      "end": "94.78",
+      "duration": "34.98",
+      "segments": [
+        {"start_sent_id": 12, "end_sent_id": 18}
+      ],
+      "confidence_rank": 5,
+      "confidence_note": "Practical Utility + Aspirational: Clean explainer of how investors actually operate — filter, wait for dip, hold, earn lakhs. Strong educational arc for someone just entering the market.",
+      "hook_text": "అసలు investors ఏం చేస్తారు?",
+      "payoff_text": "వాళ్ళు 5 year-లు, 10 year-లు, 20 year-లు, 30 year-లు ఈ విధంగా పెట్టుబడి పెడతారు.",
+      "why": "Answers a fundamental beginner question with a complete process — filter → wait → buy → hold → profit — ending on a timeframe that frames investing as a lifestyle commitment.",
+      "engagement_type": "Educational",
+      "hook_score": 8,
+      "coherence_score": 9,
+      "cultural_score": 7,
+      "engagement_score": 7,
+      "psychological_trigger": "Practical Utility + Curiosity Gap",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "Lowest engagement potential of the 5 clips — purely educational. Good for saves, not shares. Rank 5 is correct."
+    }
+  ]
+}

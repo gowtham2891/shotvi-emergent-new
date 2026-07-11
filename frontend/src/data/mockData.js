@@ -1,0 +1,445 @@
+// Realistic Telugu/Tenglish mock data for Shotvi
+
+export const LANGUAGES = [
+  { code: "te", label: "తెలుగు (Telugu)", flag: "TE" },
+  { code: "tenglish", label: "Tenglish (Roman)", flag: "TG" },
+  { code: "hi", label: "हिन्दी (Hindi)", flag: "HI" },
+  { code: "en", label: "English", flag: "EN" },
+];
+
+export const CAPTION_PRESETS = [
+  {
+    id: "bold-yellow",
+    name: "Bold Yellow",
+    className: "caption-bold-yellow",
+    swatch: "#facc15",
+  },
+  {
+    id: "neon-green",
+    name: "Neon Green",
+    className: "caption-neon-green",
+    swatch: "#22ff9c",
+  },
+  {
+    id: "fire-gradient",
+    name: "Fire Gradient",
+    className: "caption-fire-gradient",
+    swatch: "linear-gradient(180deg,#fde047,#fb923c,#ef4444)",
+  },
+  {
+    id: "clean-white",
+    name: "Clean White",
+    className: "caption-clean-white",
+    swatch: "#ffffff",
+  },
+];
+
+// Default pill background per preset — user overridable
+export const PILL_DEFAULTS_BY_PRESET = {
+  "bold-yellow": {
+    enabled: true,
+    color: "#000000",
+    opacity: 0.5,
+    padding: 10,
+    radius: 8,
+  },
+  "neon-green": {
+    enabled: false,
+    color: "#000000",
+    opacity: 0.6,
+    padding: 8,
+    radius: 12,
+  },
+  "fire-gradient": {
+    enabled: true,
+    color: "#000000",
+    opacity: 0.35,
+    padding: 8,
+    radius: 8,
+  },
+  "clean-white": {
+    enabled: false,
+    color: "#000000",
+    opacity: 0.5,
+    padding: 8,
+    radius: 6,
+  },
+};
+
+// Initial canvas elements — caption visible, others hidden by default so user can toggle
+export const INITIAL_ELEMENTS = [
+  {
+    id: "el_caption_1",
+    type: "caption",
+    x: 0.5,
+    y: 0.82,
+    scale: 1,
+    rotation: 0,
+    visible: true,
+    locked: false,
+    props: {
+      presetId: "bold-yellow",
+      font: "Outfit",
+      fontSize: 0.055,
+      animation: "karaoke",
+      pill: PILL_DEFAULTS_BY_PRESET["bold-yellow"],
+    },
+  },
+  {
+    id: "el_headline_1",
+    type: "headline",
+    x: 0.5,
+    y: 0.14,
+    scale: 1,
+    rotation: 0,
+    visible: false,
+    locked: false,
+    props: {
+      text: "94% VIRAL",
+      font: "Outfit",
+      fontSize: 0.055,
+      color: "#22ff9c",
+      weight: 900,
+      italic: false,
+      uppercase: true,
+      stroke: true,
+    },
+  },
+  {
+    id: "el_progress_1",
+    type: "progress",
+    x: 0.5,
+    y: 0.965,
+    scale: 1,
+    rotation: 0,
+    visible: false,
+    locked: false,
+    props: {
+      color: "#7c3aed",
+      width: 0.92,
+      height: 0.006,
+    },
+  },
+  {
+    id: "el_logo_1",
+    type: "logo",
+    x: 0.18,
+    y: 0.07,
+    scale: 1,
+    rotation: 0,
+    visible: false,
+    locked: false,
+    props: {
+      text: "@rahul_creator",
+      avatar: "R",
+      font: "Manrope",
+      fontSize: 0.022,
+    },
+  },
+  {
+    id: "el_sticker_1",
+    type: "sticker",
+    x: 0.78,
+    y: 0.6,
+    scale: 1,
+    rotation: -12,
+    visible: false,
+    locked: false,
+    props: {
+      emoji: "🔥",
+      fontSize: 0.13,
+    },
+  },
+];
+
+export const FONTS = [
+  "Outfit",
+  "Manrope",
+  "Bebas Neue",
+  "Anton",
+  "Poppins",
+  "Playfair Display",
+];
+
+// Projects (dashboard)
+export const PROJECTS = [
+  {
+    id: "prj_001",
+    title: "AI Tools Telugu Podcast - Ep 14",
+    thumbnail:
+      "https://images.pexels.com/photos/36917952/pexels-photo-36917952.jpeg",
+    duration: "1:24:18",
+    createdAt: "2 hours ago",
+    status: "ready",
+    clipsCount: 8,
+    language: "te",
+  },
+  {
+    id: "prj_002",
+    title: "Stock Market Basics — Part 1",
+    thumbnail:
+      "https://images.pexels.com/photos/34037223/pexels-photo-34037223.jpeg",
+    duration: "42:07",
+    createdAt: "5 hours ago",
+    status: "selecting_clips",
+    progress: 78,
+    clipsCount: 0,
+    language: "tenglish",
+  },
+  {
+    id: "prj_003",
+    title: "My Podcast Setup Tour 2024",
+    thumbnail:
+      "https://images.pexels.com/photos/13027585/pexels-photo-13027585.jpeg",
+    duration: "28:44",
+    createdAt: "yesterday",
+    status: "transcribing",
+    progress: 42,
+    clipsCount: 0,
+    language: "tenglish",
+  },
+  {
+    id: "prj_004",
+    title: "Viral Aithe Ela — Reels Strategy",
+    thumbnail:
+      "https://images.unsplash.com/photo-1563089145-599997674d42",
+    duration: "56:31",
+    createdAt: "yesterday",
+    status: "ready",
+    clipsCount: 12,
+    language: "te",
+  },
+  {
+    id: "prj_005",
+    title: "Interview with Startup Founder",
+    thumbnail:
+      "https://images.pexels.com/photos/36917952/pexels-photo-36917952.jpeg",
+    duration: "1:12:00",
+    createdAt: "3 days ago",
+    status: "uploading",
+    progress: 24,
+    clipsCount: 0,
+    language: "tenglish",
+  },
+  {
+    id: "prj_006",
+    title: "Motivation Mantra - Sunday Session",
+    thumbnail:
+      "https://images.pexels.com/photos/34037223/pexels-photo-34037223.jpeg",
+    duration: "38:12",
+    createdAt: "5 days ago",
+    status: "ready",
+    clipsCount: 6,
+    language: "te",
+  },
+];
+
+// Clips per project
+export const CLIPS_BY_PROJECT = {
+  prj_001: [
+    {
+      id: "clip_001",
+      projectId: "prj_001",
+      hook: "ఈ ఒక్క AI tool మీ life మార్చేస్తుంది!",
+      hookEn: "This one AI tool will change your life!",
+      duration: 42,
+      virality: 94,
+      thumbnail:
+        "https://images.pexels.com/photos/36917952/pexels-photo-36917952.jpeg",
+      startAt: "12:04",
+    },
+    {
+      id: "clip_002",
+      projectId: "prj_001",
+      hook: "YouTube Shorts తో నెలకి ₹80,000?",
+      hookEn: "₹80,000/month with YouTube Shorts?",
+      duration: 38,
+      virality: 89,
+      thumbnail:
+        "https://images.pexels.com/photos/34037223/pexels-photo-34037223.jpeg",
+      startAt: "22:41",
+    },
+    {
+      id: "clip_003",
+      projectId: "prj_001",
+      hook: "Secret trick for Instagram Reels 🔥",
+      hookEn: "Secret trick for Instagram Reels",
+      duration: 56,
+      virality: 82,
+      thumbnail:
+        "https://images.pexels.com/photos/13027585/pexels-photo-13027585.jpeg",
+      startAt: "35:12",
+    },
+    {
+      id: "clip_004",
+      projectId: "prj_001",
+      hook: "ఎలా viral అవ్వాలి 2024 లో?",
+      hookEn: "How to go viral in 2024?",
+      duration: 48,
+      virality: 76,
+      thumbnail:
+        "https://images.unsplash.com/photo-1563089145-599997674d42",
+      startAt: "48:22",
+    },
+    {
+      id: "clip_005",
+      projectId: "prj_001",
+      hook: "ChatGPT vs Claude — nenu use chesedi ide!",
+      hookEn: "ChatGPT vs Claude — this is what I use!",
+      duration: 34,
+      virality: 71,
+      thumbnail:
+        "https://images.pexels.com/photos/36917952/pexels-photo-36917952.jpeg",
+      startAt: "01:02:15",
+    },
+    {
+      id: "clip_006",
+      projectId: "prj_001",
+      hook: "Free tools nuvvu miss avvakudadu",
+      hookEn: "Free tools you shouldn't miss",
+      duration: 44,
+      virality: 68,
+      thumbnail:
+        "https://images.pexels.com/photos/34037223/pexels-photo-34037223.jpeg",
+      startAt: "01:11:08",
+    },
+    {
+      id: "clip_007",
+      projectId: "prj_001",
+      hook: "నేను Rs.10 lakhs ఎలా earn చేశాను",
+      hookEn: "How I earned Rs.10 lakhs",
+      duration: 52,
+      virality: 65,
+      thumbnail:
+        "https://images.pexels.com/photos/13027585/pexels-photo-13027585.jpeg",
+      startAt: "01:18:44",
+    },
+    {
+      id: "clip_008",
+      projectId: "prj_001",
+      hook: "AI vaadi mana job tinesthada?",
+      hookEn: "Will AI take our jobs?",
+      duration: 40,
+      virality: 58,
+      thumbnail:
+        "https://images.unsplash.com/photo-1563089145-599997674d42",
+      startAt: "01:22:33",
+    },
+  ],
+};
+
+// Fake fallback for other projects — use prj_001 clips remapped
+export const getClipsForProject = (projectId) => {
+  if (CLIPS_BY_PROJECT[projectId]) return CLIPS_BY_PROJECT[projectId];
+  return CLIPS_BY_PROJECT.prj_001.slice(0, 4).map((c, i) => ({
+    ...c,
+    id: `${projectId}_c${i}`,
+    projectId,
+  }));
+};
+
+// Word-level transcript for the editor — one clip's worth (mixed te/tenglish)
+// Each word has: text, start (sec), end (sec)
+export const WORD_TRANSCRIPT = [
+  { text: "ఈ", start: 0.0, end: 0.28 },
+  { text: "ఒక్క", start: 0.28, end: 0.72 },
+  { text: "AI", start: 0.72, end: 1.06 },
+  { text: "tool", start: 1.06, end: 1.5 },
+  { text: "మీ", start: 1.5, end: 1.82 },
+  { text: "life", start: 1.82, end: 2.24 },
+  { text: "ni", start: 2.24, end: 2.42 },
+  { text: "totally", start: 2.42, end: 2.98 },
+  { text: "మార్చేస్తుంది!", start: 2.98, end: 3.9 },
+  { text: "Nenu", start: 4.2, end: 4.58 },
+  { text: "ee", start: 4.58, end: 4.8 },
+  { text: "tool", start: 4.8, end: 5.16 },
+  { text: "ni", start: 5.16, end: 5.36 },
+  { text: "roju", start: 5.36, end: 5.74 },
+  { text: "vaadutunna,", start: 5.74, end: 6.42 },
+  { text: "and", start: 6.42, end: 6.72 },
+  { text: "trust", start: 6.72, end: 7.06 },
+  { text: "me,", start: 7.06, end: 7.36 },
+  { text: "ఇది", start: 7.5, end: 7.9 },
+  { text: "next", start: 7.9, end: 8.24 },
+  { text: "level!", start: 8.24, end: 8.86 },
+  { text: "First", start: 9.2, end: 9.6 },
+  { text: "ga,", start: 9.6, end: 9.86 },
+  { text: "meeru", start: 9.86, end: 10.26 },
+  { text: "cheyaalsindi", start: 10.26, end: 10.98 },
+  { text: "ఒకటే —", start: 10.98, end: 11.6 },
+  { text: "sign", start: 11.6, end: 11.92 },
+  { text: "up", start: 11.92, end: 12.16 },
+  { text: "cheyandi,", start: 12.16, end: 12.68 },
+  { text: "అంతే!", start: 12.68, end: 13.3 },
+];
+
+export const CLIP_DURATION = 13.6; // seconds — matches transcript
+
+export const MUSIC_LIBRARY = [
+  { id: "m1", name: "Trap Beat — Late Night", duration: "0:32", mood: "Hype" },
+  { id: "m2", name: "Cinematic Rise", duration: "0:45", mood: "Emotional" },
+  { id: "m3", name: "Lo-Fi Chill", duration: "0:58", mood: "Calm" },
+  { id: "m4", name: "Bollywood Groove", duration: "0:42", mood: "Fun" },
+  { id: "m5", name: "Epic Trailer Drop", duration: "0:38", mood: "Bold" },
+  { id: "m6", name: "South Indie Percussion", duration: "0:51", mood: "Vibe" },
+];
+
+export const STATUS_META = {
+  uploading: { label: "Uploading", color: "#7c3aed" },
+  transcribing: { label: "Transcribing", color: "#f59e0b" },
+  selecting_clips: { label: "Selecting Clips", color: "#f59e0b" },
+  ready: { label: "Ready", color: "#10b981" },
+  exporting: { label: "Exporting", color: "#7c3aed" },
+  failed: { label: "Failed", color: "#ef4444" },
+  expired: { label: "Expired", color: "#71717a" },
+};
+
+export const PRICING_TIERS = [
+  {
+    id: "starter",
+    name: "Starter",
+    price: "₹0",
+    period: "forever",
+    tag: "Free",
+    features: [
+      "3 projects / month",
+      "Up to 15 min uploads",
+      "Watermarked exports",
+      "Telugu + Tenglish captions",
+    ],
+    highlighted: false,
+    cta: "Get started",
+  },
+  {
+    id: "creator",
+    name: "Creator",
+    price: "₹499",
+    period: "per month",
+    tag: "Most popular",
+    features: [
+      "Unlimited projects",
+      "Up to 2 hr uploads",
+      "No watermark, 1080p exports",
+      "All caption presets + custom fonts",
+      "Word-level editor",
+    ],
+    highlighted: true,
+    cta: "Start 7-day trial",
+  },
+  {
+    id: "studio",
+    name: "Studio",
+    price: "₹1,499",
+    period: "per month",
+    tag: "For teams",
+    features: [
+      "Team seats & shared library",
+      "4K burn-in exports",
+      "Priority render queue",
+      "API access",
+      "Dedicated support",
+    ],
+    highlighted: false,
+    cta: "Talk to sales",
+  },
+];

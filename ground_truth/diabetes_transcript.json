@@ -1,0 +1,591 @@
+{
+  "video_id": "-OetXsp7xdI_audio",
+  "video_duration": 864.72,
+  "total_sentences": 194,
+  "total_segments": 14,
+  "clips": [
+    {
+      "clip_id": "-OetXsp7xdI_audio_c1",
+      "start": 568.8,
+      "end": 649.1,
+      "duration": 80.3,
+      "segments": [
+        {
+          "start_sent_id": 132,
+          "end_sent_id": 145
+        }
+      ],
+      "confidence_rank": 1,
+      "confidence_note": "Controversial Take: Links Indian diabetes genetics to British colonial famines, sparking strong reactions and curiosity.",
+      "hook_text": "అసలు మన genetics-లోకి diabetes అనేది ఎలా వచ్చిందంటే దానికి కారణం British వాళ్ళు.",
+      "payoff_text": "అందుకే Western countries వాళ్ళతో compare చేస్తే మనకి diabetes వచ్చే chance-లు 3 to 5 times ఎక్కువ ఉంటుంది.",
+      "why": "Explains how British rule impacted Indian genetics, increasing diabetes risk.",
+      "engagement_type": "Controversial",
+      "hook_score": 10.0,
+      "coherence_score": 9.0,
+      "cultural_score": 10.0,
+      "engagement_score": 10.0,
+      "psychological_trigger": "Controversial Take, Myth Busting, Regional Pride Trigger",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "",
+      "virality_score": 10.0,
+      "para_id": 132,
+      "anchor_text": "అందుకే Western countries వాళ్ళతో compare చేస్తే మనకి diabetes వచ్చే chance-లు 3 to 5 times ఎక్కువ ఉంటుంది.",
+      "anchor_score": 10.0,
+      "transcript": [
+        {
+          "start": 568.8,
+          "end": 574.44,
+          "text": "అసలు మన genetics-లోకి diabetes అనేది ఎలా వచ్చిందంటే దానికి కారణం British వాళ్ళు."
+        },
+        {
+          "start": 574.3,
+          "end": 580.3,
+          "text": "Yes, India-లో diabetes వ్యాప్తి చెందడానికి British rule ఒక కారణం ఎలానో చెప్తాను చూడండి."
+        },
+        {
+          "start": 580.14,
+          "end": 583.96,
+          "text": "British Raj time-లో India-లో 25 major famines వచ్చాయి."
+        },
+        {
+          "start": 583.76,
+          "end": 585.44,
+          "text": "Famine అంటే కరువు అన్నమాట."
+        },
+        {
+          "start": 585.78,
+          "end": 589.06,
+          "text": "ఈ 25 famines-లో దాదాపు 60 million Indians చనిపోయారు."
+        },
+        {
+          "start": 589.28,
+          "end": 597.52,
+          "text": "ఒక పక్క కరువుతో కడుపులు మండుతుంటే ఇంకో పక్క British వాళ్ళు దారుణమైన tax-లు విధించడంతో పాటు మన దగ్గర ఉన్న కాస్త food-ని కూడా"
+        },
+        {
+          "start": 597.56,
+          "end": 600.14,
+          "text": "వాళ్ళ country-లకు export చేసుకునే వాళ్ళు."
+        },
+        {
+          "start": 600.08,
+          "end": 613.12,
+          "text": "Over the years famines రావటం plus Britishers మన దగ్గర ఉన్న food-ని లాక్కోవడంతో South Asians-లో ముఖ్యంగా Indians physiology-లో fat-ని store చేసుకునే పద్ధతి అండ్ sugar-ని process చేసే పద్ధతిలో తేడా వచ్చేస్తుంది."
+        },
+        {
+          "start": 613.08,
+          "end": 619.76,
+          "text": "Over the time behavior-లు అండ్ environmental changes వల్ల మన genes working అనేది change అవుతూ వచ్చింది."
+        },
+        {
+          "start": 619.88,
+          "end": 622.46,
+          "text": "But underlying DNA sequence మాత్రం అలానే ఉంటుంది."
+        },
+        {
+          "start": 622.58,
+          "end": 627.92,
+          "text": "సో ఈ కరువుల వల్ల వచ్చిన ఈ genes changes అనేవి generations నుంచి pass అవుతూ వచ్చి"
+        },
+        {
+          "start": 627.3,
+          "end": 629.66,
+          "text": "diabetes వచ్చే chance-లను పెంచాయి."
+        },
+        {
+          "start": 629.72,
+          "end": 642.34,
+          "text": "మీరు గమనిస్తే same age gender body mass ఉన్న ఒక white foreigner-ని and South Asians like India, Pakistan వాళ్ళని తీసుకొని compare చేస్తే South Asians-లో insulin resistance అనేది కొద్దిగా ఎక్కువ ఉంటుంది."
+        },
+        {
+          "start": 642.46,
+          "end": 649.1,
+          "text": "అందుకే Western countries వాళ్ళతో compare చేస్తే మనకి diabetes వచ్చే chance-లు 3 to 5 times ఎక్కువ ఉంటుంది."
+        }
+      ],
+      "transcript_text": "అసలు మన genetics-లోకి diabetes అనేది ఎలా వచ్చిందంటే దానికి కారణం British వాళ్ళు. Yes, India-లో diabetes వ్యాప్తి చెందడానికి British rule ఒక కారణం ఎలానో చెప్తాను చూడండి. British Raj time-లో India-లో 25 major famines వచ్చాయి. Famine అంటే కరువు అన్నమాట. ఈ 25 famines-లో దాదాపు 60 million Indians చనిపోయారు. ఒక పక్క కరువుతో కడుపులు మండుతుంటే ఇంకో పక్క British వాళ్ళు దారుణమైన tax-లు విధించడంతో పాటు మన దగ్గర ఉన్న కాస్త food-ని కూడా వాళ్ళ country-లకు export చేసుకునే వాళ్ళు. Over the years famines రావటం plus Britishers మన దగ్గర ఉన్న food-ని లాక్కోవడంతో South Asians-లో ముఖ్యంగా Indians physiology-లో fat-ని store చేసుకునే పద్ధతి అండ్ sugar-ని process చేసే పద్ధతిలో తేడా వచ్చేస్తుంది. Over the time behavior-లు అండ్ environmental changes వల్ల మన genes working అనేది change అవుతూ వచ్చింది. But underlying DNA sequence మాత్రం అలానే ఉంటుంది. సో ఈ కరువుల వల్ల వచ్చిన ఈ genes changes అనేవి generations నుంచి pass అవుతూ వచ్చి diabetes వచ్చే chance-లను పెంచాయి. మీరు గమనిస్తే same age gender body mass ఉన్న ఒక white foreigner-ని and South Asians like India, Pakistan వాళ్ళని తీసుకొని compare చేస్తే South Asians-లో insulin resistance అనేది కొద్దిగా ఎక్కువ ఉంటుంది. అందుకే Western countries వాళ్ళతో compare చేస్తే మనకి diabetes వచ్చే chance-లు 3 to 5 times ఎక్కువ ఉంటుంది."
+    },
+    {
+      "clip_id": "-OetXsp7xdI_audio_c2",
+      "start": 8.8,
+      "end": 72.34,
+      "duration": 63.54,
+      "segments": [
+        {
+          "start_sent_id": 3,
+          "end_sent_id": 18
+        }
+      ],
+      "confidence_rank": 2,
+      "confidence_note": "Negative Visualization: Starts with a shocking fact about India's diabetes crisis, then makes it personally relatable.",
+      "hook_text": "ఈ ప్రపంచంలో ఉన్న దేశాలన్నిటిలో highest diabetes patients ఉన్న దేశం ఏంటో తెలుసా?",
+      "payoff_text": "అప్పుడు మీకే అర్థమవుతుంది diabetes situation అనేది ఎలా ఉందో.",
+      "why": "Reveals India's alarming diabetes growth and its personal impact.",
+      "engagement_type": "Relatable",
+      "hook_score": 9.0,
+      "coherence_score": 9.0,
+      "cultural_score": 9.0,
+      "engagement_score": 9.0,
+      "psychological_trigger": "Curiosity Gap, Negative Visualization, Middle-Class Relatability",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "",
+      "virality_score": 9.5,
+      "para_id": 3,
+      "anchor_text": "అప్పుడు మీకే అర్థమవుతుంది diabetes situation అనేది ఎలా ఉందో.",
+      "anchor_score": 9.5,
+      "transcript": [
+        {
+          "start": 8.8,
+          "end": 13.08,
+          "text": "ఈ ప్రపంచంలో ఉన్న దేశాలన్నిటిలో highest diabetes patients ఉన్న దేశం ఏంటో తెలుసా?"
+        },
+        {
+          "start": 13.68,
+          "end": 15.74,
+          "text": "చాలా మంది India అనుకుంటారు కదా?"
+        },
+        {
+          "start": 16.04,
+          "end": 17.0,
+          "text": "కాదు, China."
+        },
+        {
+          "start": 16.76,
+          "end": 22.32,
+          "text": "India 2nd place-లో ఉంది, America 3rd place-లో ఉంది, next వచ్చేసి Pakistan ఉంది."
+        },
+        {
+          "start": 22.22,
+          "end": 31.5,
+          "text": "India 2nd place-లో ఉంది, but diabetes capital of the world ఏంటి అని Google తల్లిని అడిగితే bold letter-లలో India అని చెప్తుంది."
+        },
+        {
+          "start": 31.6,
+          "end": 32.1,
+          "text": "But why?"
+        },
+        {
+          "start": 32.22,
+          "end": 35.84,
+          "text": "Because India-లో diabetes పెరుగుతున్న speed అలాంటిది."
+        },
+        {
+          "start": 35.98,
+          "end": 42.18,
+          "text": "Year 2000-లో 32.7 million adult-లకు diabetes ఉంటే 2024-కి ఆ number 90 million-కి చేరుకుంది."
+        },
+        {
+          "start": 42.24,
+          "end": 43.64,
+          "text": "ఇదే కొనసాగితే 2000"
+        },
+        {
+          "start": 43.98,
+          "end": 48.96,
+          "text": "50-కి India-లో diabetes patient సంఖ్య 156 million-కి చేరుకునే అవకాశం ఉంది."
+        },
+        {
+          "start": 49.1,
+          "end": 52.26,
+          "text": "ఇవన్నీ కాదు మీ family WhatsApp group ఓపెన్ చేయండి."
+        },
+        {
+          "start": 52.34,
+          "end": 55.88,
+          "text": "ఎంతమంది రోజు diabetes-కి medicine వేసుకుంటున్నారు?"
+        },
+        {
+          "start": 56.32,
+          "end": 58.26,
+          "text": "ఎంతమంది pre-diabetic అని అడగండి."
+        },
+        {
+          "start": 57.9,
+          "end": 65.24,
+          "text": "పోనీ మీ family function ఏదైనా attend అయినప్పుడు మీ family-లో ఉన్న వాళ్ళందరికీ sweets offer చేయండి."
+        },
+        {
+          "start": 64.7,
+          "end": 67.98,
+          "text": "ఎంతమంది ఆ sweets accept చేసి తింటారో గమనించండి."
+        },
+        {
+          "start": 68.3,
+          "end": 72.34,
+          "text": "అప్పుడు మీకే అర్థమవుతుంది diabetes situation అనేది ఎలా ఉందో."
+        }
+      ],
+      "transcript_text": "ఈ ప్రపంచంలో ఉన్న దేశాలన్నిటిలో highest diabetes patients ఉన్న దేశం ఏంటో తెలుసా? చాలా మంది India అనుకుంటారు కదా? కాదు, China. India 2nd place-లో ఉంది, America 3rd place-లో ఉంది, next వచ్చేసి Pakistan ఉంది. India 2nd place-లో ఉంది, but diabetes capital of the world ఏంటి అని Google తల్లిని అడిగితే bold letter-లలో India అని చెప్తుంది. But why? Because India-లో diabetes పెరుగుతున్న speed అలాంటిది. Year 2000-లో 32.7 million adult-లకు diabetes ఉంటే 2024-కి ఆ number 90 million-కి చేరుకుంది. ఇదే కొనసాగితే 2000 50-కి India-లో diabetes patient సంఖ్య 156 million-కి చేరుకునే అవకాశం ఉంది. ఇవన్నీ కాదు మీ family WhatsApp group ఓపెన్ చేయండి. ఎంతమంది రోజు diabetes-కి medicine వేసుకుంటున్నారు? ఎంతమంది pre-diabetic అని అడగండి. పోనీ మీ family function ఏదైనా attend అయినప్పుడు మీ family-లో ఉన్న వాళ్ళందరికీ sweets offer చేయండి. ఎంతమంది ఆ sweets accept చేసి తింటారో గమనించండి. అప్పుడు మీకే అర్థమవుతుంది diabetes situation అనేది ఎలా ఉందో."
+    },
+    {
+      "clip_id": "-OetXsp7xdI_audio_c3",
+      "start": 668.52,
+      "end": 757.96,
+      "duration": 89.44,
+      "segments": [
+        {
+          "start_sent_id": 151,
+          "end_sent_id": 169
+        }
+      ],
+      "confidence_rank": 3,
+      "confidence_note": "Middle-Class Relatability: Connects economic development and the rise of fast food to personal health choices.",
+      "hook_text": "సీ ఏ దేశమైనా ఎకనామిక్ డెవలప్మెంట్ వైపు వెళ్తున్నప్పుడు జనాలు బిజీ అయిపోతారు.",
+      "payoff_text": "సో economic development మంచిదే కానీ దాని మాయలో పడిపోయి మనం diabetes-కి లొంగిపోతున్నాం అని ఎవరు గ్రహించట్లేదు.",
+      "why": "Explains how economic growth and fast food lead to increased diabetes.",
+      "engagement_type": "Relatable",
+      "hook_score": 8.0,
+      "coherence_score": 9.0,
+      "cultural_score": 9.0,
+      "engagement_score": 9.0,
+      "psychological_trigger": "Middle-Class Relatability, Negative Visualization, Practical Utility",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "",
+      "virality_score": 9.1,
+      "para_id": 151,
+      "anchor_text": "సో economic development మంచిదే కానీ దాని మాయలో పడిపోయి మనం diabetes-కి లొంగిపోతున్నాం అని ఎవరు గ్రహించట్లేదు.",
+      "anchor_score": 9.1,
+      "transcript": [
+        {
+          "start": 668.52,
+          "end": 673.32,
+          "text": "సీ ఏ దేశమైనా ఎకనామిక్ డెవలప్మెంట్ వైపు వెళ్తున్నప్పుడు జనాలు బిజీ అయిపోతారు."
+        },
+        {
+          "start": 673.38,
+          "end": 676.5,
+          "text": "ఎక్కువ సంపాదిస్తున్నారు అండ్ ఎక్కువ తినేస్తారు."
+        },
+        {
+          "start": 676.0,
+          "end": 681.7,
+          "text": "ఇన్ని ఎక్కువల మధ్యలో హెల్త్-ని పట్టించుకోవడం ఎక్సర్సైజ్-లు చేయడం అనేది తక్కువ అయిపోయింది."
+        },
+        {
+          "start": 681.98,
+          "end": 684.28,
+          "text": "అండ్ లాస్ట్ ఫ్యూ ఇయర్స్-లో ఇదే జరిగింది."
+        },
+        {
+          "start": 684.4,
+          "end": 687.7,
+          "text": "ఇంట్లో వండుకోవడం మానేసి ఫాస్ట్ ఫుడ్ మీద పడ్డారు జనాలు."
+        },
+        {
+          "start": 687.64,
+          "end": 691.7,
+          "text": "ఈ fast food వల్ల obesity ఇంకా diabetes fast-గా పెరిగిపోతున్నాయి."
+        },
+        {
+          "start": 691.76,
+          "end": 697.64,
+          "text": "For example, America-ని తీసుకోండి, World War-లు తర్వాత economy improve అవుతూ వచ్చింది."
+        },
+        {
+          "start": 697.82,
+          "end": 706.6,
+          "text": "And ఇదే time-లో US-లో fast food chain-లు like McDonald's, KFC, Pizza Hut, Domino's ఇవన్నీ కూడా 1940, 1960 మధ్యలో పుట్టుకొని వచ్చాయి."
+        },
+        {
+          "start": 706.98,
+          "end": 714.96,
+          "text": "అంటే World War-లు complete అయ్యి economic development మొదలయ్యాక ఇవి 20 ఏళ్లలోనే impact-ని చూపించడం మొదలుపెట్టాయి."
+        },
+        {
+          "start": 714.96,
+          "end": 717.44,
+          "text": "1980s వచ్చేసరికి America-లో obesity అనేది ఒక"
+        },
+        {
+          "start": 717.52,
+          "end": 719.0,
+          "text": "ఎప్పుడు మీకు అయిపోయింది?"
+        },
+        {
+          "start": 719.22,
+          "end": 720.64,
+          "text": "Same goes with India too."
+        },
+        {
+          "start": 720.38,
+          "end": 726.16,
+          "text": "1991 liberalization తర్వాత Indian economy foreign brand-లకు స్వాగతం పలికింది."
+        },
+        {
+          "start": 725.8,
+          "end": 733.74,
+          "text": "And ఈ foreign brand-లలో చాలా శాతం soft drink-లు, junk food-లు ఉన్నాయి like McDonald's, Pizza Hut, Domino's, KFC etc."
+        },
+        {
+          "start": 733.66,
+          "end": 733.74,
+          "text": "etc."
+        },
+        {
+          "start": 733.66,
+          "end": 740.66,
+          "text": "ఈ company-లు అన్నీ కూడా India-లో ఒక్కసారిగా enter అయ్యాయి all in the name of economic development."
+        },
+        {
+          "start": 740.78,
+          "end": 748.12,
+          "text": "And ఈ company-లు enter అవ్వడానికి ముందు India-లో diabetes patient-ల సంఖ్య 26 million-గా ఉండేది కానీ 1900"
+        },
+        {
+          "start": 747.78,
+          "end": 750.58,
+          "text": "90 తర్వాత నుంచి 2016 వరకు ఈ సంఖ్య 65 million-కి చేరుకుంది."
+        },
+        {
+          "start": 751.8,
+          "end": 757.96,
+          "text": "సో economic development మంచిదే కానీ దాని మాయలో పడిపోయి మనం diabetes-కి లొంగిపోతున్నాం అని ఎవరు గ్రహించట్లేదు."
+        }
+      ],
+      "transcript_text": "సీ ఏ దేశమైనా ఎకనామిక్ డెవలప్మెంట్ వైపు వెళ్తున్నప్పుడు జనాలు బిజీ అయిపోతారు. ఎక్కువ సంపాదిస్తున్నారు అండ్ ఎక్కువ తినేస్తారు. ఇన్ని ఎక్కువల మధ్యలో హెల్త్-ని పట్టించుకోవడం ఎక్సర్సైజ్-లు చేయడం అనేది తక్కువ అయిపోయింది. అండ్ లాస్ట్ ఫ్యూ ఇయర్స్-లో ఇదే జరిగింది. ఇంట్లో వండుకోవడం మానేసి ఫాస్ట్ ఫుడ్ మీద పడ్డారు జనాలు. ఈ fast food వల్ల obesity ఇంకా diabetes fast-గా పెరిగిపోతున్నాయి. For example, America-ని తీసుకోండి, World War-లు తర్వాత economy improve అవుతూ వచ్చింది. And ఇదే time-లో US-లో fast food chain-లు like McDonald's, KFC, Pizza Hut, Domino's ఇవన్నీ కూడా 1940, 1960 మధ్యలో పుట్టుకొని వచ్చాయి. అంటే World War-లు complete అయ్యి economic development మొదలయ్యాక ఇవి 20 ఏళ్లలోనే impact-ని చూపించడం మొదలుపెట్టాయి. 1980s వచ్చేసరికి America-లో obesity అనేది ఒక ఎప్పుడు మీకు అయిపోయింది? Same goes with India too. 1991 liberalization తర్వాత Indian economy foreign brand-లకు స్వాగతం పలికింది. And ఈ foreign brand-లలో చాలా శాతం soft drink-లు, junk food-లు ఉన్నాయి like McDonald's, Pizza Hut, Domino's, KFC etc. etc. ఈ company-లు అన్నీ కూడా India-లో ఒక్కసారిగా enter అయ్యాయి all in the name of economic development. And ఈ company-లు enter అవ్వడానికి ముందు India-లో diabetes patient-ల సంఖ్య 26 million-గా ఉండేది కానీ 1900 90 తర్వాత నుంచి 2016 వరకు ఈ సంఖ్య 65 million-కి చేరుకుంది. సో economic development మంచిదే కానీ దాని మాయలో పడిపోయి మనం diabetes-కి లొంగిపోతున్నాం అని ఎవరు గ్రహించట్లేదు."
+    },
+    {
+      "clip_id": "-OetXsp7xdI_audio_c4",
+      "start": 760.96,
+      "end": 804.06,
+      "duration": 43.1,
+      "segments": [
+        {
+          "start_sent_id": 171,
+          "end_sent_id": 178
+        }
+      ],
+      "confidence_rank": 4,
+      "confidence_note": "Middle-Class Relatability: Contrasts village and city lifestyles, highlighting how urbanization contributes to diabetes.",
+      "hook_text": "ఎవరైనా village-లో ఉండే వాళ్ళని చూడండి వాళ్ళు 4-5-కే లేస్తారు.",
+      "payoff_text": "saturated fats ఇంకా sugar consumption అనేది బాగా పెరిగిపోయి final-గా diabetes-కి దారి తీస్తుంది.",
+      "why": "Highlights how urbanization and modern lifestyle increase diabetes risk.",
+      "engagement_type": "Relatable",
+      "hook_score": 8.0,
+      "coherence_score": 9.0,
+      "cultural_score": 9.0,
+      "engagement_score": 8.0,
+      "psychological_trigger": "Middle-Class Relatability, Negative Visualization",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "",
+      "virality_score": 9.0,
+      "para_id": 171,
+      "anchor_text": "saturated fats ఇంకా sugar consumption అనేది బాగా పెరిగిపోయి final-గా diabetes-కి దారి తీస్తుంది.",
+      "anchor_score": 9.0,
+      "transcript": [
+        {
+          "start": 760.96,
+          "end": 764.78,
+          "text": "ఎవరైనా village-లో ఉండే వాళ్ళని చూడండి వాళ్ళు 4-5-కే లేస్తారు."
+        },
+        {
+          "start": 764.86,
+          "end": 767.58,
+          "text": "లేచిన దగ్గర నుంచి ఏదో ఒక పని చేస్తూనే ఉంటారు."
+        },
+        {
+          "start": 767.68,
+          "end": 773.16,
+          "text": "afternoon ఒక 1 hour అలా rest తీసుకుంటారేమో అంతే బట్ రోజంతా ఏదో ఒక పని చేస్తూనే ఉంటారు."
+        },
+        {
+          "start": 773.22,
+          "end": 777.6,
+          "text": "ఏ పని లేకపోతే ఏదో ఒక fun physical activity-లో participate చేస్తారు."
+        },
+        {
+          "start": 777.64,
+          "end": 786.4,
+          "text": "Of course, ఈ lifestyle అందరికీ set అవ్వదు అనుకోండి, but నా point ఏంటంటే villages-లో ఉండే వాళ్ళకి, cities-లో ఉండే వాళ్ళకి lifestyle-లో చాలా తేడా ఉంటుంది."
+        },
+        {
+          "start": 786.74,
+          "end": 794.28,
+          "text": "urbanization పేరుతో cities-కి వచ్చేసి గంటలు గంటలు screen ముందు కూర్చోవడం direct-గా obesity ఇంకా diabetes-కి కారణం అవుతుంది."
+        },
+        {
+          "start": 794.48,
+          "end": 798.56,
+          "text": "urbanization జరిగినప్పుడు జనాల lifestyle-లో చాలా మార్పులు వస్తాయి."
+        },
+        {
+          "start": 798.72,
+          "end": 804.06,
+          "text": "saturated fats ఇంకా sugar consumption అనేది బాగా పెరిగిపోయి final-గా diabetes-కి దారి తీస్తుంది."
+        }
+      ],
+      "transcript_text": "ఎవరైనా village-లో ఉండే వాళ్ళని చూడండి వాళ్ళు 4-5-కే లేస్తారు. లేచిన దగ్గర నుంచి ఏదో ఒక పని చేస్తూనే ఉంటారు. afternoon ఒక 1 hour అలా rest తీసుకుంటారేమో అంతే బట్ రోజంతా ఏదో ఒక పని చేస్తూనే ఉంటారు. ఏ పని లేకపోతే ఏదో ఒక fun physical activity-లో participate చేస్తారు. Of course, ఈ lifestyle అందరికీ set అవ్వదు అనుకోండి, but నా point ఏంటంటే villages-లో ఉండే వాళ్ళకి, cities-లో ఉండే వాళ్ళకి lifestyle-లో చాలా తేడా ఉంటుంది. urbanization పేరుతో cities-కి వచ్చేసి గంటలు గంటలు screen ముందు కూర్చోవడం direct-గా obesity ఇంకా diabetes-కి కారణం అవుతుంది. urbanization జరిగినప్పుడు జనాల lifestyle-లో చాలా మార్పులు వస్తాయి. saturated fats ఇంకా sugar consumption అనేది బాగా పెరిగిపోయి final-గా diabetes-కి దారి తీస్తుంది."
+    },
+    {
+      "clip_id": "-OetXsp7xdI_audio_c5",
+      "start": 156.92,
+      "end": 205.66,
+      "duration": 48.74,
+      "segments": [
+        {
+          "start_sent_id": 42,
+          "end_sent_id": 51
+        }
+      ],
+      "confidence_rank": 5,
+      "confidence_note": "Practical Utility: Simplifies the complex mechanism of diabetes using a clear, easy-to-understand analogy.",
+      "hook_text": "For example, cells-ని engines అనుకుందాం, glucose-ని fuel అనుకుందాం and insulin-ని key అనుకుందాం.",
+      "payoff_text": "అందుకే ఈ ప్రపంచంలో ఉన్న 10 most dangerous diseases list-లో diabetes-కి కూడా చోటు దక్కింది.",
+      "why": "Simplifies diabetes mechanism, explaining how it becomes dangerous.",
+      "engagement_type": "Educational",
+      "hook_score": 8.0,
+      "coherence_score": 9.0,
+      "cultural_score": 7.0,
+      "engagement_score": 8.0,
+      "psychological_trigger": "Practical Utility, Curiosity Gap",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "",
+      "virality_score": 8.1,
+      "para_id": 42,
+      "anchor_text": "అందుకే ఈ ప్రపంచంలో ఉన్న 10 most dangerous diseases list-లో diabetes-కి కూడా చోటు దక్కింది.",
+      "anchor_score": 8.1,
+      "transcript": [
+        {
+          "start": 156.92,
+          "end": 163.54,
+          "text": "For example, cells-ని engines అనుకుందాం, glucose-ని fuel అనుకుందాం and insulin-ని key అనుకుందాం."
+        },
+        {
+          "start": 163.64,
+          "end": 171.26,
+          "text": "So ఈ insulin అనే key వెళ్లి cells అనే engines-ని open చేసినప్పుడు ఈ glucose అనే fuel cells లోపలికి వెళ్తుంది."
+        },
+        {
+          "start": 171.32,
+          "end": 173.38,
+          "text": "అప్పుడు cells పనిచేస్తాయి."
+        },
+        {
+          "start": 172.8,
+          "end": 177.52,
+          "text": "So problem ఎక్కడ వస్తుంది అంటే కొంతమందిలో insulin అనేది సరిగ్గా"
+        },
+        {
+          "start": 177.6,
+          "end": 178.2,
+          "text": "produce అవ్వదు."
+        },
+        {
+          "start": 178.56,
+          "end": 183.8,
+          "text": "ఇంకొంతమందిలో produce అయినా కానీ మన body ఆ insulin-కి సరిగ్గా respond అవ్వదు."
+        },
+        {
+          "start": 183.74,
+          "end": 190.6,
+          "text": "So అలాంటి situation-లో మన body-లో ఉన్న glucose cells దగ్గరికి వెళ్లకుండా blood-లోనే ఉండిపోతుంది."
+        },
+        {
+          "start": 190.74,
+          "end": 196.14,
+          "text": "దాంతో blood sugar levels అనేవి rise అయ్యి over the time dangerous-గా మారుతుంది."
+        },
+        {
+          "start": 196.06,
+          "end": 198.96,
+          "text": "And ఈ dangerous condition-నే diabetes అంటారు."
+        },
+        {
+          "start": 199.28,
+          "end": 205.66,
+          "text": "అందుకే ఈ ప్రపంచంలో ఉన్న 10 most dangerous diseases list-లో diabetes-కి కూడా చోటు దక్కింది."
+        }
+      ],
+      "transcript_text": "For example, cells-ని engines అనుకుందాం, glucose-ని fuel అనుకుందాం and insulin-ని key అనుకుందాం. So ఈ insulin అనే key వెళ్లి cells అనే engines-ని open చేసినప్పుడు ఈ glucose అనే fuel cells లోపలికి వెళ్తుంది. అప్పుడు cells పనిచేస్తాయి. So problem ఎక్కడ వస్తుంది అంటే కొంతమందిలో insulin అనేది సరిగ్గా produce అవ్వదు. ఇంకొంతమందిలో produce అయినా కానీ మన body ఆ insulin-కి సరిగ్గా respond అవ్వదు. So అలాంటి situation-లో మన body-లో ఉన్న glucose cells దగ్గరికి వెళ్లకుండా blood-లోనే ఉండిపోతుంది. దాంతో blood sugar levels అనేవి rise అయ్యి over the time dangerous-గా మారుతుంది. And ఈ dangerous condition-నే diabetes అంటారు. అందుకే ఈ ప్రపంచంలో ఉన్న 10 most dangerous diseases list-లో diabetes-కి కూడా చోటు దక్కింది."
+    },
+    {
+      "clip_id": "-OetXsp7xdI_audio_c6",
+      "start": 219.72,
+      "end": 263.86,
+      "duration": 44.14,
+      "segments": [
+        {
+          "start_sent_id": 56,
+          "end_sent_id": 63
+        }
+      ],
+      "confidence_rank": 6,
+      "confidence_note": "Shocking Fact: Reveals a surprising and ancient method of diabetes detection, creating immediate curiosity.",
+      "hook_text": "ఈ diabetes-ని మొట్టమొదటిసారిగా 3000 సంవత్సరాల క్రితం ancient Egyptians కనుగొన్నారు అన్నమాట.",
+      "payoff_text": "అంటే meaning honey urine అని అర్థం అన్నమాట.",
+      "why": "Reveals ancient, surprising method of diabetes detection using ants.",
+      "engagement_type": "Curiosity",
+      "hook_score": 9.0,
+      "coherence_score": 9.0,
+      "cultural_score": 8.0,
+      "engagement_score": 8.0,
+      "psychological_trigger": "Curiosity Gap, Shocking Fact",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "",
+      "virality_score": 8.7,
+      "para_id": 56,
+      "anchor_text": "అంటే meaning honey urine అని అర్థం అన్నమాట.",
+      "anchor_score": 8.7,
+      "transcript": [
+        {
+          "start": 219.72,
+          "end": 226.2,
+          "text": "ఈ diabetes-ని మొట్టమొదటిసారిగా 3000 సంవత్సరాల క్రితం ancient Egyptians కనుగొన్నారు అన్నమాట."
+        },
+        {
+          "start": 226.12,
+          "end": 232.28,
+          "text": "India-లో 300 and 400 AD మధ్యలో diabetic అనే disease ఒకటి వస్తుంది అని తెలుసుకున్నారు."
+        },
+        {
+          "start": 232.38,
+          "end": 237.48,
+          "text": "ఆ time-లో ఒక మనిషికి diabetes ఉందో లేదో తెలుసుకోవడానికి చీమలు అంటే ant"
+        },
+        {
+          "start": 237.66,
+          "end": 238.56,
+          "text": "ని use చేసేవాళ్ళు."
+        },
+        {
+          "start": 239.0,
+          "end": 247.04,
+          "text": "diabetes ఉందో లేదో తెలుసుకోవడం కోసం patient urine-ని collect చేసి ఆ urine-ని ants-కి దగ్గరలో spray చేసేవాళ్ళు అన్నమాట."
+        },
+        {
+          "start": 246.74,
+          "end": 257.46,
+          "text": "ఆ spray చేసిన దాని దగ్గరికి ants వస్తే patient-లు blood-లో high sugar level-లు ఉన్నట్లు and అతను diabetes-తో బాధపడుతున్నట్లు physician-లు confirm చేసేవాళ్ళు."
+        },
+        {
+          "start": 257.56,
+          "end": 260.38,
+          "text": "అందుకే హిందీలో diabetes-ని మధుమేహ అంటారు."
+        },
+        {
+          "start": 260.48,
+          "end": 263.86,
+          "text": "అంటే meaning honey urine అని అర్థం అన్నమాట."
+        }
+      ],
+      "transcript_text": "ఈ diabetes-ని మొట్టమొదటిసారిగా 3000 సంవత్సరాల క్రితం ancient Egyptians కనుగొన్నారు అన్నమాట. India-లో 300 and 400 AD మధ్యలో diabetic అనే disease ఒకటి వస్తుంది అని తెలుసుకున్నారు. ఆ time-లో ఒక మనిషికి diabetes ఉందో లేదో తెలుసుకోవడానికి చీమలు అంటే ant ని use చేసేవాళ్ళు. diabetes ఉందో లేదో తెలుసుకోవడం కోసం patient urine-ని collect చేసి ఆ urine-ని ants-కి దగ్గరలో spray చేసేవాళ్ళు అన్నమాట. ఆ spray చేసిన దాని దగ్గరికి ants వస్తే patient-లు blood-లో high sugar level-లు ఉన్నట్లు and అతను diabetes-తో బాధపడుతున్నట్లు physician-లు confirm చేసేవాళ్ళు. అందుకే హిందీలో diabetes-ని మధుమేహ అంటారు. అంటే meaning honey urine అని అర్థం అన్నమాట."
+    }
+  ],
+  "metadata": {
+    "pipeline": "ClipForge-v14-SkillAligned",
+    "approach": "embeddings-segmentation (junk only) → gemini-skill-aligned-selection → segments-array → weighted-virality-score",
+    "language": "Telugu/Codemix",
+    "segmentation": "14 segments (junk detection only)",
+    "embedding_model": "l3cube-pune/telugu-sentence-similarity-sbert",
+    "scorer": "gemini/gemini-2.5-flash",
+    "gemini_role": "skill-aligned editor (single call, no hook validation loop)",
+    "virality_weights": "hook=40%, coherence=30%, cultural=20%, engagement=10%"
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "clips": [
+    {
+      "clip_id": "clip_c1",
+      "start": "568.8",
+      "end": "649.4",
+      "duration": "80.96",
+      "segments": [
+        {"start_sent_id": 110, "end_sent_id": 121}
+      ],
+      "confidence_rank": 1,
+      "confidence_note": "Colonial Guilt + Myth Busting: Revealing that British-era famines literally rewired Indian DNA to be diabetes-prone is a jaw-dropping reframe that combines historical outrage with personal health stakes — a perfect cocktail for Telugu urban audience who already distrust colonial narratives.",
+      "hook_text": "అసలు మన genetics-లోకి diabetes అనేది ఎలా వచ్చిందంటే దానికి కారణం British వాళ్ళు.",
+      "payoff_text": "అందుకే Western countries వాళ్ళతో compare చేస్తే మనకి diabetes వచ్చే chance-లు 3 to 5 times ఎక్కువ ఉంటుంది.",
+      "why": "The clip reveals that British colonial famines genetically altered South Asian metabolism, making Indians 3–5x more diabetes-prone than Westerners — a complete cause-to-consequence arc with emotional and factual payoff.",
+      "engagement_type": "Controversial",
+      "hook_score": 9,
+      "coherence_score": 9,
+      "cultural_score": 10,
+      "engagement_score": 9,
+      "psychological_trigger": "Myth Busting + Colonial Outrage",
+      "trimmed": true,
+      "trim_reason": "Removed sentence 113 ('Famine అంటే కరువు అన్నమాట') — it's a definition filler that adds no emotional weight; clip flows naturally from 112 to 114.",
+      "notes": ""
+    },
+    {
+      "clip_id": "clip_c2",
+      "start": "8.68",
+      "end": "71.74",
+      "duration": "63.06",
+      "segments": [
+        {"start_sent_id": 3, "end_sent_id": 17}
+      ],
+      "confidence_rank": 2,
+      "confidence_note": "Middle-Class Relatability: The WhatsApp family group and sweets-at-function tests are hyper-specific to Telugu family culture — every viewer has lived this exact scenario, making the diabetes statistics feel personal rather than abstract.",
+      "hook_text": "ఈ ప్రపంచంలో ఉన్న దేశాలన్నిటిలో highest diabetes patients ఉన్న దేశం ఏంటో తెలుసా?",
+      "payoff_text": "అప్పుడు మీకే అర్థమవుతుంది diabetes situation అనేది ఎలా ఉందో.",
+      "why": "Opens with a myth-bust (China, not India, is #1) then immediately grounds the crisis in the viewer's own family through the WhatsApp and sweets test — turning a statistic into a felt reality.",
+      "engagement_type": "Relatable",
+      "hook_score": 8,
+      "coherence_score": 8,
+      "cultural_score": 9,
+      "engagement_score": 9,
+      "psychological_trigger": "Curiosity Gap + Middle-Class Relatability",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "Ends slightly soft ('అప్పుడు మీకే అర్థమవుతుంది') — not a hard fact payoff, but the cultural resonance of the sweets scene carries it."
+    },
+      {
+      "clip_id": "clip_c3",
+      "start": "219.44",
+      "end": "262.48",
+      "duration": "43.04",
+      "segments": [
+        {"start_sent_id": 47, "end_sent_id": 53}
+      ],
+      "confidence_rank": 4,
+      "confidence_note": "Shocking Trivia: Ancient India diagnosing diabetes by offering urine to ants is viscerally bizarre and immediately shareable — exactly the kind of 'I have to tell someone this' content that drives shares in Telugu edutainment channels.",
+      "hook_text": "ఈ diabetes-ని మొట్టమొదటిసారిగా 3000 సంవత్సరాల క్రితం ancient Egyptians కనుగొన్నారు అన్నమాట.",
+      "payoff_text": "అంటే meaning honey urine అని అర్థం అన్నమాట.",
+      "why": "Opens with the ancient discovery of diabetes, reveals that India diagnosed it using ants attracted to sweet urine, and closes with the etymology of 'madhumeh' — a complete curiosity arc.",
+      "engagement_type": "Educational",
+      "hook_score": 8,
+      "coherence_score": 9,
+      "cultural_score": 7,
+      "engagement_score": 8,
+      "psychological_trigger": "Curiosity Gap + Shocking Fact",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "Short clip (~35s estimated). Payoff is mildly soft but the 'honey urine' etymology is distinctive enough to land."
+    },
+    {
+      "clip_id": "clip_c4",
+      "start": "653.98",
+      "end": "760.18",
+      "duration": "106.2",
+      "segments": [
+        {"start_sent_id": 123, "end_sent_id": 125},
+        {"start_sent_id": 130, "end_sent_id": 141}
+      ],
+      "confidence_rank": 3,
+      "confidence_note": "Controversial Take + Practical Utility: Blaming economic development — something everyone celebrates — for diabetes is a genuinely counter-intuitive claim that creates productive cognitive dissonance, backed by the 1991 liberalization data point that Telugu middle-class viewers recognise.",
+      "hook_text": "economic development కావాలని అందరూ గోల పెడుతుంటే economic development వల్ల డయాబెటిస్ వస్తుంది అంటాడు ఏంటి వీడు అనుకుంటారేమో.",
+      "payoff_text": "సో economic development మంచిదే కానీ దాని మాయలో పడిపోయి మనం diabetes-కి లొంగిపోతున్నాం అని ఎవరు గ్రహించట్లేదు.",
+      "why": "Takes the controversial position that economic progress is a diabetes driver, proves it with India's 1991 liberalization + fast food entry data, and closes with a sharp cultural critique.",
+      "engagement_type": "Controversial",
+      "hook_score": 8,
+      "coherence_score": 8,
+      "cultural_score": 8,
+      "engagement_score": 8,
+      "psychological_trigger": "Controversial Take + Negative Visualization",
+      "trimmed": true,
+      "trim_reason": "Removed sentences 126–129 (generic 'busy, earning more, exercising less' filler) and 132–135 (America McDonald's example — tangential context; Indian audience doesn't need the US detour). Clip jumps from the provocative claim directly to the fast food consequence and then the India 1991 proof. Coherence confirmed: 125 ('sad truth: economy's side effect includes diabetes') connects naturally to 130 ('people stopped cooking at home, started eating fast food').",
+      "notes": ""
+    },
+    {
+      "clip_id": "clip_c5",
+      "start": "482.68",
+      "end": "522.9",
+      "duration": "40.22",
+      "segments": [
+        {"start_sent_id": 97, "end_sent_id": 101}
+      ],
+      "confidence_rank": 5,
+      "confidence_note": "Fear + Practical Utility: Opening with 'it's not just blood sugar — it destroys your heart, eyes, kidneys' activates immediate fear for viewers who think they have a manageable condition, followed by the hopeful 1921 insulin discovery payoff.",
+      "hook_text": "diabetes dangerous disease-లలో ఒకటిగా పరిగణించడానికి కారణం ఏంటంటే ఇది attack అయినప్పుడు just blood-లో sugar level-లు పెరగటం మాత్రమే కాదు చాలా case-లలో diabetes attack అయిన వాళ్ళకి high cholesterol level-లు రావటం మొదలవుతుంది.",
+      "payoff_text": "ఎందుకంటే ఈ insulin shot-ల వల్ల ప్రపంచంలో ఎన్నో లక్షల మంది ప్రాణాలతో ఉన్నారు.",
+      "why": "Reframes diabetes from a 'sugar problem' into a multi-organ threat, then pivots to the insulin breakthrough of 1921 as the reason millions are alive today — fear followed by hope.",
+      "engagement_type": "Educational",
+      "hook_score": 7,
+      "coherence_score": 8,
+      "cultural_score": 6,
+      "engagement_score": 7,
+      "psychological_trigger": "Negative Visualization + Social Proof",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "Hook sentence is long and slightly complex as a cold open — works better mid-scroll for viewers already in health content. Weakest of the five but the organ-damage detail earns its place."
+    }
+  ]
+}

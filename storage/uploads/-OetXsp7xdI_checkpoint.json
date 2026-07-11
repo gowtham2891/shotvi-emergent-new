@@ -1,0 +1,20 @@
+{
+  "video_id": "-OetXsp7xdI",
+  "video_path": "storage\\uploads\\-OetXsp7xdI.mp4",
+  "audio_path": "storage\\uploads\\-OetXsp7xdI_audio.wav",
+  "transcript_path": "storage\\uploads\\-OetXsp7xdI_transcript.json",
+  "clips_path": "storage\\uploads\\-OetXsp7xdI_clips.json",
+  "raw_clip_paths": [
+  ],
+  "vertical_clip_paths": [
+  ],
+  "captioned_clip_paths": [
+
+  ],
+  "completed_stages": [
+    "download",
+    "transcribe"
+  ],
+  "failed_stage": null,
+  "total_time_seconds": 0.0
+}

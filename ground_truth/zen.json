@@ -1,0 +1,119 @@
+{
+  "clips": [
+    {
+      "clip_id": "clip_c1",
+      "start": "57.2",
+      "end": "104.44",
+      "duration": "47.24",
+      "segments": [
+        {"start_sent_id": 15, "end_sent_id": 26}
+      ],
+      "confidence_rank": 1,
+      "confidence_note": "Myth Busting + Middle-Class Relatability: Calls out multitasking habits (Instagram while eating, phone at gym) that every Telugu 18-35 urban viewer does daily, then flips it — 'you think it's normal but it's destroying your brain.' Lands with a named concept (Monk Mode) that feels like a secret weapon they just unlocked.",
+      "hook_text": "తింటూ Instagram చూడడం, work చేస్తూ song-లు వినడం, gym-లో ఉండి phone వాడటం ఇవన్నీ మనం చేస్తూ ఉంటాం.",
+      "payoff_text": "దీన్నే Monk Mode అని అంటారు.",
+      "why": "Viewer's everyday multitasking habit is exposed as brain damage, then reframed with a monk-level solution called Monk Mode.",
+      "engagement_type": "Relatable",
+      "hook_score": 9,
+      "coherence_score": 8,
+      "cultural_score": 9,
+      "engagement_score": 9,
+      "psychological_trigger": "Middle-Class Relatability + Myth Busting",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "Hook is strong because it lists specific guilty habits before delivering the verdict. Payoff lands with named concept — shareable."
+    },
+    {
+      "clip_id": "clip_c2",
+      "start": "261.76",
+      "end": "351.36",
+      "duration": "89.6",
+      "segments": [
+        {"start_sent_id": 57, "end_sent_id": 78}
+      ],
+      "confidence_rank": 2,
+      "confidence_note": "Negative Visualization + Emotional Reframe: The two-arrow metaphor is visceral and universally relatable. The twist — 'you can't stop the first arrow, but you keep stabbing yourself with the second' — is the kind of counter-intuitive reframe Telugu audiences save and share.",
+      "hook_text": "ఒక వ్యక్తికి ఒక బాణం వచ్చి బలంగా గుచ్చుకుంది.",
+      "payoff_text": "ప్రపంచం తలకిందులైనా మీరు మాత్రం కొండలా నిలబడతారు.",
+      "why": "Buddha's two-arrow parable sets up pain vs. suffering — the first arrow is life, the second is your own overthinking — and ends with the promise of becoming emotionally bulletproof.",
+      "engagement_type": "Wisdom",
+      "hook_score": 8,
+      "coherence_score": 9,
+      "cultural_score": 8,
+      "engagement_score": 9,
+      "psychological_trigger": "Negative Visualization + Emotional Reframe",
+      "trimmed": true,
+      "trim_reason": "Removed sentences 79–95 (sponsor bridge + Ditto Insurance ad). Sentence 78 ('ప్రపంచం తలకిందులైనా మీరు మాత్రం కొండలా నిలబడతారు') is the natural payoff — the ad pivot that follows is clean junk.",
+      "notes": "Strong arc. Payoff at 78 is one of the best lines in the video. Do not let this clip bleed into the sponsor segment."
+    },
+    {
+      "clip_id": "clip_c3",
+      "start": "475.72",
+      "end": "487.18",
+      "duration": "11.46",
+      "segments": [
+        {"start_sent_id": 108, "end_sent_id": 122}
+      ],
+      "confidence_rank": 3,
+      "confidence_note": "Curiosity Gap + Controversial Take: 'The more desperately you chase something, the faster it runs away' is counterintuitive and hits hard for Telugu youth obsessing over jobs, relationships, and money. The interview example makes it hyper-concrete.",
+      "hook_text": "నువ్వు ఎంతగా దేన్నైనా పిచ్చిగా వెంటాడతావో అది నీ నుండి అంతగా దూరం పారిపోతుంది.",
+      "payoff_text": "అదే the backwards law.",
+      "why": "Backwards Law — chasing makes things flee, detachment magnetizes — illustrated with a job interview mindset shift and sealed with the named concept.",
+      "engagement_type": "Insight",
+      "hook_score": 9,
+      "coherence_score": 8,
+      "cultural_score": 8,
+      "engagement_score": 8,
+      "psychological_trigger": "Curiosity Gap + Controversial Take",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "Hook is cold-open ready — zero prior context needed. 'Backwards law' named concept at the end makes this clip saveable."
+    },
+    {
+      "clip_id": "clip_c4",
+      "start": "546.98",
+      "end": "648.92",
+      "duration": "101.94",
+      "segments": [
+        {"start_sent_id": 123, "end_sent_id": 147}
+      ],
+      "confidence_rank": 4,
+      "confidence_note": "Practical Utility + Aspirational: The martial arts story is cinematic and the lesson — overthinking kills your natural talent under pressure — is something every interview/stage-fright sufferer in the Telugu 18-35 demographic has lived. 'CEO secret weapon' elevates it.",
+      "hook_text": "ఒక పాత Zen martial arts master దగ్గరికి ఒక శిష్యుడు వెళ్ళాడు.",
+      "payoff_text": "కొన్నిసార్లు ఏమి ఆలోచించకపోవడమే అతి పెద్ద బలం.",
+      "why": "A martial arts story proves that 1,000 thoughts mid-action is the enemy, builds to the Mushin concept — empty mind = peak performance — and closes with a punchy counter-intuitive one-liner.",
+      "engagement_type": "Story",
+      "hook_score": 7,
+      "coherence_score": 9,
+      "cultural_score": 7,
+      "engagement_score": 8,
+      "psychological_trigger": "Practical Utility + Aspirational",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "Clip is on the longer side (~25 sentences). Could trim 136–137 ('దీన్నే machine అని అంటారు. ఇది actual-గా మన real life-లో కూడా జరుగుతుంది.') as transitional filler — 138 connects directly to 135 in spirit. Hook is a story opener, not a scroll-stopper — slightly weaker than other clips but the arc is solid."
+    },
+    {
+      "clip_id": "clip_c5",
+      "start": "697.82",
+      "end": "754.88",
+      "duration": "57.06",
+      "segments": [
+        {"start_sent_id": 159, "end_sent_id": 173}
+      ],
+      "confidence_rank": 5,
+      "confidence_note": "Social Comparison Anxiety + Emotional Resolution: Instagram comparison pain is the single most relatable trigger for Telugu urban youth. 'You might be a plum tree — your season hasn't come yet' is the kind of comforting reframe that gets screenshotted and shared in WhatsApp groups.",
+      "hook_text": "ఈ రోజుల్లో మన పరిస్థితి ఎలా ఉందో తెలుసా?",
+      "payoff_text": "So నమ్మండి.",
+      "why": "Instagram-triggered comparison spiral is named, validated, then dismantled with the cherry/plum season metaphor — ending with a direct call to self-belief.",
+      "engagement_type": "Emotional",
+      "hook_score": 7,
+      "coherence_score": 8,
+      "cultural_score": 9,
+      "engagement_score": 9,
+      "psychological_trigger": "Middle-Class Relatability + Emotional Resolution",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "Payoff at 'So నమ్మండి' is intentionally abrupt — works as a mic-drop. Hook is a soft question opener, not the strongest cold-open, but the Instagram reference in sentence 160-161 will immediately stop the scroll for target audience."
+    }
+  ]
+}

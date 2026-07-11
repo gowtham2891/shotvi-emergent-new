@@ -1,0 +1,74 @@
+{
+  "clips": [
+    {
+      "clip_id": "clip_c1",
+      "start": "133.26",
+      "end": "207.86",
+      "duration": "74.6",
+      "segments": [
+        {"start_sent_id": 28, "end_sent_id": 40}
+      ],
+      "confidence_rank": 2,
+      "confidence_note": "Fear + Historical Drama: Hitler's spies infiltrating Swiss banks to catch Jews hiding money — with death penalty stakes — then the Swiss govt responding with a banking law that changed the world. This has a complete thriller arc that Telugu audiences will not skip.",
+      "hook_text": "అయితే ఈ Swiss bank-లు ఎవరి details బయటకు తెలియకుండా ఇంత secret-గా maintain చేయడానికి కారణం ఏమిటంటే World War-లు జరుగుతున్న సమయంలో ముఖ్యంగా Germany-లో Hitler అధికారంలోకి వచ్చిన తర్వాత German citizen-లు ఎవరైనా వేరే దేశాల్లో తమ సంపద దాచినా వాటి వివరాలు తెలియజేయకపోతే మరణ శిక్ష విధించేవారు.",
+      "payoff_text": "ఈ చట్టమే Swiss bank-లకు ప్రపంచవ్యాప్తంగా గుర్తింపు తెచ్చిపెట్టింది.",
+      "why": "Nazi Germany's death threats forced Swiss banks to legally enshrine secrecy — the origin story of why Swiss banks became the world's most trusted vaults.",
+      "engagement_type": "Story",
+      "hook_score": 8,
+      "coherence_score": 9,
+      "cultural_score": 7,
+      "engagement_score": 8,
+      "psychological_trigger": "Fear + Historical Revelation",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "Hook sentence starts with 'అయితే' — borderline. However the sentence is a complete, self-contained revelation (not mid-thought), so it functions as a cold open. If the pipeline flags it, trim to S29 as fallback but the arc weakens."
+    },
+    {
+      "clip_id": "clip_c2",
+      "start": "364.14",
+      "end": "439.64",
+      "duration": "75.5",
+      "segments": [
+        {"start_sent_id": 70, "end_sent_id": 81}
+      ],
+      "confidence_rank": 1,
+      "confidence_note": "Controversy + Consequence: One whistleblower + a financial crisis brought down 300 years of Swiss banking secrecy. Concrete numbers (₹7,000 కోట్లు, 4,450 accounts) make this feel like a news expose. Highest share potential — this is the 'wait till the end' clip.",
+      "hook_text": "మొదటగా 2007-వ సంవత్సరంలో అతి పెద్ద Swiss Bank అయిన UBS Bank-లో పని చేసే Bradley అనే వ్యక్తి American client-ల కోసం పని చేసేవాడు.",
+      "payoff_text": "అలాగే UBS బ్యాంక్ $780 మిలియన్ డాలర్లు అంటే సుమారుగా ₹7,000 కోట్ల ఫైన్ పే చేసి America-కు చెందిన 4,450 మంది Swiss బ్యాంక్ అకౌంట్ హోల్డర్స్ డీటెయిల్స్-ని కూడా America-కు షేర్ చేసింది.",
+      "why": "A single UBS employee's whistleblowing + US financial pressure forced Switzerland to betray 300 years of banking secrecy and pay a ₹7,000 crore fine.",
+      "engagement_type": "Controversial",
+      "hook_score": 7,
+      "coherence_score": 9,
+      "cultural_score": 8,
+      "engagement_score": 9,
+      "psychological_trigger": "Curiosity Gap + Shocking Revelation",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "Hook starts with 'మొదటగా' which is a mild sequence marker, not a hard transition. Content is self-contained and the character introduction (Bradley) works as a cold open. Hook score capped at 7 because it opens with setup rather than a consequence-first punch — but the payoff is extremely strong."
+    },
+    {
+      "clip_id": "clip_c3",
+      "start": "490.68",
+      "end": "562.96",
+      "duration": "72.28",
+      "segments": [
+        {"start_sent_id": 92, "end_sent_id": 97},
+        {"start_sent_id": 103, "end_sent_id": 106}
+      ],
+      "confidence_rank": 3,
+      "confidence_note": "Practical Utility + Political Curiosity: Every Indian who's followed black money debates has wondered why names aren't released. This clip answers it directly. Saves/shares from politically aware 25-35 Telugu audience will be high.",
+      "hook_text": "Swiss Bank Indian clients account వివరాలు Government-కి పంపిస్తున్నప్పుడు Indian Government వాళ్ళ వివరాలు ఎందుకు బయటకు announce చేయడం లేదు అని.",
+      "payoff_text": "అందుకే Indian Government Swiss Bank account holders data-ని బయటకు release చేయడం లేదు.",
+      "why": "The AEOI treaty legally prohibits India from making Swiss account data public — and releasing it would cost India access to all future data.",
+      "engagement_type": "Educational",
+      "hook_score": 8,
+      "coherence_score": 8,
+      "cultural_score": 9,
+      "engagement_score": 7,
+      "psychological_trigger": "Curiosity Gap + Practical Utility",
+      "trimmed": true,
+      "trim_reason": "Removed S98-102 (IT dept process mechanics — repetitive, no emotional value) and S100-101 which are fragmented sentences ('ఈ process.' / 'అంతా కూడా internal-గా జరుగుతుంది.'). The jump from S97 to S103 is coherent — both discuss consequences of the treaty.",
+      "notes": "Hook sentence starts with 'మరి' — mild transition but the question format is strong enough to function as cold open. Payoff is clean but slightly dry. Coherence after trim is solid."
+    }
+  ]
+}

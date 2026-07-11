@@ -1,0 +1,546 @@
+{
+  "video_id": "VYRehLcNx0o",
+  "video_duration": 761.5,
+  "total_sentences": 150,
+  "total_segments": 12,
+  "clips": [
+    {
+      "clip_id": "VYRehLcNx0o_c1",
+      "start": 180.24,
+      "end": 219.68,
+      "duration": 39.44,
+      "segments": [
+        {
+          "start_sent_id": 35,
+          "end_sent_id": 42
+        }
+      ],
+      "confidence_rank": 1,
+      "confidence_note": "Consequence-first: Explains the severe penalties and the ultimate secrecy mechanism.",
+      "hook_text": "ఇది తెలుసుకున్న Switzerland Government 1934-లో కొత్త Swiss Banking Act-ని pass చేసింది.",
+      "payoff_text": "So దీనివల్ల bank-లో పనిచేసే క్రింద స్థాయి employee-లు ఎవరికీ కూడా ఆ account holder పేరు తెలిసేది కాదు.",
+      "why": "How Swiss Bank secrecy was legally enforced and implemented.",
+      "engagement_type": "Educational",
+      "hook_score": 9.0,
+      "coherence_score": 9.0,
+      "cultural_score": 8.0,
+      "engagement_score": 9.0,
+      "psychological_trigger": "Consequence-first, Curiosity Gap",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "",
+      "virality_score": 8.8,
+      "para_id": 35,
+      "anchor_text": "So దీనివల్ల bank-లో పనిచేసే క్రింద స్థాయి employee-లు ఎవరికీ కూడా ఆ account holder పేరు తెలిసేది కాదు.",
+      "anchor_score": 8.8,
+      "transcript": [
+        {
+          "start": 180.24,
+          "end": 185.18,
+          "text": "ఇది తెలుసుకున్న Switzerland Government 1934-లో కొత్త Swiss Banking Act-ని pass చేసింది."
+        },
+        {
+          "start": 185.56,
+          "end": 187.86,
+          "text": "ఇది ప్రపంచ banking చరిత్రలోనే ఒక సంచలనం."
+        },
+        {
+          "start": 188.28,
+          "end": 191.24,
+          "text": "ఈ చట్టం bank secrecy-కి అత్యంత ప్రాధాన్యతనిచ్చింది."
+        },
+        {
+          "start": 191.52,
+          "end": 196.74,
+          "text": "దీని ప్రకారం customer వివరాలు వారి transaction రహస్యంగా ఉంచడం Switzerland-లోని bank-లకు తప్పనిసరి."
+        },
+        {
+          "start": 197.12,
+          "end": 204.5,
+          "text": "దీన్ని ఉల్లంఘిస్తే bank ఉద్యోగులకు 3 నుండి 5 సంవత్సరాల జైలు శిక్ష అలాగే కొన్ని కోట్ల ₹ జరిమానా వంటి తీవ్రమైన శిక్షలు విధించేది."
+        },
+        {
+          "start": 204.98,
+          "end": 207.86,
+          "text": "ఈ చట్టమే Swiss bank-లకు ప్రపంచవ్యాప్తంగా గుర్తింపు తెచ్చిపెట్టింది."
+        },
+        {
+          "start": 208.22,
+          "end": 214.18,
+          "text": "ఈ Act-లో భాగంగా secrecy-ని మరింత పెంచడానికి bank-లో customer name-కి బదులుగా number system-తో replace చేసింది."
+        },
+        {
+          "start": 214.42,
+          "end": 219.68,
+          "text": "So దీనివల్ల bank-లో పనిచేసే క్రింద స్థాయి employee-లు ఎవరికీ కూడా ఆ account holder పేరు తెలిసేది కాదు."
+        }
+      ],
+      "transcript_text": "ఇది తెలుసుకున్న Switzerland Government 1934-లో కొత్త Swiss Banking Act-ని pass చేసింది. ఇది ప్రపంచ banking చరిత్రలోనే ఒక సంచలనం. ఈ చట్టం bank secrecy-కి అత్యంత ప్రాధాన్యతనిచ్చింది. దీని ప్రకారం customer వివరాలు వారి transaction రహస్యంగా ఉంచడం Switzerland-లోని bank-లకు తప్పనిసరి. దీన్ని ఉల్లంఘిస్తే bank ఉద్యోగులకు 3 నుండి 5 సంవత్సరాల జైలు శిక్ష అలాగే కొన్ని కోట్ల ₹ జరిమానా వంటి తీవ్రమైన శిక్షలు విధించేది. ఈ చట్టమే Swiss bank-లకు ప్రపంచవ్యాప్తంగా గుర్తింపు తెచ్చిపెట్టింది. ఈ Act-లో భాగంగా secrecy-ని మరింత పెంచడానికి bank-లో customer name-కి బదులుగా number system-తో replace చేసింది. So దీనివల్ల bank-లో పనిచేసే క్రింద స్థాయి employee-లు ఎవరికీ కూడా ఆ account holder పేరు తెలిసేది కాదు."
+    },
+    {
+      "clip_id": "VYRehLcNx0o_c2",
+      "start": 481.22,
+      "end": 562.96,
+      "duration": 81.74,
+      "segments": [
+        {
+          "start_sent_id": 90,
+          "end_sent_id": 106
+        }
+      ],
+      "confidence_rank": 2,
+      "confidence_note": "Curiosity Gap: Addresses a very common question among the Telugu audience.",
+      "hook_text": "మరి Swiss Bank Indian clients account వివరాలు Government-కి పంపిస్తున్నప్పుడు Indian Government వాళ్ళ వివరాలు ఎందుకు బయటకు announce చేయడం లేదు అని.",
+      "payoff_text": "అందుకే Indian Government Swiss Bank account holders data-ని బయటకు release చేయడం లేదు.",
+      "why": "Why Indian government doesn't reveal Swiss Bank account holders' names.",
+      "engagement_type": "Educational",
+      "hook_score": 10.0,
+      "coherence_score": 9.0,
+      "cultural_score": 10.0,
+      "engagement_score": 9.0,
+      "psychological_trigger": "Curiosity Gap, Myth Busting",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "",
+      "virality_score": 9.6,
+      "para_id": 90,
+      "anchor_text": "అందుకే Indian Government Swiss Bank account holders data-ని బయటకు release చేయడం లేదు.",
+      "anchor_score": 9.6,
+      "transcript": [
+        {
+          "start": 481.22,
+          "end": 488.28,
+          "text": "అలాగే ఎవరైతే Indians-కి Swiss Bank-లో account ఉందో వాళ్ళందరి వివరాలు కూడా ప్రతి సంవత్సరం September నెలలో మన Government-కి పంపడం జరుగుతుంది."
+        },
+        {
+          "start": 488.62,
+          "end": 490.38,
+          "text": "అయితే ఇక్కడ మనందరికీ ఒక doubt రావచ్చు."
+        },
+        {
+          "start": 490.68,
+          "end": 497.86,
+          "text": "మరి Swiss Bank Indian clients account వివరాలు Government-కి పంపిస్తున్నప్పుడు Indian Government వాళ్ళ వివరాలు ఎందుకు బయటకు announce చేయడం లేదు అని."
+        },
+        {
+          "start": 498.14,
+          "end": 502.0,
+          "text": "అయితే AEOI system-లో భాగంగా అన్ని దేశాల మధ్య ఒక ఒప్పందం ఉంది."
+        },
+        {
+          "start": 502.34,
+          "end": 506.56,
+          "text": "అది ఏంటంటే Swiss Bank-లు share చేసిన data-ని ఏ దేశం కూడా public-కి వెల్లడించకూడదు."
+        },
+        {
+          "start": 506.98,
+          "end": 508.56,
+          "text": "అలాగే ఆ data-ని leak చేయకూడదు."
+        },
+        {
+          "start": 508.92,
+          "end": 512.96,
+          "text": "అది కేవలం tax purpose కోసం Income Tax Department వాళ్ళు మాత్రమే ఉపయోగించుకోవాలి."
+        },
+        {
+          "start": 513.28,
+          "end": 517.48,
+          "text": "అంతే కానీ ఆ data-ని Parliament-లో గాని, media-కి గాని, public-కి గాని announce చేయకూడదు."
+        },
+        {
+          "start": 517.84,
+          "end": 528.42,
+          "text": "అంటే ఎవరైనా ఒక వ్యక్తికి Swiss Bank-లో account ఉండి దానిలో డబ్బు ఉంటే ఆ డబ్బుని Income Tax Department-కి declare చేసి దానికి సరైన tax India-లో కడుతున్నారా లేదా అనేది Income Tax Department check చేసుకుంటుంది."
+        },
+        {
+          "start": 528.78,
+          "end": 530.94,
+          "text": "వాళ్ళు tax pay చేస్తూ ఉంటే ఎటువంటి problem లేదు."
+        },
+        {
+          "start": 531.3,
+          "end": 536.06,
+          "text": "tax pay చేయకపోతే వాళ్ళకి notice-లు పంపడం, penalty-లు వేయడం, tax collect చేయడం వంటివి చేస్తుంది."
+        },
+        {
+          "start": 536.4,
+          "end": 536.86,
+          "text": "ఈ process."
+        },
+        {
+          "start": 536.94,
+          "end": 538.42,
+          "text": "అంతా కూడా internal-గా జరుగుతుంది."
+        },
+        {
+          "start": 538.8,
+          "end": 550.42,
+          "text": "అలా కాకుండా ఈ Swiss Bank account holder వివరాలు public-కి announce చేసినా లేదా political-గా use చేసుకున్నా AEOI system-లోని data sharing treaty ప్రకారం అప్పటి నుండి Swiss Bank-లు India-కి data share చేయడం ఆపేస్తాయి."
+        },
+        {
+          "start": 550.84,
+          "end": 554.4,
+          "text": "అలాగే international-గా మిగిలిన దేశాలు కూడా India-ని blacklist-లో పెట్టేస్తాయి."
+        },
+        {
+          "start": 554.84,
+          "end": 558.54,
+          "text": "ఇలా data leak చేయకూడదు అనేది అన్ని దేశాల మధ్య ఉన్న ఒక strict condition."
+        },
+        {
+          "start": 558.82,
+          "end": 562.96,
+          "text": "అందుకే Indian Government Swiss Bank account holders data-ని బయటకు release చేయడం లేదు."
+        }
+      ],
+      "transcript_text": "అలాగే ఎవరైతే Indians-కి Swiss Bank-లో account ఉందో వాళ్ళందరి వివరాలు కూడా ప్రతి సంవత్సరం September నెలలో మన Government-కి పంపడం జరుగుతుంది. అయితే ఇక్కడ మనందరికీ ఒక doubt రావచ్చు. మరి Swiss Bank Indian clients account వివరాలు Government-కి పంపిస్తున్నప్పుడు Indian Government వాళ్ళ వివరాలు ఎందుకు బయటకు announce చేయడం లేదు అని. అయితే AEOI system-లో భాగంగా అన్ని దేశాల మధ్య ఒక ఒప్పందం ఉంది. అది ఏంటంటే Swiss Bank-లు share చేసిన data-ని ఏ దేశం కూడా public-కి వెల్లడించకూడదు. అలాగే ఆ data-ని leak చేయకూడదు. అది కేవలం tax purpose కోసం Income Tax Department వాళ్ళు మాత్రమే ఉపయోగించుకోవాలి. అంతే కానీ ఆ data-ని Parliament-లో గాని, media-కి గాని, public-కి గాని announce చేయకూడదు. అంటే ఎవరైనా ఒక వ్యక్తికి Swiss Bank-లో account ఉండి దానిలో డబ్బు ఉంటే ఆ డబ్బుని Income Tax Department-కి declare చేసి దానికి సరైన tax India-లో కడుతున్నారా లేదా అనేది Income Tax Department check చేసుకుంటుంది. వాళ్ళు tax pay చేస్తూ ఉంటే ఎటువంటి problem లేదు. tax pay చేయకపోతే వాళ్ళకి notice-లు పంపడం, penalty-లు వేయడం, tax collect చేయడం వంటివి చేస్తుంది. ఈ process. అంతా కూడా internal-గా జరుగుతుంది. అలా కాకుండా ఈ Swiss Bank account holder వివరాలు public-కి announce చేసినా లేదా political-గా use చేసుకున్నా AEOI system-లోని data sharing treaty ప్రకారం అప్పటి నుండి Swiss Bank-లు India-కి data share చేయడం ఆపేస్తాయి. అలాగే international-గా మిగిలిన దేశాలు కూడా India-ని blacklist-లో పెట్టేస్తాయి. ఇలా data leak చేయకూడదు అనేది అన్ని దేశాల మధ్య ఉన్న ఒక strict condition. అందుకే Indian Government Swiss Bank account holders data-ని బయటకు release చేయడం లేదు."
+    },
+    {
+      "clip_id": "VYRehLcNx0o_c3",
+      "start": 590.34,
+      "end": 628.84,
+      "duration": 38.5,
+      "segments": [
+        {
+          "start_sent_id": 112,
+          "end_sent_id": 117
+        }
+      ],
+      "confidence_rank": 3,
+      "confidence_note": "Myth Busting: Challenges the popular misconception that all Swiss accounts are black money.",
+      "hook_text": "అయితే ఇక్కడ గుర్తుంచుకోవలసిన విషయం ఏమిటంటే Swiss Bank-లో account account ఉన్న వాళ్ళందరూ illegal-గా black money దాచుకున్నట్టు కాదు.",
+      "payoff_text": "అలాగే legal-గా account ఉన్న వాళ్ళంతా కూడా Government మీద defamation case-లు వేసే అవకాశం ఉంటుంది.",
+      "why": "Not all Swiss Bank accounts are black money; legal reasons exist.",
+      "engagement_type": "Relatable",
+      "hook_score": 9.0,
+      "coherence_score": 9.0,
+      "cultural_score": 9.0,
+      "engagement_score": 8.0,
+      "psychological_trigger": "Myth Busting, Middle-Class Relatability",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "",
+      "virality_score": 9.4,
+      "para_id": 112,
+      "anchor_text": "అలాగే legal-గా account ఉన్న వాళ్ళంతా కూడా Government మీద defamation case-లు వేసే అవకాశం ఉంటుంది.",
+      "anchor_score": 9.4,
+      "transcript": [
+        {
+          "start": 590.34,
+          "end": 596.02,
+          "text": "అయితే ఇక్కడ గుర్తుంచుకోవలసిన విషయం ఏమిటంటే Swiss Bank-లో account account ఉన్న వాళ్ళందరూ illegal-గా black money దాచుకున్నట్టు కాదు."
+        },
+        {
+          "start": 596.36,
+          "end": 603.42,
+          "text": "చాలా మంది NRI-లు నిజాయితీగా Switzerland-లో business చేసేవాళ్ళు అక్కడ property-లు కొనుక్కునే వాళ్ళు కూడా Swiss Bank-లో account-లు open చేసుకుంటుంటారు."
+        },
+        {
+          "start": 603.88,
+          "end": 615.44,
+          "text": "అయితే cinema-ల్లో ఎక్కువగా ఈ black money-ని Swiss Bank-లో దాచినట్టు చూపించడం వల్ల Swiss Bank-లో ఉండేది మొత్తం black money అని అక్కడ account holder-లు అంతా అక్రమంగా సంపాదించిన వారని చాలా మందిలో ఒక రకమైన అపోహ create అయిపోయింది."
+        },
+        {
+          "start": 615.78,
+          "end": 623.42,
+          "text": "కాబట్టి ఒకవేళ Government కనుక ఈ Swiss Bank account holder-లు list కనుక బయటకు release చేస్తే ఆ list-లో ఉండే వాళ్ళంతా చెడ్డ వాళ్ళే అనే ఒక అభిప్రాయం ఏర్పడింది."
+        },
+        {
+          "start": 623.56,
+          "end": 623.92,
+          "text": "పడవచ్చు."
+        },
+        {
+          "start": 623.96,
+          "end": 628.84,
+          "text": "అలాగే legal-గా account ఉన్న వాళ్ళంతా కూడా Government మీద defamation case-లు వేసే అవకాశం ఉంటుంది."
+        }
+      ],
+      "transcript_text": "అయితే ఇక్కడ గుర్తుంచుకోవలసిన విషయం ఏమిటంటే Swiss Bank-లో account account ఉన్న వాళ్ళందరూ illegal-గా black money దాచుకున్నట్టు కాదు. చాలా మంది NRI-లు నిజాయితీగా Switzerland-లో business చేసేవాళ్ళు అక్కడ property-లు కొనుక్కునే వాళ్ళు కూడా Swiss Bank-లో account-లు open చేసుకుంటుంటారు. అయితే cinema-ల్లో ఎక్కువగా ఈ black money-ని Swiss Bank-లో దాచినట్టు చూపించడం వల్ల Swiss Bank-లో ఉండేది మొత్తం black money అని అక్కడ account holder-లు అంతా అక్రమంగా సంపాదించిన వారని చాలా మందిలో ఒక రకమైన అపోహ create అయిపోయింది. కాబట్టి ఒకవేళ Government కనుక ఈ Swiss Bank account holder-లు list కనుక బయటకు release చేస్తే ఆ list-లో ఉండే వాళ్ళంతా చెడ్డ వాళ్ళే అనే ఒక అభిప్రాయం ఏర్పడింది. పడవచ్చు. అలాగే legal-గా account ఉన్న వాళ్ళంతా కూడా Government మీద defamation case-లు వేసే అవకాశం ఉంటుంది."
+    },
+    {
+      "clip_id": "VYRehLcNx0o_c4",
+      "start": 630.28,
+      "end": 677.46,
+      "duration": 47.18,
+      "segments": [
+        {
+          "start_sent_id": 119,
+          "end_sent_id": 128
+        }
+      ],
+      "confidence_rank": 4,
+      "confidence_note": "Curiosity Gap: Explains why people still use Swiss Banks despite no secrecy.",
+      "hook_text": "అయితే ఒకప్పటిలా account-లను secret-గా maintain చేయకుండా Swiss Bank-లు అన్ని దేశాలకు వాళ్ళ వాళ్ళ citizen-ల data-ని every year share చేస్తున్నప్పటికీ ఇంకా అన్ని దేశాల వాళ్ళు Swiss Bank-లో amount దాచుకుంటున్నారు.",
+      "payoff_text": "అందుకే ఇప్పుడు అక్కడ డబ్బు దాచుకునే వాళ్ళంతా secrecy కోసం కాదు, safety కోసం దాచుకుంటున్నారు.",
+      "why": "Why Swiss Banks are still preferred today: safety, not secrecy.",
+      "engagement_type": "Insight",
+      "hook_score": 9.0,
+      "coherence_score": 9.0,
+      "cultural_score": 8.0,
+      "engagement_score": 8.0,
+      "psychological_trigger": "Curiosity Gap, Insight",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "",
+      "virality_score": 8.7,
+      "para_id": 119,
+      "anchor_text": "అందుకే ఇప్పుడు అక్కడ డబ్బు దాచుకునే వాళ్ళంతా secrecy కోసం కాదు, safety కోసం దాచుకుంటున్నారు.",
+      "anchor_score": 8.7,
+      "transcript": [
+        {
+          "start": 630.28,
+          "end": 641.24,
+          "text": "అయితే ఒకప్పటిలా account-లను secret-గా maintain చేయకుండా Swiss Bank-లు అన్ని దేశాలకు వాళ్ళ వాళ్ళ citizen-ల data-ని every year share చేస్తున్నప్పటికీ ఇంకా అన్ని దేశాల వాళ్ళు Swiss Bank-లో amount దాచుకుంటున్నారు."
+        },
+        {
+          "start": 641.58,
+          "end": 644.06,
+          "text": "ఎందుకంటే Switzerland ఎప్పుడూ కూడా neutral-గా ఉంటుంది."
+        },
+        {
+          "start": 644.44,
+          "end": 649.26,
+          "text": "political and economical-గా stable-గా ఉండడం వల్ల యుద్ధాల సమయంలో Swiss Bank-లు safe-గా ఉంటాయి."
+        },
+        {
+          "start": 649.6,
+          "end": 651.34,
+          "text": "అలాగే అక్కడ corruption కూడా చాలా తక్కువ."
+        },
+        {
+          "start": 651.8,
+          "end": 656.52,
+          "text": "And Switzerland currency అయిన Swiss France ప్రపంచంలోనే strongest and safest currency-లలో ఒకటి."
+        },
+        {
+          "start": 656.84,
+          "end": 659.64,
+          "text": "ఎందుకంటే అక్కడ ఉండే banking system చాలా strong-గా ఉంటుంది."
+        },
+        {
+          "start": 659.94,
+          "end": 661.92,
+          "text": "అలాగే inflation కూడా చాలా తక్కువగా ఉంటుంది."
+        },
+        {
+          "start": 662.32,
+          "end": 668.06,
+          "text": "మిగిలిన అన్ని దేశాలలో inflation 5-10% ఉంటే Switzerland-లో మాత్రం 0-2% ఉంటుంది."
+        },
+        {
+          "start": 668.32,
+          "end": 672.56,
+          "text": "ఈ కారణంగానే global financial crisis సమయంలో కూడా Swiss currency strong-గా ఉంటుంది."
+        },
+        {
+          "start": 672.94,
+          "end": 677.46,
+          "text": "అందుకే ఇప్పుడు అక్కడ డబ్బు దాచుకునే వాళ్ళంతా secrecy కోసం కాదు, safety కోసం దాచుకుంటున్నారు."
+        }
+      ],
+      "transcript_text": "అయితే ఒకప్పటిలా account-లను secret-గా maintain చేయకుండా Swiss Bank-లు అన్ని దేశాలకు వాళ్ళ వాళ్ళ citizen-ల data-ని every year share చేస్తున్నప్పటికీ ఇంకా అన్ని దేశాల వాళ్ళు Swiss Bank-లో amount దాచుకుంటున్నారు. ఎందుకంటే Switzerland ఎప్పుడూ కూడా neutral-గా ఉంటుంది. political and economical-గా stable-గా ఉండడం వల్ల యుద్ధాల సమయంలో Swiss Bank-లు safe-గా ఉంటాయి. అలాగే అక్కడ corruption కూడా చాలా తక్కువ. And Switzerland currency అయిన Swiss France ప్రపంచంలోనే strongest and safest currency-లలో ఒకటి. ఎందుకంటే అక్కడ ఉండే banking system చాలా strong-గా ఉంటుంది. అలాగే inflation కూడా చాలా తక్కువగా ఉంటుంది. మిగిలిన అన్ని దేశాలలో inflation 5-10% ఉంటే Switzerland-లో మాత్రం 0-2% ఉంటుంది. ఈ కారణంగానే global financial crisis సమయంలో కూడా Swiss currency strong-గా ఉంటుంది. అందుకే ఇప్పుడు అక్కడ డబ్బు దాచుకునే వాళ్ళంతా secrecy కోసం కాదు, safety కోసం దాచుకుంటున్నారు."
+    },
+    {
+      "clip_id": "VYRehLcNx0o_c5",
+      "start": 359.92,
+      "end": 439.64,
+      "duration": 79.72,
+      "segments": [
+        {
+          "start_sent_id": 69,
+          "end_sent_id": 81
+        }
+      ],
+      "confidence_rank": 5,
+      "confidence_note": "Consequence-first: Highlights the dramatic end of a 300-year-old system.",
+      "hook_text": "300 సంవత్సరాల చరిత్ర కలిగిన Swiss Bank secrecy system మూసిపోయింది.",
+      "payoff_text": "అలాగే UBS బ్యాంక్ $780 మిలియన్ డాలర్లు అంటే సుమారుగా ₹7,000 కోట్ల ఫైన్ పే చేసి America-కు చెందిన 4,450 మంది Swiss బ్యాంక్ అకౌంట్ హోల్డర్స్ డీటెయిల్స్-ని కూడా America-కు షేర్ చేసింది.",
+      "why": "The dramatic story of how Swiss Bank secrecy collapsed in 2008.",
+      "engagement_type": "Story",
+      "hook_score": 9.0,
+      "coherence_score": 9.0,
+      "cultural_score": 8.0,
+      "engagement_score": 9.0,
+      "psychological_trigger": "Consequence-first, Story",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "",
+      "virality_score": 9.3,
+      "para_id": 69,
+      "anchor_text": "అలాగే UBS బ్యాంక్ $780 మిలియన్ డాలర్లు అంటే సుమారుగా ₹7,000 కోట్ల ఫైన్ పే చేసి America-కు చెందిన 4,450 మంది Swiss బ్యాంక్ అకౌంట్ హోల్డర్స్ డీటెయిల్స్-ని కూడా America-కు షేర్ చేసింది.",
+      "anchor_score": 9.3,
+      "transcript": [
+        {
+          "start": 359.92,
+          "end": 363.86,
+          "text": "కారణంగా 300 సంవత్సరాల చరిత్ర కలిగిన Swiss Bank secrecy system మూసిపోయింది."
+        },
+        {
+          "start": 364.14,
+          "end": 371.7,
+          "text": "మొదటగా 2007-వ సంవత్సరంలో అతి పెద్ద Swiss Bank అయిన UBS Bank-లో పని చేసే Bradley అనే వ్యక్తి American client-ల కోసం పని చేసేవాడు."
+        },
+        {
+          "start": 371.96,
+          "end": 377.24,
+          "text": "అప్పట్లో UBS Bank US citizen-లు tax ఎగ్గొట్టి ఆ డబ్బుని Switzerland-కి తరలించడంలో help చేసేది."
+        },
+        {
+          "start": 377.52,
+          "end": 379.14,
+          "text": "దానికి Bradley కూడా help చేసేవాడు."
+        },
+        {
+          "start": 379.44,
+          "end": 387.52,
+          "text": "కానీ కొంత కాలానికి అతను ఆ job మానేసి American citizen-లు tax ఎగ్గొట్టడంలో UBS చేస్తున్న మోసాల గురించి direct-గా American Government-కి చెప్పేసాడు."
+        },
+        {
+          "start": 387.84,
+          "end": 393.86,
+          "text": "ఇది ఎలా ఉండగా మరొక వైపు 2000 8-లో global financial crisis కారణంగా America ఆర్థికంగా చాలా దెబ్బ తింది."
+        },
+        {
+          "start": 393.9,
+          "end": 396.62,
+          "text": "ఆ సమయంలో American government-కి చాలా డబ్బు అవసరమైంది."
+        },
+        {
+          "start": 396.98,
+          "end": 404.68,
+          "text": "So America-లో tax ఎగ్గొట్టి Swiss Bank-లో కొన్ని billion $ డబ్బు దాస్తున్న వారి account details share చేయమని UBS Bank మీద America ఒత్తిడి తెచ్చింది."
+        },
+        {
+          "start": 405.08,
+          "end": 412.18,
+          "text": "అలాగే ఈ details ఇవ్వకపోతే America-లో UBS Bank operate చేయడానికి వీలు లేకుండా banking license-ను cancel చేస్తామని warning ఇచ్చింది."
+        },
+        {
+          "start": 412.68,
+          "end": 416.42,
+          "text": "దీంతో America-లో business కోల్పోవడం అంటే UBS Bank collapse అయిపోయినట్టే."
+        },
+        {
+          "start": 416.66,
+          "end": 419.38,
+          "text": "అదే జరిగితే Switzerland-కి చాలా పెద్ద problem create అవుతుంది."
+        },
+        {
+          "start": 419.66,
+          "end": 428.12,
+          "text": "అందుకే UBS బ్యాంక్ అలాగే Switzerland గవర్నమెంట్ కూడా 1934-లో తెచ్చిన యాక్ట్-కి విరుద్ధంగా క్లయింట్స్ డేటా-ని American గవర్నమెంట్-తో షేర్ చేయడానికి ఒప్పుకుంది."
+        },
+        {
+          "start": 428.4,
+          "end": 439.64,
+          "text": "అలాగే UBS బ్యాంక్ $780 మిలియన్ డాలర్లు అంటే సుమారుగా ₹7,000 కోట్ల ఫైన్ పే చేసి America-కు చెందిన 4,450 మంది Swiss బ్యాంక్ అకౌంట్ హోల్డర్స్ డీటెయిల్స్-ని కూడా America-కు షేర్ చేసింది."
+        }
+      ],
+      "transcript_text": "కారణంగా 300 సంవత్సరాల చరిత్ర కలిగిన Swiss Bank secrecy system మూసిపోయింది. మొదటగా 2007-వ సంవత్సరంలో అతి పెద్ద Swiss Bank అయిన UBS Bank-లో పని చేసే Bradley అనే వ్యక్తి American client-ల కోసం పని చేసేవాడు. అప్పట్లో UBS Bank US citizen-లు tax ఎగ్గొట్టి ఆ డబ్బుని Switzerland-కి తరలించడంలో help చేసేది. దానికి Bradley కూడా help చేసేవాడు. కానీ కొంత కాలానికి అతను ఆ job మానేసి American citizen-లు tax ఎగ్గొట్టడంలో UBS చేస్తున్న మోసాల గురించి direct-గా American Government-కి చెప్పేసాడు. ఇది ఎలా ఉండగా మరొక వైపు 2000 8-లో global financial crisis కారణంగా America ఆర్థికంగా చాలా దెబ్బ తింది. ఆ సమయంలో American government-కి చాలా డబ్బు అవసరమైంది. So America-లో tax ఎగ్గొట్టి Swiss Bank-లో కొన్ని billion $ డబ్బు దాస్తున్న వారి account details share చేయమని UBS Bank మీద America ఒత్తిడి తెచ్చింది. అలాగే ఈ details ఇవ్వకపోతే America-లో UBS Bank operate చేయడానికి వీలు లేకుండా banking license-ను cancel చేస్తామని warning ఇచ్చింది. దీంతో America-లో business కోల్పోవడం అంటే UBS Bank collapse అయిపోయినట్టే. అదే జరిగితే Switzerland-కి చాలా పెద్ద problem create అవుతుంది. అందుకే UBS బ్యాంక్ అలాగే Switzerland గవర్నమెంట్ కూడా 1934-లో తెచ్చిన యాక్ట్-కి విరుద్ధంగా క్లయింట్స్ డేటా-ని American గవర్నమెంట్-తో షేర్ చేయడానికి ఒప్పుకుంది. అలాగే UBS బ్యాంక్ $780 మిలియన్ డాలర్లు అంటే సుమారుగా ₹7,000 కోట్ల ఫైన్ పే చేసి America-కు చెందిన 4,450 మంది Swiss బ్యాంక్ అకౌంట్ హోల్డర్స్ డీటెయిల్స్-ని కూడా America-కు షేర్ చేసింది."
+    },
+    {
+      "clip_id": "VYRehLcNx0o_c6",
+      "start": 64.38,
+      "end": 132.96,
+      "duration": 68.58,
+      "segments": [
+        {
+          "start_sent_id": 16,
+          "end_sent_id": 27
+        }
+      ],
+      "confidence_rank": 6,
+      "confidence_note": "Curiosity Gap: Explores the historical origins of Swiss Bank secrecy and safety.",
+      "hook_text": "అయితే ఇలా secret-గా money దాచడం అనేది Switzerland-లోని Swiss Bank-లలోనే ఎందుకు start అయింది?",
+      "payoff_text": "అందుకే చాలా చాలా మంది money ఇక్కడ దాచుకునేవారు.",
+      "why": "Historical reasons for Switzerland becoming a hub for secret banking.",
+      "engagement_type": "Educational",
+      "hook_score": 8.0,
+      "coherence_score": 9.0,
+      "cultural_score": 8.0,
+      "engagement_score": 8.0,
+      "psychological_trigger": "Curiosity Gap, Historical Context",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "",
+      "virality_score": 8.3,
+      "para_id": 16,
+      "anchor_text": "అందుకే చాలా చాలా మంది money ఇక్కడ దాచుకునేవారు.",
+      "anchor_score": 8.3,
+      "transcript": [
+        {
+          "start": 64.38,
+          "end": 69.3,
+          "text": "అయితే ఇలా secret-గా money దాచడం అనేది Switzerland-లోని Swiss Bank-లలోనే ఎందుకు start అయింది?"
+        },
+        {
+          "start": 69.6,
+          "end": 70.96,
+          "text": "అసలు దీని history ఏంటో చూద్దాం."
+        },
+        {
+          "start": 71.56,
+          "end": 75.9,
+          "text": "Switzerland దేశం చుట్టూ France, Germany, Italy, Austria వంటి పెద్ద దేశాలు ఉన్నాయి."
+        },
+        {
+          "start": 76.12,
+          "end": 78.72,
+          "text": "చరిత్రలో ఈ దేశాల మధ్య ఎప్పుడూ యుద్ధాలు జరుగుతూ ఉండేవి."
+        },
+        {
+          "start": 79.0,
+          "end": 82.44,
+          "text": "కానీ Switzerland మాత్రం ఏ యుద్ధంలోనూ పాల్గొనకుండా neutral-గా ఉండేది."
+        },
+        {
+          "start": 82.7,
+          "end": 91.36,
+          "text": "దీంతో చుట్టుపక్కల ఉన్న రాజులు, వ్యాపారులు తమ డబ్బుకు యుద్ధాల వల్ల ఎటువంటి ప్రమాదం లేకుండా ఉండడానికి neutral-గా ఉండే Switzerland bank-లలో డబ్బు దాచడం మొదలు పెట్టారు."
+        },
+        {
+          "start": 91.74,
+          "end": 96.58,
+          "text": "అలాగే 1st, 2nd ప్రపంచ యుద్ధ సమయాల్లో Europe దేశాల్లో political stability లేదు."
+        },
+        {
+          "start": 96.8,
+          "end": 101.28,
+          "text": "అలాగే ఆ యుద్ధానికి కావలసిన డబ్బు కోసం Europe దేశాలు tax-లను బాగా పెంచడం జరిగింది."
+        },
+        {
+          "start": 101.52,
+          "end": 110.54,
+          "text": "కాబట్టి ఈ tax-లను తప్పించడానికి డబ్బు ఉన్న వారంతా political-గా stable-గా ఉన్న Switzerland-లోని bank-లపై ఏ దేశ నియంత్రణ ఉండదని నమ్మి Swiss bank-లలో దాచుకునేవారు."
+        },
+        {
+          "start": 110.88,
+          "end": 125.56,
+          "text": "అలాగే Switzerland-లో ఉండే చాలా bank-లు ఈ విలువైన డబ్బు, gold, diamond-లు వంటి వాటిని అక్కడ Cold War సమయంలో protection కోసం కొన్ని వందల సంవత్సరాల క్రితం Alps పర్వతాల క్రింద కొన్ని వందల meter-ల లోతులో నిర్మించిన military bunker-లలో Swiss vault-లో safe-గా store చేస్తారు."
+        },
+        {
+          "start": 125.92,
+          "end": 130.46,
+          "text": "ఈ vault-లు పర్వతాల క్రింద ఉండడం వల్ల physical-గా high security and tough protection ఉంటుంది."
+        },
+        {
+          "start": 130.86,
+          "end": 132.96,
+          "text": "అందుకే చాలా చాలా మంది money ఇక్కడ దాచుకునేవారు."
+        }
+      ],
+      "transcript_text": "అయితే ఇలా secret-గా money దాచడం అనేది Switzerland-లోని Swiss Bank-లలోనే ఎందుకు start అయింది? అసలు దీని history ఏంటో చూద్దాం. Switzerland దేశం చుట్టూ France, Germany, Italy, Austria వంటి పెద్ద దేశాలు ఉన్నాయి. చరిత్రలో ఈ దేశాల మధ్య ఎప్పుడూ యుద్ధాలు జరుగుతూ ఉండేవి. కానీ Switzerland మాత్రం ఏ యుద్ధంలోనూ పాల్గొనకుండా neutral-గా ఉండేది. దీంతో చుట్టుపక్కల ఉన్న రాజులు, వ్యాపారులు తమ డబ్బుకు యుద్ధాల వల్ల ఎటువంటి ప్రమాదం లేకుండా ఉండడానికి neutral-గా ఉండే Switzerland bank-లలో డబ్బు దాచడం మొదలు పెట్టారు. అలాగే 1st, 2nd ప్రపంచ యుద్ధ సమయాల్లో Europe దేశాల్లో political stability లేదు. అలాగే ఆ యుద్ధానికి కావలసిన డబ్బు కోసం Europe దేశాలు tax-లను బాగా పెంచడం జరిగింది. కాబట్టి ఈ tax-లను తప్పించడానికి డబ్బు ఉన్న వారంతా political-గా stable-గా ఉన్న Switzerland-లోని bank-లపై ఏ దేశ నియంత్రణ ఉండదని నమ్మి Swiss bank-లలో దాచుకునేవారు. అలాగే Switzerland-లో ఉండే చాలా bank-లు ఈ విలువైన డబ్బు, gold, diamond-లు వంటి వాటిని అక్కడ Cold War సమయంలో protection కోసం కొన్ని వందల సంవత్సరాల క్రితం Alps పర్వతాల క్రింద కొన్ని వందల meter-ల లోతులో నిర్మించిన military bunker-లలో Swiss vault-లో safe-గా store చేస్తారు. ఈ vault-లు పర్వతాల క్రింద ఉండడం వల్ల physical-గా high security and tough protection ఉంటుంది. అందుకే చాలా చాలా మంది money ఇక్కడ దాచుకునేవారు."
+    }
+  ],
+  "metadata": {
+    "pipeline": "ClipForge-v14-SkillAligned",
+    "approach": "embeddings-segmentation (junk only) → gemini-skill-aligned-selection → segments-array → weighted-virality-score",
+    "language": "Telugu/Codemix",
+    "segmentation": "12 segments (junk detection only)",
+    "embedding_model": "l3cube-pune/telugu-sentence-similarity-sbert",
+    "scorer": "gemini/gemini-2.5-flash",
+    "gemini_role": "skill-aligned editor (single call, no hook validation loop)",
+    "virality_weights": "hook=40%, coherence=30%, cultural=20%, engagement=10%"
+  }
+}

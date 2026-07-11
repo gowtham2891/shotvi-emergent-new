@@ -1,0 +1,319 @@
+import React, { useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  ArrowLeft,
+  Play,
+  Edit3,
+  Download,
+  Clock,
+  TrendingUp,
+  Share2,
+  Flame,
+  Loader2,
+  AlertTriangle,
+  FileVideo,
+} from "lucide-react";
+import { AppShell } from "@/components/shotvi/AppShell";
+import { useAppStore } from "@/store/useAppStore";
+import { CLIPS } from "@/constants/testIds";
+
+const ViralityGauge = ({ score }) => {
+  const color =
+    score >= 85 ? "#22ff9c" : score >= 70 ? "#facc15" : "#fb923c";
+  return (
+    <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-black/60 backdrop-blur-sm border border-white/10">
+      <Flame size={12} style={{ color }} />
+      <span
+        className="font-mono text-xs font-bold"
+        style={{ color }}
+      >
+        {score}
+      </span>
+      <span className="text-[10px] text-white/60">viral</span>
+    </div>
+  );
+};
+
+const ClipCard = ({ clip, onEdit, onPreview, onExport, rank }) => {
+  return (
+    <div
+      data-testid={CLIPS.card(clip.id)}
+      className="group rounded-xl border border-[#2a2a35] bg-[#0b0b10] overflow-hidden hover:border-[#7c3aed]/50 transition-all"
+    >
+      {/* 9:16 preview */}
+      <div className="relative aspect-[9/16] bg-black overflow-hidden">
+        {clip.thumbnail ? (
+          <img
+            src={clip.thumbnail}
+            alt={clip.hook}
+            className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#111116] to-[#1a1a24]">
+            <FileVideo size={32} className="text-[#2a2a35]" />
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/40" />
+
+        {/* Rank pill */}
+        <div className="absolute top-3 left-3 flex items-center gap-2">
+          <div className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-black/60 backdrop-blur-sm text-white/80 border border-white/10">
+            #{String(rank).padStart(2, "0")}
+          </div>
+          <ViralityGauge score={clip.virality} />
+        </div>
+
+        {/* Duration */}
+        <div className="absolute top-3 right-3 text-[11px] font-mono text-white/90 flex items-center gap-1 bg-black/60 px-2 py-0.5 rounded backdrop-blur-sm border border-white/10">
+          <Clock size={10} /> {clip.duration}s
+        </div>
+
+        {/* Caption preview */}
+        <div className="absolute inset-x-4 bottom-16 text-center">
+          <div className="caption-bold-yellow text-lg leading-tight inline">
+            {clip.hook}
+          </div>
+        </div>
+
+        {/* Hover play */}
+        <button
+          data-testid={CLIPS.preview(clip.id)}
+          onClick={() => onPreview(clip)}
+          className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+        >
+          <div className="w-14 h-14 rounded-full bg-[#7c3aed]/90 backdrop-blur-sm flex items-center justify-center shadow-[0_0_30px_rgba(124,58,237,0.7)]">
+            <Play size={20} className="text-white ml-0.5" fill="white" />
+          </div>
+        </button>
+
+        {/* Source timecode */}
+        <div className="absolute bottom-3 left-3 text-[10px] font-mono text-white/60 bg-black/50 px-1.5 py-0.5 rounded">
+          from {clip.startAt}
+        </div>
+      </div>
+
+      {/* Meta */}
+      <div className="p-4">
+        <p className="text-[11px] uppercase tracking-widest text-[#71717a] mb-1.5">
+          Hook line
+        </p>
+        <p className="text-sm text-white font-medium leading-snug line-clamp-2 mb-1">
+          {clip.hook}
+        </p>
+        <p className="text-xs text-[#71717a] line-clamp-1 mb-4">
+          {clip.hookEn}
+        </p>
+        <div className="flex gap-2">
+          <button
+            data-testid={CLIPS.edit(clip.id)}
+            onClick={() => onEdit(clip)}
+            className="flex-1 inline-flex items-center justify-center gap-1.5 bg-[#7c3aed] hover:bg-[#6d28d9] text-white text-xs font-semibold py-2 rounded-md transition-colors"
+          >
+            <Edit3 size={12} /> Edit
+          </button>
+          <button
+            data-testid={CLIPS.export(clip.id)}
+            onClick={() => onExport(clip)}
+            className="inline-flex items-center justify-center gap-1.5 bg-[#111116] border border-[#2a2a35] hover:border-[#7c3aed]/50 text-white text-xs font-medium px-3 py-2 rounded-md transition-colors"
+          >
+            <Download size={12} /> Export
+          </button>
+          <button className="inline-flex items-center justify-center bg-[#111116] border border-[#2a2a35] hover:border-[#7c3aed]/50 text-white px-2.5 py-2 rounded-md transition-colors">
+            <Share2 size={12} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default function ClipsGallery() {
+  const { projectId } = useParams();
+  const navigate = useNavigate();
+
+  const loadProjectClips = useAppStore((s) => s.loadProjectClips);
+  const clipsLoading = useAppStore((s) => s.clipsLoading);
+  const clipsError = useAppStore((s) => s.clipsError);
+  const clips = useAppStore((s) => s.clipsByJob[projectId]) || [];
+  const project = useAppStore((s) => s.getProject(projectId)) || {
+    id: projectId,
+    title: "Project",
+    status: "ready",
+  };
+
+  const setCurrentClip = useAppStore((s) => s.setCurrentClip);
+
+  useEffect(() => {
+    loadProjectClips(projectId);
+  }, [projectId, loadProjectClips]);
+
+  const onEdit = (clip) => {
+    setCurrentClip(clip.id);
+    navigate(`/editor/${clip.id}`);
+  };
+  const onPreview = (clip) => {
+    setCurrentClip(clip.id);
+    navigate(`/editor/${clip.id}`);
+  };
+  const onExport = (clip) => {
+    setCurrentClip(clip.id);
+    navigate(`/export/${clip.id}`);
+  };
+
+  const avgVirality = clips.length
+    ? Math.round(clips.reduce((a, c) => a + c.virality, 0) / clips.length)
+    : 0;
+
+  if (clipsLoading && clips.length === 0) {
+    return (
+      <AppShell title={project.title} subtitle="Loading clips…">
+        <div data-testid={CLIPS.root} className="p-8 flex justify-center">
+          <Loader2 size={28} className="text-[#c4b5fd] animate-spin mt-16" />
+        </div>
+      </AppShell>
+    );
+  }
+
+  // Still processing / failed / expired → informative empty states
+  if (!clipsLoading && (clipsError || clips.length === 0)) {
+    const stillProcessing =
+      !clipsError && project.status && !["ready", "failed", "expired"].includes(project.status);
+    return (
+      <AppShell
+        title={project.title}
+        subtitle={clipsError ? "Unavailable" : stillProcessing ? "Processing…" : "No clips"}
+        actions={
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="inline-flex items-center gap-1.5 bg-[#111116] border border-[#2a2a35] hover:border-[#7c3aed] text-white text-sm px-3 py-2 rounded-md transition-colors"
+            data-testid={CLIPS.backBtn}
+          >
+            <ArrowLeft size={14} /> All projects
+          </button>
+        }
+      >
+        <div data-testid={CLIPS.root} className="p-8 max-w-xl mx-auto text-center">
+          <div className="rounded-2xl border border-[#2a2a35] bg-[#0b0b10] p-10">
+            {clipsError ? (
+              <>
+                <AlertTriangle size={28} className="text-[#f59e0b] mx-auto mb-4" />
+                <p className="text-sm text-[#a1a1aa] mb-6">{clipsError}</p>
+                <div className="flex justify-center gap-3">
+                  <button
+                    onClick={() => loadProjectClips(projectId)}
+                    className="text-xs font-semibold bg-[#7c3aed] hover:bg-[#6d28d9] text-white px-4 py-2 rounded-md transition-colors"
+                  >
+                    Retry
+                  </button>
+                  <button
+                    onClick={() => navigate("/upload")}
+                    className="text-xs font-semibold bg-[#111116] border border-[#2a2a35] text-white px-4 py-2 rounded-md"
+                  >
+                    New project
+                  </button>
+                </div>
+              </>
+            ) : stillProcessing ? (
+              <>
+                <Loader2 size={28} className="text-[#c4b5fd] mx-auto mb-4 animate-spin" />
+                <p className="text-sm font-semibold text-white mb-1">
+                  This project is still processing
+                </p>
+                <p className="text-xs text-[#a1a1aa]">
+                  {project.currentStage || "Clips will appear here when the pipeline finishes."}
+                </p>
+              </>
+            ) : (
+              <p className="text-sm text-[#a1a1aa]">No clips were generated for this project.</p>
+            )}
+          </div>
+        </div>
+      </AppShell>
+    );
+  }
+
+  return (
+    <AppShell
+      title={project.title}
+      subtitle={`${clips.length} AI-selected clips · Avg virality ${avgVirality}%`}
+      actions={
+        <button
+          onClick={() => navigate("/dashboard")}
+          className="inline-flex items-center gap-1.5 bg-[#111116] border border-[#2a2a35] hover:border-[#7c3aed] text-white text-sm px-3 py-2 rounded-md transition-colors"
+          data-testid={CLIPS.backBtn}
+        >
+          <ArrowLeft size={14} /> All projects
+        </button>
+      }
+    >
+      <div data-testid={CLIPS.root} className="p-8 max-w-[1400px] mx-auto">
+        {/* Insight banner */}
+        <div className="mb-8 rounded-xl border border-[#7c3aed]/30 bg-gradient-to-r from-[#7c3aed]/10 via-[#7c3aed]/5 to-transparent p-5 flex items-center gap-4">
+          <div className="w-11 h-11 rounded-full bg-[#7c3aed]/20 border border-[#7c3aed]/40 flex items-center justify-center">
+            <TrendingUp size={18} className="text-[#c4b5fd]" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-white mb-0.5">
+              We found {clips.length} shareable moments in this video
+            </p>
+            <p className="text-xs text-[#a1a1aa]">
+              Top pick scored{" "}
+              <span className="text-[#22ff9c] font-mono font-bold">
+                {clips[0]?.virality}
+              </span>
+              /100 based on hook strength, punchline density & audio energy.
+            </p>
+          </div>
+          <button
+            onClick={() => navigate(`/editor/${clips[0].id}`)}
+            className="text-xs font-semibold bg-white text-black px-4 py-2 rounded-md hover:bg-[#e5e5e5] transition-colors"
+          >
+            Open top clip
+          </button>
+        </div>
+
+        {/* Filters */}
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex gap-2 text-xs">
+            {["All", "Top scoring", "< 30s", "30-45s", "> 45s"].map(
+              (f, i) => (
+                <button
+                  key={f}
+                  className={`px-3 py-1.5 rounded-md border transition-colors ${
+                    i === 0
+                      ? "bg-[#7c3aed]/15 border-[#7c3aed]/40 text-white"
+                      : "bg-[#0b0b10] border-[#2a2a35] text-[#a1a1aa] hover:text-white"
+                  }`}
+                >
+                  {f}
+                </button>
+              )
+            )}
+          </div>
+          <div className="flex items-center gap-2 text-xs text-[#71717a]">
+            <span>Sort by</span>
+            <select className="bg-[#0b0b10] border border-[#2a2a35] rounded-md px-2 py-1.5 text-white outline-none">
+              <option>Virality score</option>
+              <option>Duration</option>
+              <option>Timeline order</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
+          {clips.map((clip, i) => (
+            <ClipCard
+              key={clip.id}
+              clip={clip}
+              rank={i + 1}
+              onEdit={onEdit}
+              onPreview={onPreview}
+              onExport={onExport}
+            />
+          ))}
+        </div>
+      </div>
+    </AppShell>
+  );
+}

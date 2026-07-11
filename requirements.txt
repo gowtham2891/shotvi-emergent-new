@@ -1,0 +1,25 @@
+yt-dlp
+python-dotenv
+opencv-python
+mediapipe
+sarvamai
+numpy==1.26.4
+google-genai
+transformers==4.36.2
+--extra-index-url https://download.pytorch.org/whl/cu121
+torch==2.1.0+cu121
+torchaudio==2.1.0+cu121
+sentence-transformers
+librosa
+stable-ts
+langsmith
+google-adk
+fastapi
+
+uvicorn
+celery
+redis
+sqlalchemy
+psycopg2-binary
+python-multipart
+resend

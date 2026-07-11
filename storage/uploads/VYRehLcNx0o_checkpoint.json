@@ -1,0 +1,18 @@
+{
+  "video_id": "VYRehLcNx0o",
+  "video_path": "storage\\uploads\\VYRehLcNx0o.mp4",
+  "audio_path": "storage\\uploads\\VYRehLcNx0o_audio.wav",
+  "transcript_path": "storage\\uploads\\VYRehLcNx0o_transcript.json",
+  "clips_path": "storage\\uploads\\VYRehLcNx0o_clips.json",
+  "raw_clip_paths": [
+  ],
+  "vertical_clip_paths": [
+  ],
+  "captioned_clip_paths": [],
+  "completed_stages": [
+    "download",
+    "transcribe"
+  ],
+  "failed_stage": null,
+  "total_time_seconds": 0.0
+}

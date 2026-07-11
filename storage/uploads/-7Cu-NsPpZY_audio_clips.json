@@ -1,0 +1,407 @@
+{
+  "video_id": "-7Cu-NsPpZY",
+  "video_duration": 719.18,
+  "total_sentences": 176,
+  "total_segments": 10,
+  "clips": [
+    {
+      "clip_id": "-7Cu-NsPpZY_c1",
+      "start": 458.46,
+      "end": 505.04,
+      "duration": 46.58,
+      "segments": [
+        {
+          "start_sent_id": 102,
+          "end_sent_id": 112
+        }
+      ],
+      "confidence_rank": 1,
+      "confidence_note": "Myth Busting: Shocking 90% loss statistic is a high-performing hook for Telugu financial social media.",
+      "hook_text": "90% of people trading-లో daily loss-ని face చేస్తున్నారు.",
+      "payoff_text": "సో, మీకు risk తీసుకునే capacity ఉండి, మీకు time ఉండి అంత ఉంది అనుకున్నట్లయితే trading చేసుకోండి.",
+      "why": "Busts easy-money trading myths by revealing high failure rates and risks.",
+      "visual_note": "The host looks directly at the camera with a serious, cautionary expression.",
+      "engagement_type": "Insight",
+      "hook_score": 10.0,
+      "coherence_score": 9.0,
+      "cultural_score": 9.0,
+      "engagement_score": 9.0,
+      "psychological_trigger": "Shocking Fact",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "",
+      "virality_score": 9.4,
+      "para_id": 102,
+      "anchor_text": "సో, మీకు risk తీసుకునే capacity ఉండి, మీకు time ఉండి అంత ఉంది అనుకున్నట్లయితే trading చేసుకోండి.",
+      "anchor_score": 9.4,
+      "transcript": [
+        {
+          "start": 458.46,
+          "end": 463.78,
+          "text": "90% of people trading-లో daily loss-ని face చేస్తున్నారు."
+        },
+        {
+          "start": 465.22,
+          "end": 468.4,
+          "text": "ఇప్పుడు coin coin వేస్తాం బొమ్మ బరుసు."
+        },
+        {
+          "start": 469.9,
+          "end": 472.16,
+          "text": "ట్రేడింగ్-లో డైలీ ప్రాఫిట్ వస్తుంది."
+        },
+        {
+          "start": 473.04,
+          "end": 473.86,
+          "text": "అవును, ఎప్పుడు?"
+        },
+        {
+          "start": 474.7,
+          "end": 476.98,
+          "text": "మీకు ఇది ఉంటే, అదృష్టం ఉంటే."
+        },
+        {
+          "start": 477.82,
+          "end": 480.48,
+          "text": "అదృష్టం లేకపోతే డైలీ లాసే రావచ్చు."
+        },
+        {
+          "start": 481.34,
+          "end": 487.96,
+          "text": "So మన India-లో 90% ఎవరైతే trading చేస్తున్నారో వాళ్ళు నష్టపోతూ ఉన్నారు."
+        },
+        {
+          "start": 488.32,
+          "end": 489.8,
+          "text": "దానితో పాటు tension."
+        },
+        {
+          "start": 490.52,
+          "end": 492.36,
+          "text": "tension tension-గా చూస్తూనే ఉండాలి."
+        },
+        {
+          "start": 493.4,
+          "end": 495.32,
+          "text": "time అంతా stock market పైనే పెట్టాలి."
+        },
+        {
+          "start": 497.0,
+          "end": 505.04,
+          "text": "సో, మీకు risk తీసుకునే capacity ఉండి, మీకు time ఉండి అంత ఉంది అనుకున్నట్లయితే trading చేసుకోండి."
+        }
+      ],
+      "transcript_text": "90% of people trading-లో daily loss-ని face చేస్తున్నారు. ఇప్పుడు coin coin వేస్తాం బొమ్మ బరుసు. ట్రేడింగ్-లో డైలీ ప్రాఫిట్ వస్తుంది. అవును, ఎప్పుడు? మీకు ఇది ఉంటే, అదృష్టం ఉంటే. అదృష్టం లేకపోతే డైలీ లాసే రావచ్చు. So మన India-లో 90% ఎవరైతే trading చేస్తున్నారో వాళ్ళు నష్టపోతూ ఉన్నారు. దానితో పాటు tension. tension tension-గా చూస్తూనే ఉండాలి. time అంతా stock market పైనే పెట్టాలి. సో, మీకు risk తీసుకునే capacity ఉండి, మీకు time ఉండి అంత ఉంది అనుకున్నట్లయితే trading చేసుకోండి."
+    },
+    {
+      "clip_id": "-7Cu-NsPpZY_c2",
+      "start": 208.88,
+      "end": 248.02,
+      "duration": 37.58,
+      "segments": [
+        {
+          "start_sent_id": 43,
+          "end_sent_id": 43
+        },
+        {
+          "start_sent_id": 45,
+          "end_sent_id": 51
+        }
+      ],
+      "confidence_rank": 2,
+      "confidence_note": "Wealth Creation: The MRF 1000 to 75000 story is a classic aspirational hook for investors.",
+      "hook_text": "MRF MRF యొక్క share 2000 సంవత్సరంలో just 1000.",
+      "payoff_text": "So ఇంత power investment-లో ఉంది కానీ trading-లో అంత power లేదు.",
+      "why": "Illustrates massive ROI of long-term investing vs trading using MRF stock.",
+      "visual_note": "The screen displays a clear stock market summary of MRF Limited growth.",
+      "engagement_type": "Insight",
+      "hook_score": 9.0,
+      "coherence_score": 9.0,
+      "cultural_score": 8.0,
+      "engagement_score": 8.0,
+      "psychological_trigger": "Curiosity Gap",
+      "trimmed": true,
+      "trim_reason": "Removed redundant repetition of the starting year and a weak closing sentence.",
+      "notes": "Trimming sentence 44 which was a repetitive stutter of the previous sentence.",
+      "virality_score": 8.7,
+      "para_id": 43,
+      "anchor_text": "So ఇంత power investment-లో ఉంది కానీ trading-లో అంత power లేదు.",
+      "anchor_score": 8.7,
+      "transcript": [
+        {
+          "start": 208.88,
+          "end": 211.94,
+          "text": "MRF MRF యొక్క share 2000 సంవత్సరంలో just 1000."
+        },
+        {
+          "start": -1,
+          "end": -1,
+          "text": "[CUT]"
+        },
+        {
+          "start": 213.5,
+          "end": 214.44,
+          "text": "కానీ ఈరోజు."
+        },
+        {
+          "start": 214.46,
+          "end": 217.84,
+          "text": "75,000 చూడండి."
+        },
+        {
+          "start": 217.86,
+          "end": 219.46,
+          "text": "1000 ఎక్కడ?"
+        },
+        {
+          "start": 219.48,
+          "end": 221.44,
+          "text": "75,000 ఎక్కడ?"
+        },
+        {
+          "start": 221.46,
+          "end": 230.24,
+          "text": "2000 సంవత్సరంలో 1000 కానీ ఇప్పుడు 75,000 ఈ విధంగా increase అయింది."
+        },
+        {
+          "start": 230.44,
+          "end": 242.14,
+          "text": "మనం కనుక 2000 సంవత్సరంలో చాలా share-లు అనగా ఒక 10,00,000, 20,00,000 ఈ విధంగా ఖర్చు పెట్టి ఆ share-లను కొన్నట్లయితే ఈరోజు మనం కోట్లాధిపతి."
+        },
+        {
+          "start": 243.04,
+          "end": 248.02,
+          "text": "So ఇంత power investment-లో ఉంది కానీ trading-లో అంత power లేదు."
+        }
+      ],
+      "transcript_text": "MRF MRF యొక్క share 2000 సంవత్సరంలో just 1000. కానీ ఈరోజు. 75,000 చూడండి. 1000 ఎక్కడ? 75,000 ఎక్కడ? 2000 సంవత్సరంలో 1000 కానీ ఇప్పుడు 75,000 ఈ విధంగా increase అయింది. మనం కనుక 2000 సంవత్సరంలో చాలా share-లు అనగా ఒక 10,00,000, 20,00,000 ఈ విధంగా ఖర్చు పెట్టి ఆ share-లను కొన్నట్లయితే ఈరోజు మనం కోట్లాధిపతి. So ఇంత power investment-లో ఉంది కానీ trading-లో అంత power లేదు."
+    },
+    {
+      "clip_id": "-7Cu-NsPpZY_c3",
+      "start": 505.98,
+      "end": 566.92,
+      "duration": 58.7,
+      "segments": [
+        {
+          "start_sent_id": 113,
+          "end_sent_id": 119
+        },
+        {
+          "start_sent_id": 121,
+          "end_sent_id": 128
+        }
+      ],
+      "confidence_rank": 3,
+      "confidence_note": "Relatability + Secret: Exposes why media pushes trading while providing practical advice for professionals.",
+      "hook_text": "ఒకవేళ మీరే కనుక college-కి వెళ్ళాలి, job చేయాలి, వ్యాపారం చూసుకోవాలి.",
+      "payoff_text": "వాళ్ళకి profit.",
+      "why": "Advises busy people to invest and exposes media's profit motives for trading.",
+      "visual_note": "A sharp cut to a person looking at their phone and laptop.",
+      "engagement_type": "Insight",
+      "hook_score": 8.0,
+      "coherence_score": 8.0,
+      "cultural_score": 9.0,
+      "engagement_score": 9.0,
+      "psychological_trigger": "Middle-Class Relatability",
+      "trimmed": true,
+      "trim_reason": "Removed mid-clip reference 'as I already said' which breaks the standalone feel.",
+      "notes": "",
+      "virality_score": 8.3,
+      "para_id": 113,
+      "anchor_text": "వాళ్ళకి profit.",
+      "anchor_score": 8.3,
+      "transcript": [
+        {
+          "start": 505.98,
+          "end": 511.3,
+          "text": "ఒకవేళ మీరే కనుక college-కి వెళ్ళాలి, job చేయాలి, వ్యాపారం చూసుకోవాలి."
+        },
+        {
+          "start": 511.72,
+          "end": 518.68,
+          "text": "ఆ పని, ఈ పని ఉంది అనుకున్నట్లయితే, దయచేసి trading చేయకండి, దయచేసి investment చేసుకోండి."
+        },
+        {
+          "start": 519.4,
+          "end": 522.38,
+          "text": "మంచి stock-లలో ఎక్కువ డబ్బు పెట్టేసి ఉంచేయండి."
+        },
+        {
+          "start": 523.06,
+          "end": 526.4,
+          "text": "long term-లో ఖచ్చితంగా మీకైతే లాభాలు రావడానికి అవకాశం ఉంది."
+        },
+        {
+          "start": 527.24,
+          "end": 533.62,
+          "text": "అదే విధంగా recent-గా చాలా YouTube channel-లు కావచ్చు, TV వాళ్ళు కావచ్చు మొత్తం trading-నే encourage చేస్తున్నారు."
+        },
+        {
+          "start": 533.76,
+          "end": 534.02,
+          "text": "ఎందుకు?"
+        },
+        {
+          "start": 535.52,
+          "end": 540.7,
+          "text": "ఎందుకంటే వాళ్ళకి లాభం, మీరు daily trading చేసినట్లయితే వాళ్ళకి profit ఎలా?"
+        },
+        {
+          "start": -1,
+          "end": -1,
+          "text": "[CUT]"
+        },
+        {
+          "start": 542.94,
+          "end": 545.62,
+          "text": "మీరే కనుక trading చేయాలంటే కచ్చితంగా news చూడాలి."
+        },
+        {
+          "start": 546.74,
+          "end": 549.08,
+          "text": "వార్తలు చూడాలంటే TV open చేయాలి."
+        },
+        {
+          "start": 550.44,
+          "end": 550.86,
+          "text": "current bill."
+        },
+        {
+          "start": 551.9,
+          "end": 552.56,
+          "text": "TV కొంటారు."
+        },
+        {
+          "start": 553.3,
+          "end": 553.58,
+          "text": "news."
+        },
+        {
+          "start": 554.08,
+          "end": 554.88,
+          "text": "అదే విధంగా YouTube."
+        },
+        {
+          "start": 555.56,
+          "end": 565.38,
+          "text": "YouTube channel-లు కూడా daily చెప్తూ ఉంటాయి trading best అని చెప్పి ఎందుకంటే మీరు trading చేస్తున్నట్లయితే daily వాళ్ళ యొక్క YouTube channel open చేసి ఏం చెప్తున్నారో చూస్తారు."
+        },
+        {
+          "start": 566.06,
+          "end": 566.92,
+          "text": "వాళ్ళకి profit."
+        }
+      ],
+      "transcript_text": "ఒకవేళ మీరే కనుక college-కి వెళ్ళాలి, job చేయాలి, వ్యాపారం చూసుకోవాలి. ఆ పని, ఈ పని ఉంది అనుకున్నట్లయితే, దయచేసి trading చేయకండి, దయచేసి investment చేసుకోండి. మంచి stock-లలో ఎక్కువ డబ్బు పెట్టేసి ఉంచేయండి. long term-లో ఖచ్చితంగా మీకైతే లాభాలు రావడానికి అవకాశం ఉంది. అదే విధంగా recent-గా చాలా YouTube channel-లు కావచ్చు, TV వాళ్ళు కావచ్చు మొత్తం trading-నే encourage చేస్తున్నారు. ఎందుకు? ఎందుకంటే వాళ్ళకి లాభం, మీరు daily trading చేసినట్లయితే వాళ్ళకి profit ఎలా? మీరే కనుక trading చేయాలంటే కచ్చితంగా news చూడాలి. వార్తలు చూడాలంటే TV open చేయాలి. current bill. TV కొంటారు. news. అదే విధంగా YouTube. YouTube channel-లు కూడా daily చెప్తూ ఉంటాయి trading best అని చెప్పి ఎందుకంటే మీరు trading చేస్తున్నట్లయితే daily వాళ్ళ యొక్క YouTube channel open చేసి ఏం చెప్తున్నారో చూస్తారు. వాళ్ళకి profit."
+    },
+    {
+      "clip_id": "-7Cu-NsPpZY_c4",
+      "start": 294.88,
+      "end": 355.16,
+      "duration": 60.28,
+      "segments": [
+        {
+          "start_sent_id": 64,
+          "end_sent_id": 75
+        }
+      ],
+      "confidence_rank": 4,
+      "confidence_note": "Risk Awareness: Effectively communicates the 'stay glued to the screen' reality of day trading.",
+      "hook_text": "మనమే కనుక intraday trading చేయాలంటే, మన time మొత్తం అక్కడే ఉండాలి, అక్కడే చూస్తూ ఉండాలి system-ని.",
+      "payoff_text": "So అందుకనే మీరే కనుక trading చేస్తున్నట్లయితే చూస్తూనే ఉండాలి.",
+      "why": "Explains the high risk of loss in intraday trading without constant monitoring.",
+      "visual_note": "Expressive hand gestures followed by B-roll of a man typing quickly.",
+      "engagement_type": "Insight",
+      "hook_score": 7.0,
+      "coherence_score": 8.0,
+      "cultural_score": 8.0,
+      "engagement_score": 7.0,
+      "psychological_trigger": "Risk Awareness",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "",
+      "virality_score": 7.5,
+      "para_id": 64,
+      "anchor_text": "So అందుకనే మీరే కనుక trading చేస్తున్నట్లయితే చూస్తూనే ఉండాలి.",
+      "anchor_score": 7.5,
+      "transcript": [
+        {
+          "start": 294.88,
+          "end": 301.46,
+          "text": "మనమే కనుక intraday trading చేయాలంటే, మన time మొత్తం అక్కడే ఉండాలి, అక్కడే చూస్తూ ఉండాలి system-ని."
+        },
+        {
+          "start": 302.24,
+          "end": 311.14,
+          "text": "మనమే కనుక job అది ఇది అని చెప్పి బయటికి వెళ్ళినట్లయితే, అదే time-లో పొరపాటున ఆ share బాగా increase అయినట్లయితే, గోవిందా!"
+        },
+        {
+          "start": 312.02,
+          "end": 315.16,
+          "text": "ఇంక్రీస్ అయిందంటే నెక్స్ట్ ఖచ్చితంగా డిక్రీస్ అవుతుంది."
+        },
+        {
+          "start": 316.28,
+          "end": 319.12,
+          "text": "ఇప్పుడు intraday trading-లో మనకి 3:30 వరకు time ఉంటుంది."
+        },
+        {
+          "start": 319.68,
+          "end": 326.42,
+          "text": "మనమే కనుక morning 10:00 AM-కి shares-ని కొన్నట్లయితే 3:30-కి automatic-గా square off అయిపోతాయి."
+        },
+        {
+          "start": 326.92,
+          "end": 328.16,
+          "text": "automatic-గా sell అయిపోతాయి."
+        },
+        {
+          "start": 328.76,
+          "end": 334.7,
+          "text": "ఆ time-లో stock market close అయ్యే time-లో price ఎంతైతే ఉందో అంతే consider."
+        },
+        {
+          "start": 335.42,
+          "end": 336.88,
+          "text": "For example, 100-కి కొన్నారు."
+        },
+        {
+          "start": 337.9,
+          "end": 339.1,
+          "text": "మర్చిపోయారు, బయటికి వెళ్లారు."
+        },
+        {
+          "start": 339.96,
+          "end": 344.36,
+          "text": "అది 330 స్టాక్ మార్కెట్ క్లోజ్ అయ్యే టైంలో అది కాస్త ₹80."
+        },
+        {
+          "start": 346.3,
+          "end": 350.72,
+          "text": "₹80-కి తగ్గినట్లయితే ఒక share మీద మీకు ₹20 loss."
+        },
+        {
+          "start": 351.3,
+          "end": 355.16,
+          "text": "So అందుకనే మీరే కనుక trading చేస్తున్నట్లయితే చూస్తూనే ఉండాలి."
+        }
+      ],
+      "transcript_text": "మనమే కనుక intraday trading చేయాలంటే, మన time మొత్తం అక్కడే ఉండాలి, అక్కడే చూస్తూ ఉండాలి system-ని. మనమే కనుక job అది ఇది అని చెప్పి బయటికి వెళ్ళినట్లయితే, అదే time-లో పొరపాటున ఆ share బాగా increase అయినట్లయితే, గోవిందా! ఇంక్రీస్ అయిందంటే నెక్స్ట్ ఖచ్చితంగా డిక్రీస్ అవుతుంది. ఇప్పుడు intraday trading-లో మనకి 3:30 వరకు time ఉంటుంది. మనమే కనుక morning 10:00 AM-కి shares-ని కొన్నట్లయితే 3:30-కి automatic-గా square off అయిపోతాయి. automatic-గా sell అయిపోతాయి. ఆ time-లో stock market close అయ్యే time-లో price ఎంతైతే ఉందో అంతే consider. For example, 100-కి కొన్నారు. మర్చిపోయారు, బయటికి వెళ్లారు. అది 330 స్టాక్ మార్కెట్ క్లోజ్ అయ్యే టైంలో అది కాస్త ₹80. ₹80-కి తగ్గినట్లయితే ఒక share మీద మీకు ₹20 loss. So అందుకనే మీరే కనుక trading చేస్తున్నట్లయితే చూస్తూనే ఉండాలి."
+    }
+  ],
+  "metadata": {
+    "pipeline": "ClipForge-v17-ThreeCallVision",
+    "approach": "junk-detection (incl. sentence-level CTA flagging) → video-upload → context-cache → rough-cut (Call1) → fine-cut (Call2) → trim-long-clips (Call3, conditional) → segments-array",
+    "language": "Telugu/Codemix",
+    "gemini_model": "gemini-3-flash-preview",
+    "thinking_level": "HIGH",
+    "call_1": "rough cut — find all genuine Reel moments",
+    "call_2": "fine cut — perfect hooks, payoffs, trim, score, rank",
+    "call_3": "trim-long-clips — fires only on clips > 90s",
+    "trim_trigger_sec": 90,
+    "trim_target_sec": 75,
+    "caching": "context cache reuses video tokens across all calls",
+    "clip_count_rule": "quality decides count, no min/max in prompts",
+    "file_uri": "https://generativelanguage.googleapis.com/v1beta/files/yf7rxln38jrf"
+  }
+}

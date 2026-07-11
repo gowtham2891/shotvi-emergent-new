@@ -1,0 +1,19 @@
+services:
+  redis:
+    image: redis:latest
+    container_name: clipforge-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - clipforge-redis-data:/data
+    command: >
+      redis-server
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+      --loglevel notice
+    restart: unless-stopped
+
+volumes:
+  clipforge-redis-data:
+    external: true

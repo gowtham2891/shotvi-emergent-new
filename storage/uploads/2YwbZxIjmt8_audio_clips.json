@@ -1,0 +1,493 @@
+{
+  "video_id": "2YwbZxIjmt8",
+  "video_duration": 1062.92,
+  "total_sentences": 247,
+  "total_segments": 17,
+  "clips": [
+    {
+      "clip_id": "2YwbZxIjmt8_c5",
+      "start": 807.0,
+      "end": 869.94,
+      "duration": 62.94,
+      "segments": [
+        {
+          "start_sent_id": 184,
+          "end_sent_id": 196
+        }
+      ],
+      "confidence_rank": 1,
+      "confidence_note": "Local Corruption: Mentions Hyderabad Cricket Association and inside corruption, huge hook for local Telugu viewers.",
+      "hook_text": "Problem ఏంటంటే ఈ black ticket market అనేది inside job.",
+      "payoff_text": "అంటే ఒక IPL season-లో black ticket turnover minimum-లో minimum 100 crore-లు ఉంటుంది which is all black money.",
+      "why": "Exposing the black ticket market corruption and the 100-crore illegal revenue.",
+      "visual_note": "Speaker looks serious as news headlines about HCA ticket arrests appear.",
+      "engagement_type": "Controversial",
+      "hook_score": 9.0,
+      "coherence_score": 9.0,
+      "cultural_score": 10.0,
+      "engagement_score": 9.0,
+      "psychological_trigger": "Controversial Take",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "Direct mention of local Hyderabad issues makes this a viral candidate.",
+      "virality_score": 9.7,
+      "para_id": 184,
+      "anchor_text": "అంటే ఒక IPL season-లో black ticket turnover minimum-లో minimum 100 crore-లు ఉంటుంది which is all black money.",
+      "anchor_score": 9.7,
+      "transcript": [
+        {
+          "start": 807.0,
+          "end": 810.62,
+          "text": "ఇక్కడ problem ఏంటంటే ఈ black ticket market అనేది inside job."
+        },
+        {
+          "start": 810.72,
+          "end": 816.38,
+          "text": "అంటే match organizer-లలోని ఎవరో ఒకరు డబ్బు కాశపడి ఈ black ticket market-ని నడిపిస్తూ ఉంటారు."
+        },
+        {
+          "start": 816.54,
+          "end": 825.08,
+          "text": "Last year Hyderabad Cricket Association President అయిన Jagan Mohan Rao ఈ black ticket marketing-లో involve అవ్వడంతో పోలీసులు అతన్ని arrest చేశారన్నమాట."
+        },
+        {
+          "start": 825.46,
+          "end": 829.0,
+          "text": "కనిపించకుండా ఈ black ticket market కూడా money flow-లో part అవుతుంది."
+        },
+        {
+          "start": 829.06,
+          "end": 831.26,
+          "text": "Of course అదంతా illegal money-యే అనుకోండి."
+        },
+        {
+          "start": 831.3,
+          "end": 835.04,
+          "text": "ఇప్పుడు for example ఒక stadium-లో ఒక 40,000 seat-లు ఉంటాయి అనుకుందాం."
+        },
+        {
+          "start": 835.08,
+          "end": 840.18,
+          "text": "High demand ఉన్న match-లలో 20 to 25 ticket-లు black market-లోకి వెళ్తాయి అనుకుందాం."
+        },
+        {
+          "start": 840.24,
+          "end": 846.0,
+          "text": "అంటే 40,000 seat-లలో 20% అంటే 8,000 seat-లు black market చేతిలో ఉన్నాయి."
+        },
+        {
+          "start": 846.1,
+          "end": 851.92,
+          "text": "మరి 1 lakh కాదు కానీ normal price కంటే ఒక 5,000 extra-కి black market-లో ticket price ఉంది అనుకుందాం."
+        },
+        {
+          "start": 851.98,
+          "end": 855.92,
+          "text": "అంటే ఒక్కో match-కి black market వాళ్ళకి లాభం 4 crore-లు."
+        },
+        {
+          "start": 855.94,
+          "end": 860.22,
+          "text": "74 match-లలో ఒక 30 match-లు high demand match-లు ఉన్నాయి అనుకుందాం."
+        },
+        {
+          "start": 860.3,
+          "end": 862.72,
+          "text": "అంటే 30 × 4, 120 crore-లు."
+        },
+        {
+          "start": 862.82,
+          "end": 869.94,
+          "text": "అంటే ఒక IPL season-లో black ticket turnover minimum-లో minimum 100 crore-లు ఉంటుంది which is all black money."
+        }
+      ],
+      "transcript_text": "ఇక్కడ problem ఏంటంటే ఈ black ticket market అనేది inside job. అంటే match organizer-లలోని ఎవరో ఒకరు డబ్బు కాశపడి ఈ black ticket market-ని నడిపిస్తూ ఉంటారు. Last year Hyderabad Cricket Association President అయిన Jagan Mohan Rao ఈ black ticket marketing-లో involve అవ్వడంతో పోలీసులు అతన్ని arrest చేశారన్నమాట. కనిపించకుండా ఈ black ticket market కూడా money flow-లో part అవుతుంది. Of course అదంతా illegal money-యే అనుకోండి. ఇప్పుడు for example ఒక stadium-లో ఒక 40,000 seat-లు ఉంటాయి అనుకుందాం. High demand ఉన్న match-లలో 20 to 25 ticket-లు black market-లోకి వెళ్తాయి అనుకుందాం. అంటే 40,000 seat-లలో 20% అంటే 8,000 seat-లు black market చేతిలో ఉన్నాయి. మరి 1 lakh కాదు కానీ normal price కంటే ఒక 5,000 extra-కి black market-లో ticket price ఉంది అనుకుందాం. అంటే ఒక్కో match-కి black market వాళ్ళకి లాభం 4 crore-లు. 74 match-లలో ఒక 30 match-లు high demand match-లు ఉన్నాయి అనుకుందాం. అంటే 30 × 4, 120 crore-లు. అంటే ఒక IPL season-లో black ticket turnover minimum-లో minimum 100 crore-లు ఉంటుంది which is all black money."
+    },
+    {
+      "clip_id": "2YwbZxIjmt8_c2",
+      "start": 198.96,
+      "end": 284.24,
+      "duration": 85.28,
+      "segments": [
+        {
+          "start_sent_id": 42,
+          "end_sent_id": 57
+        }
+      ],
+      "confidence_rank": 2,
+      "confidence_note": "Relatable Math: Breaking down billions into the cost of a single ball is shocking.",
+      "hook_text": "అక్షరాల 40 ₹38,390 కోట్ల రూపాయలు అది కూడా 5 years-కి మాత్రమే.",
+      "payoff_text": "ఒక్క ball cost ₹50,00,000.",
+      "why": "Breaking down the massive broadcasting deal and calculating the cost per ball.",
+      "visual_note": "A headline flashes showing the 48,390 crore figure with dramatic background music.",
+      "engagement_type": "Insight",
+      "hook_score": 8.0,
+      "coherence_score": 9.0,
+      "cultural_score": 8.0,
+      "engagement_score": 9.0,
+      "psychological_trigger": "Curiosity Gap",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "The 50 lakh per ball payoff is a perfect social media share trigger.",
+      "virality_score": 8.4,
+      "para_id": 42,
+      "anchor_text": "ఒక్క ball cost ₹50,00,000.",
+      "anchor_score": 8.4,
+      "transcript": [
+        {
+          "start": 198.96,
+          "end": 205.3,
+          "text": "అక్షరాల 40 ₹38,390 కోట్ల రూపాయలు అది కూడా 5 years-కి మాత్రమే."
+        },
+        {
+          "start": 205.62,
+          "end": 216.22,
+          "text": "Star Sports వాళ్ళు TV rights కోసం ₹23,575 కోట్లు pay చేస్తే Viacom 18 వాళ్ళు ₹23,758 crore-లు pay చేశారు digital rights కోసం."
+        },
+        {
+          "start": 216.38,
+          "end": 220.58,
+          "text": "ఈ Viacom 18 వాళ్ళు తర్వాత Star-తో merge అయ్యి Jio Star-గా మారిందన్నమాట."
+        },
+        {
+          "start": 220.88,
+          "end": 229.7,
+          "text": "And International Broadcasting Rights అంటే IPL-ని America, England, Australia, Middle East-లో చూపించడం కోసం Times Internet ఇంకా Viacom 18 13."
+        },
+        {
+          "start": 229.7,
+          "end": 232.22,
+          "text": "₹924 కోట్లు పే చేశాయి."
+        },
+        {
+          "start": 233.18,
+          "end": 237.9,
+          "text": "2008-లో IPL బ్రాడ్కాస్టింగ్ రైట్స్ వాల్యూ ₹8,200 కోట్లు ఫర్ 10 ఇయర్స్."
+        },
+        {
+          "start": 238.38,
+          "end": 243.78,
+          "text": "2018-లో అయితే డీల్ 5 ఇయర్స్-కి ₹16,347 కోట్ల-కి జంప్ అయింది."
+        },
+        {
+          "start": 245.26,
+          "end": 250.86,
+          "text": "2022-లో ఈ డీల్ 5 ఇయర్స్-కి ₹48,390 కోట్ల రూపాయలకి రాకెట్ లాగా వెళ్ళింది."
+        },
+        {
+          "start": 250.88,
+          "end": 259.68,
+          "text": "₹8,200 కోట్ల నుంచి ₹48,390 కోట్లు అంటే 15 ఇయర్స్-లో ఆల్మోస్ట్ 6 టైమ్స్ ఇంక్రీస్ అయింది."
+        },
+        {
+          "start": 259.84,
+          "end": 260.62,
+          "text": "ఈ నంబర్స్ చూడడానికి."
+        },
+        {
+          "start": 260.66,
+          "end": 263.54,
+          "text": "చూస్తే నాకేం అర్థమవుతుంది అంటే IPL just grow అవ్వలేదు."
+        },
+        {
+          "start": 263.84,
+          "end": 265.04,
+          "text": "IPL explode అయింది."
+        },
+        {
+          "start": 265.3,
+          "end": 267.42,
+          "text": "ఆ explosion-లో డబ్బులు విరజిమ్మింది."
+        },
+        {
+          "start": 267.56,
+          "end": 275.58,
+          "text": "So ఇప్పుడు మీరు చూసే ప్రతి IPL match value అటు ఇటుగా ₹1,18,00,000 అంటే ఒక్క ball value almost ₹50,00,000."
+        },
+        {
+          "start": 276.72,
+          "end": 281.7,
+          "text": "ఈసారి match మధ్యలో toilet break ఆర్ snacks break వెళ్ళే ముందు ఈ value గుర్తుపెట్టుకోండి."
+        },
+        {
+          "start": 282.22,
+          "end": 284.24,
+          "text": "ఒక్క ball cost ₹50,00,000."
+        }
+      ],
+      "transcript_text": "అక్షరాల 40 ₹38,390 కోట్ల రూపాయలు అది కూడా 5 years-కి మాత్రమే. Star Sports వాళ్ళు TV rights కోసం ₹23,575 కోట్లు pay చేస్తే Viacom 18 వాళ్ళు ₹23,758 crore-లు pay చేశారు digital rights కోసం. ఈ Viacom 18 వాళ్ళు తర్వాత Star-తో merge అయ్యి Jio Star-గా మారిందన్నమాట. And International Broadcasting Rights అంటే IPL-ని America, England, Australia, Middle East-లో చూపించడం కోసం Times Internet ఇంకా Viacom 18 13. ₹924 కోట్లు పే చేశాయి. 2008-లో IPL బ్రాడ్కాస్టింగ్ రైట్స్ వాల్యూ ₹8,200 కోట్లు ఫర్ 10 ఇయర్స్. 2018-లో అయితే డీల్ 5 ఇయర్స్-కి ₹16,347 కోట్ల-కి జంప్ అయింది. 2022-లో ఈ డీల్ 5 ఇయర్స్-కి ₹48,390 కోట్ల రూపాయలకి రాకెట్ లాగా వెళ్ళింది. ₹8,200 కోట్ల నుంచి ₹48,390 కోట్లు అంటే 15 ఇయర్స్-లో ఆల్మోస్ట్ 6 టైమ్స్ ఇంక్రీస్ అయింది. ఈ నంబర్స్ చూడడానికి. చూస్తే నాకేం అర్థమవుతుంది అంటే IPL just grow అవ్వలేదు. IPL explode అయింది. ఆ explosion-లో డబ్బులు విరజిమ్మింది. So ఇప్పుడు మీరు చూసే ప్రతి IPL match value అటు ఇటుగా ₹1,18,00,000 అంటే ఒక్క ball value almost ₹50,00,000. ఈసారి match మధ్యలో toilet break ఆర్ snacks break వెళ్ళే ముందు ఈ value గుర్తుపెట్టుకోండి. ఒక్క ball cost ₹50,00,000."
+    },
+    {
+      "clip_id": "2YwbZxIjmt8_c1",
+      "start": 101.84,
+      "end": 153.86,
+      "duration": 52.02,
+      "segments": [
+        {
+          "start_sent_id": 24,
+          "end_sent_id": 30
+        }
+      ],
+      "confidence_rank": 3,
+      "confidence_note": "Global Pride: Telugu audiences love seeing Indian brands dominate global giants like NFL/NBA.",
+      "hook_text": "కొంతమంది ఇది cricket కాదు ఇది ఒక high profile circus అని అన్నారు కానీ 18 years fast forward చేసి చూస్తే ఈ high profile circus ప్రపంచంలోనే Most valuable sports league-లో 2nd place-లో ఉంది.",
+      "payoff_text": "And most shocking part ఏంటంటే ఒక్క year-లో IPL season ఉండేది just 2 month-సే అంటే 60 day-లు rough-గా 74 match-లు కానీ generate చేసేది $18 billion.",
+      "why": "Highlighting IPL's global economic dominance compared to NFL and NBA.",
+      "visual_note": "Speaker uses a remote to cycle through global sports logos with high energy.",
+      "engagement_type": "Insight",
+      "hook_score": 8.0,
+      "coherence_score": 9.0,
+      "cultural_score": 8.0,
+      "engagement_score": 8.0,
+      "psychological_trigger": "Myth Busting",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "Reframes the 'circus' criticism into a success story.",
+      "virality_score": 8.3,
+      "para_id": 24,
+      "anchor_text": "And most shocking part ఏంటంటే ఒక్క year-లో IPL season ఉండేది just 2 month-సే అంటే 60 day-లు rough-గా 74 match-లు కానీ generate చేసేది $18 billion.",
+      "anchor_score": 8.3,
+      "transcript": [
+        {
+          "start": 101.84,
+          "end": 113.36,
+          "text": "కొంతమంది ఇది cricket కాదు ఇది ఒక high profile circus అని అన్నారు కానీ 18 years fast forward చేసి చూస్తే ఈ high profile circus ప్రపంచంలోనే Most valuable sports league-లో 2nd place-లో ఉంది."
+        },
+        {
+          "start": 113.74,
+          "end": 118.18,
+          "text": "American football NFL తర్వాత ఎక్కువ డబ్బు generate చేస్తున్న league IPL-ఏ."
+        },
+        {
+          "start": 118.38,
+          "end": 123.58,
+          "text": "Most famous league-లు అయిన English Premier League and NBA కంటే IPL-ఏ ముందుంది."
+        },
+        {
+          "start": 124.66,
+          "end": 128.52,
+          "text": "2002-లో total IPL ecosystem value $8.5 billion."
+        },
+        {
+          "start": 130.34,
+          "end": 132.76,
+          "text": "2025-కి ఈ value $18 billion అయింది."
+        },
+        {
+          "start": 133.0,
+          "end": 142.72,
+          "text": "Just imagine మీలో కొంతమంది college finish చేసేలోపు లేదా job change అయ్యేలోపు or old phone నుంచి కొత్త phone కొనేలోపు IPL value double అయింది."
+        },
+        {
+          "start": 142.86,
+          "end": 153.86,
+          "text": "And most shocking part ఏంటంటే ఒక్క year-లో IPL season ఉండేది just 2 month-సే అంటే 60 day-లు rough-గా 74 match-లు కానీ generate చేసేది $18 billion."
+        }
+      ],
+      "transcript_text": "కొంతమంది ఇది cricket కాదు ఇది ఒక high profile circus అని అన్నారు కానీ 18 years fast forward చేసి చూస్తే ఈ high profile circus ప్రపంచంలోనే Most valuable sports league-లో 2nd place-లో ఉంది. American football NFL తర్వాత ఎక్కువ డబ్బు generate చేస్తున్న league IPL-ఏ. Most famous league-లు అయిన English Premier League and NBA కంటే IPL-ఏ ముందుంది. 2002-లో total IPL ecosystem value $8.5 billion. 2025-కి ఈ value $18 billion అయింది. Just imagine మీలో కొంతమంది college finish చేసేలోపు లేదా job change అయ్యేలోపు or old phone నుంచి కొత్త phone కొనేలోపు IPL value double అయింది. And most shocking part ఏంటంటే ఒక్క year-లో IPL season ఉండేది just 2 month-సే అంటే 60 day-లు rough-గా 74 match-లు కానీ generate చేసేది $18 billion."
+    },
+    {
+      "clip_id": "2YwbZxIjmt8_c4",
+      "start": 636.14,
+      "end": 670.0,
+      "duration": 33.86,
+      "segments": [
+        {
+          "start_sent_id": 146,
+          "end_sent_id": 151
+        }
+      ],
+      "confidence_rank": 4,
+      "confidence_note": "Inside Economics: Reveals the high-profit margins of team owners vs player salaries.",
+      "hook_text": "2025 IPL-లో 10 team-లకు 4,250 కోట్లు వస్తే వాళ్ళు player-ల కోసం ఖర్చు పెట్టింది 639 కోట్లు.",
+      "payoff_text": "And దానికి main reason Indian Premier League.",
+      "why": "Revealing the massive gap between franchise revenue and player spending.",
+      "visual_note": "Comparison graphics appear showing revenue vs player spend numbers.",
+      "engagement_type": "Insight",
+      "hook_score": 7.0,
+      "coherence_score": 8.0,
+      "cultural_score": 7.0,
+      "engagement_score": 7.0,
+      "psychological_trigger": "Insight",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "Short, punchy, and exposes the business behind the glamor.",
+      "virality_score": 7.3,
+      "para_id": 146,
+      "anchor_text": "And దానికి main reason Indian Premier League.",
+      "anchor_score": 7.3,
+      "transcript": [
+        {
+          "start": 636.14,
+          "end": 644.86,
+          "text": "2025 IPL-లో 10 team-లకు 4,250 కోట్లు వస్తే వాళ్ళు player-ల కోసం ఖర్చు పెట్టింది 639 కోట్లు."
+        },
+        {
+          "start": 645.18,
+          "end": 650.86,
+          "text": "అంటే franchise-లు తమకు వచ్చే ప్రతి ₹1-లో 15 పైసా మాత్రమే player-ల కోసం ఖర్చు పెడుతుంది."
+        },
+        {
+          "start": 651.1,
+          "end": 656.42,
+          "text": "layer number 5 BCCI అసలు show అంతా run చేస్తున్న master mind గురించి మాట్లాడుకోవాలి కదా?"
+        },
+        {
+          "start": 656.78,
+          "end": 660.56,
+          "text": "అండ్ ఆ master mind ఎవరో కాదు BCCI Board of Control for."
+        },
+        {
+          "start": 660.66,
+          "end": 666.88,
+          "text": "Cricket in India, richest cricket board in the world, no government funding, no public money, అంతా self earning-ఏ."
+        },
+        {
+          "start": 667.22,
+          "end": 670.0,
+          "text": "And దానికి main reason Indian Premier League."
+        }
+      ],
+      "transcript_text": "2025 IPL-లో 10 team-లకు 4,250 కోట్లు వస్తే వాళ్ళు player-ల కోసం ఖర్చు పెట్టింది 639 కోట్లు. అంటే franchise-లు తమకు వచ్చే ప్రతి ₹1-లో 15 పైసా మాత్రమే player-ల కోసం ఖర్చు పెడుతుంది. layer number 5 BCCI అసలు show అంతా run చేస్తున్న master mind గురించి మాట్లాడుకోవాలి కదా? అండ్ ఆ master mind ఎవరో కాదు BCCI Board of Control for. Cricket in India, richest cricket board in the world, no government funding, no public money, అంతా self earning-ఏ. And దానికి main reason Indian Premier League."
+    },
+    {
+      "clip_id": "2YwbZxIjmt8_c3",
+      "start": 329.26,
+      "end": 407.6,
+      "duration": 78.34,
+      "segments": [
+        {
+          "start_sent_id": 68,
+          "end_sent_id": 85
+        }
+      ],
+      "confidence_rank": 5,
+      "confidence_note": "Ad Revenue: Explains the math behind those annoying match breaks.",
+      "hook_text": "IPL 2025-లో just ఇలా ads display చేయడం ద్వారా వచ్చిన revenue ఎంతో తెలుసా?",
+      "payoff_text": "అందుకే brand-లు ఎంతైనా pay చేయడానికి ready అవుతాయి.",
+      "why": "Explaining how advertisement revenue drives the IPL economy.",
+      "visual_note": "A montage of brands flashes as the speaker reveals huge ad revenue figures.",
+      "engagement_type": "Educational",
+      "hook_score": 7.0,
+      "coherence_score": 8.0,
+      "cultural_score": 6.0,
+      "engagement_score": 6.0,
+      "psychological_trigger": "Curiosity Gap",
+      "trimmed": false,
+      "trim_reason": "",
+      "notes": "A bit more list-heavy but provides good educational value for business enthusiasts.",
+      "virality_score": 7.0,
+      "para_id": 68,
+      "anchor_text": "అందుకే brand-లు ఎంతైనా pay చేయడానికి ready అవుతాయి.",
+      "anchor_score": 7.0,
+      "transcript": [
+        {
+          "start": 329.26,
+          "end": 334.24,
+          "text": "IPL 2025-లో just ఇలా ads display చేయడం ద్వారా వచ్చిన revenue ఎంతో తెలుసా?"
+        },
+        {
+          "start": 334.26,
+          "end": 337.4,
+          "text": "₹4,800 కోట్ల రూపాయలు."
+        },
+        {
+          "start": 337.54,
+          "end": 344.44,
+          "text": "Just Jio Star ఒక్కటే 4,500 target పెట్టుకొని 1,100 advertisement-లను sign చేసుకుంది."
+        },
+        {
+          "start": 344.6,
+          "end": 351.0,
+          "text": "ఇంత amount generate అవ్వడానికి కారణం ప్రతి ఒక్క brand IPL time-లో audience-ని reach అవ్వాలి అని try చేస్తుంది."
+        },
+        {
+          "start": 351.12,
+          "end": 354.96,
+          "text": "So broadcaster-లు ad package-లకు heavy price-లను fix చేస్తారు."
+        },
+        {
+          "start": 355.12,
+          "end": 359.78,
+          "text": "TV ad package-లు వచ్చేసి ₹40 crore-ల నుంచి ₹240 crore-ల వరకు ఉంటాయి."
+        },
+        {
+          "start": 360.08,
+          "end": 364.72,
+          "text": "Connected TV అంటే మీరు మీ smart TV-లో Jio Cinema-లో IPL-ను చూస్తారు కదా అప్పుడు."
+        },
+        {
+          "start": 364.82,
+          "end": 369.18,
+          "text": "డిస్ప్లే అయ్యే ads-కి ప్యాకేజ్ 10 సెకండ్స్-కి ₹8.5 లక్షలు ఉంటుంది."
+        },
+        {
+          "start": 369.26,
+          "end": 373.12,
+          "text": "ఇంకా ఫైనల్-గా మొబైల్ ads వచ్చేసి ₹250 పర్ 1000 ఇంప్రెషన్స్."
+        },
+        {
+          "start": 373.3,
+          "end": 376.36,
+          "text": "ఎందుకు brands ఇంత పే చేస్తున్నాయి అంటే సింపుల్ ఆన్సర్."
+        },
+        {
+          "start": 376.84,
+          "end": 382.04,
+          "text": "IPL 2025 840 బిలియన్ వీవింగ్ మినిట్స్-ని రిజిస్టర్ చేస్తుంది."
+        },
+        {
+          "start": 382.22,
+          "end": 387.66,
+          "text": "జస్ట్ IPL ఫైనల్-ఏ 31.7 బిలియన్ వీవింగ్ మినిట్స్-ని రిజిస్టర్ చేస్తుంది."
+        },
+        {
+          "start": 388.16,
+          "end": 390.92,
+          "text": "IPL హిస్టరీ-లోనే ఇది మోస్ట్ వాచ్డ్ ఫైనల్ అన్నమాట."
+        },
+        {
+          "start": 391.08,
+          "end": 396.54,
+          "text": "సో ఇంత రేంజ్-లో audience చూస్తున్నప్పుడు ఏ కంపెనీ బ్రాండ్ అయినా జనాల్లోకి easy-గా వెళ్ళిపోతుంది."
+        },
+        {
+          "start": 396.74,
+          "end": 400.38,
+          "text": "literal-గా India-లో ఏ platform-కి కూడా ఇంత reach లేదు."
+        },
+        {
+          "start": 400.56,
+          "end": 402.46,
+          "text": "ఏ movie కానీ ఏ show అయినా తీసుకోండి."
+        },
+        {
+          "start": 402.88,
+          "end": 404.78,
+          "text": "Nothing comes close to IPL."
+        },
+        {
+          "start": 404.92,
+          "end": 407.6,
+          "text": "అందుకే brand-లు ఎంతైనా pay చేయడానికి ready అవుతాయి."
+        }
+      ],
+      "transcript_text": "IPL 2025-లో just ఇలా ads display చేయడం ద్వారా వచ్చిన revenue ఎంతో తెలుసా? ₹4,800 కోట్ల రూపాయలు. Just Jio Star ఒక్కటే 4,500 target పెట్టుకొని 1,100 advertisement-లను sign చేసుకుంది. ఇంత amount generate అవ్వడానికి కారణం ప్రతి ఒక్క brand IPL time-లో audience-ని reach అవ్వాలి అని try చేస్తుంది. So broadcaster-లు ad package-లకు heavy price-లను fix చేస్తారు. TV ad package-లు వచ్చేసి ₹40 crore-ల నుంచి ₹240 crore-ల వరకు ఉంటాయి. Connected TV అంటే మీరు మీ smart TV-లో Jio Cinema-లో IPL-ను చూస్తారు కదా అప్పుడు. డిస్ప్లే అయ్యే ads-కి ప్యాకేజ్ 10 సెకండ్స్-కి ₹8.5 లక్షలు ఉంటుంది. ఇంకా ఫైనల్-గా మొబైల్ ads వచ్చేసి ₹250 పర్ 1000 ఇంప్రెషన్స్. ఎందుకు brands ఇంత పే చేస్తున్నాయి అంటే సింపుల్ ఆన్సర్. IPL 2025 840 బిలియన్ వీవింగ్ మినిట్స్-ని రిజిస్టర్ చేస్తుంది. జస్ట్ IPL ఫైనల్-ఏ 31.7 బిలియన్ వీవింగ్ మినిట్స్-ని రిజిస్టర్ చేస్తుంది. IPL హిస్టరీ-లోనే ఇది మోస్ట్ వాచ్డ్ ఫైనల్ అన్నమాట. సో ఇంత రేంజ్-లో audience చూస్తున్నప్పుడు ఏ కంపెనీ బ్రాండ్ అయినా జనాల్లోకి easy-గా వెళ్ళిపోతుంది. literal-గా India-లో ఏ platform-కి కూడా ఇంత reach లేదు. ఏ movie కానీ ఏ show అయినా తీసుకోండి. Nothing comes close to IPL. అందుకే brand-లు ఎంతైనా pay చేయడానికి ready అవుతాయి."
+    }
+  ],
+  "metadata": {
+    "pipeline": "ClipForge-v17-ThreeCallVision",
+    "approach": "junk-detection (incl. sentence-level CTA flagging) → video-upload → context-cache → rough-cut (Call1) → fine-cut (Call2) → trim-long-clips (Call3, conditional) → segments-array",
+    "language": "Telugu/Codemix",
+    "gemini_model": "gemini-3-flash-preview",
+    "thinking_level": "HIGH",
+    "call_1": "rough cut — find all genuine Reel moments",
+    "call_2": "fine cut — perfect hooks, payoffs, trim, score, rank",
+    "call_3": "trim-long-clips — fires only on clips > 90s",
+    "trim_trigger_sec": 90,
+    "trim_target_sec": 75,
+    "caching": "context cache reuses video tokens across all calls",
+    "clip_count_rule": "quality decides count, no min/max in prompts",
+    "file_uri": "https://generativelanguage.googleapis.com/v1beta/files/4ukflfyuz0hi"
+  }
+}
