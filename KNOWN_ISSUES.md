@@ -85,3 +85,36 @@ SemiBold`** (cap-height ~41px @ nominal 62), NOT the Nirmala fallback (~34px). T
 based on a stale assumption from before Noto Sans Telugu was installed on this machine.
 `PREVIEW_vs_export_size.png` (later) has the correct three-way comparison: system Noto (31px)
 = bundled Noto (31px) ≠ Nirmala (34px) ≠ "Noto Sans Telugu SemiBold" (41px).
+
+### (f) Multi-segment clips silently skip `mergedGroups` / `lineSplits` transcript edits
+For clips whose selection spans 2+ segments (dead-zone cuts stitched together), the
+`apply_transcript_edits` call in `services/caption_renderer.py:676-681` accepts a
+word-edits-only view of the incoming `TranscriptEdits` and skips both structural
+edit types:
+
+```
+services/caption_renderer.py:676-681  # multi-segment branch
+  if _n_merge or _n_split:
+      print(f"  ⚠ multi-segment clip {clip_index}: "
+            f"{_n_merge} merge(s), {_n_split} split(s) skipped — "
+            f"frontend line indices include gap words; backend does not (not yet remapped)",
+            flush=True)
+  transcript_edits = None  # prevent lineSplits grouper below from misapplying
+```
+
+Reason: the frontend numbers `lineIdx` / `rawIndex` values against the flat
+concatenated word list including gap words; the backend rebuilds a segment-scoped
+transcript that omits gap words, so the indices don't line up. Applying them blindly
+would either mis-merge or drop lines.
+
+User-visible effect: on multi-segment clips only, a manual line merge or forced
+line break in the transcript editor is silently ignored during burn. The frontend
+surfaces this as a toast ("Some line edits skipped on multi-segment clip") — see
+`frontend/src/api/renders.js` warnings pass-through. Word text edits DO still apply
+on multi-segment clips (only structural edits are dropped).
+
+**Fix direction** (deferred): extend `TranscriptEdits` to carry segment-scoped
+indices for structural edits (e.g. `{segIndex, lineIdx}`), and rebuild the
+merger/splitter to consume them.
+
+Single-segment clips are unaffected — all edit kinds apply cleanly there.

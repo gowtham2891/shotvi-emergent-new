@@ -66,6 +66,13 @@ export function buildRerenderRequest(editDoc = {}) {
     transcriptEdits = null, // {wordEdits, mergedGroups, lineSplits}
     captionX = null, // 0–1 fraction of canvas width (caption center)
     captionY = null, // 0–1 fraction of canvas height (caption center)
+    // BUG-001 partial fix — caption Size (0–1 fraction of canvas height, same
+    // units the preview scales by) and Background Pill (or null when no pill).
+    // Sent to the backend as caption_font_size and caption_pill; when both are
+    // null / left at defaults, the payload OMITS them so old backends keep
+    // rendering the preset defaults byte-identically to today.
+    captionFontSize = null,
+    captionPill = null,
     elements = null, // full EditDocument elements (0–1 coords); filtered below
   } = editDoc;
 
@@ -92,6 +99,23 @@ export function buildRerenderRequest(editDoc = {}) {
       req.caption_x = captionX;
       req.caption_y = captionY;
     }
+  }
+  // BUG-001 partial fix — carry the caption's editor size + background pill.
+  // Only serialize when set (non-null) so old drafts / captions-untouched
+  // exports produce the pre-fix payload byte-for-byte, keeping every existing
+  // regression test green.
+  if (typeof captionFontSize === "number" && captionFontSize > 0) {
+    req.caption_font_size = captionFontSize;
+  }
+  if (captionPill && captionPill.enabled) {
+    // Snake-case for the API; only the fields the backend consumes.
+    req.caption_pill = {
+      enabled: true,
+      color: captionPill.color,
+      opacity: captionPill.opacity,
+      padding: captionPill.padding,
+      radius: captionPill.radius,
+    };
   }
   // Serialize the visible overlay elements (progress/sticker/logo/headline) for
   // the backend burn-in pass. Coords stay 0–1 normalized — no pixel math here

@@ -1,6 +1,17 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from typing import Optional, List, Any
 from enum import Enum
+import re
+
+
+# BUG-007 fix: strict 6-hex-digit color validator. The value flows into FFmpeg's
+# `pad=...:color=<bg_color>` filter string, so anything other than a canonical
+# hex triple risks (a) FFmpeg parse failure — the endpoint used to strip the `#`
+# leaving a bare `rrggbb` that FFmpeg treats as an unknown named color and fails
+# on — and (b) filter-token injection via commas / colons / spaces sneaked into
+# the value ("black:c=x,anullsrc" and friends). Reject anything else at the API
+# boundary with a 422 instead of letting the malformed value reach FFmpeg.
+_HEX_COLOR = re.compile(r"^#[0-9A-Fa-f]{6}$")
 
 
 class JobStatus(str, Enum):
@@ -50,6 +61,24 @@ class RerenderRequest(BaseModel):
     caption_font:     Optional[str]             = None  # bundled caption font (Noto Sans Telugu default, Ramabhadra/Mandali selectable) — None → default
     caption_x:        Optional[float]           = None  # caption center X (0–1); None = unpositioned → default centered path (Stage 6)
     caption_y:        Optional[float]           = None  # caption center Y (0–1); None = unpositioned → default 84% path (Stage 6)
+
+    # BUG-001 partial fix — carry the editor's per-caption Size + Background
+    # Pill through to the burn so the export reflects the Inspector state.
+    # Both are optional; None → the preset's built-in defaults render exactly
+    # as before this existed (byte-identical to today).
+    caption_font_size: Optional[float]           = None  # 0–1 fraction of video height (same units the preview scales by)
+    caption_pill:      Optional[dict]            = None  # {enabled, color: '#rrggbb', opacity: 0–1, padding, radius} — None disables the pill
+
+    @field_validator("bg_color")
+    @classmethod
+    def _bg_color_must_be_hex_triplet(cls, v: str) -> str:
+        """Reject anything that is not #RRGGBB. See _HEX_COLOR above for why."""
+        if not isinstance(v, str) or not _HEX_COLOR.match(v):
+            raise ValueError(
+                "bg_color must match ^#[0-9A-Fa-f]{6}$ (e.g. '#7c3aed'); "
+                "got: %r" % (v,)
+            )
+        return v
 
 
 class ClipOut(BaseModel):

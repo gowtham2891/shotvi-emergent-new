@@ -6,7 +6,17 @@ import { EDITOR } from "@/constants/testIds";
  * TransformBox — selection frame + corner scale handles + rotate handle.
  * Rendered as a child of the rotated element wrapper, so it inherits rotation.
  * Uses uniform scale-from-center for corner handles (invariant to rotation).
+ *
+ * BUG-005 containment: the progress element's rotation is computed in the
+ * layout math (services/overlay_renderer.py :: _prepare_progress_layer) but
+ * NOT applied in the composite filtergraph on export. Until that is wired,
+ * keep progress rotation at 0 in the editor so preview and export cannot
+ * silently disagree. This is UI containment only — no export-side change.
  */
+const ROTATION_DISABLED_TYPES = new Set(["progress"]);
+const isRotationDisabled = (element) =>
+  ROTATION_DISABLED_TYPES.has(element?.type);
+
 export const TransformBox = ({ element, canvasRect, elementRect }) => {
   const updateElement = useAppStore((s) => s.updateElement);
   const dragRef = useRef(null);
@@ -37,6 +47,9 @@ export const TransformBox = ({ element, canvasRect, elementRect }) => {
   const beginRotate = (e) => {
     e.stopPropagation();
     e.preventDefault();
+    // BUG-005 containment — rotation not supported on progress (export can't
+    // render it yet). Ignore the drag; the handle is hidden below too.
+    if (isRotationDisabled(element)) return;
     if (!elementRect) return;
     const cx = elementRect.left + elementRect.width / 2;
     const cy = elementRect.top + elementRect.height / 2;
@@ -75,25 +88,30 @@ export const TransformBox = ({ element, canvasRect, elementRect }) => {
         style={{ boxShadow: "0 0 0 1px rgba(124,58,237,0.35) inset" }}
       />
 
-      {/* Rotation handle line */}
-      <div className="absolute left-1/2 -top-6 w-px h-6 bg-[#7c3aed]" />
-      {/* Rotate handle */}
-      <div
-        data-testid={EDITOR.transformHandle("rot")}
-        onPointerDown={beginRotate}
-        className="absolute left-1/2 -translate-x-1/2 -top-9 w-5 h-5 rounded-full bg-[#7c3aed] border-2 border-white shadow-[0_0_12px_rgba(124,58,237,0.8)] pointer-events-auto cursor-grab flex items-center justify-center"
-        style={{ cursor: "grab" }}
-      >
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
-          <path
-            d="M4 4v6h6M20 20v-6h-6M20 10a8 8 0 0 0-14.9-3M4 14a8 8 0 0 0 14.9 3"
-            stroke="white"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </div>
+      {/* Rotation handle line — hidden for elements whose rotation the
+          export path cannot render (BUG-005 containment). */}
+      {!isRotationDisabled(element) && (
+        <>
+          <div className="absolute left-1/2 -top-6 w-px h-6 bg-[#7c3aed]" />
+          {/* Rotate handle */}
+          <div
+            data-testid={EDITOR.transformHandle("rot")}
+            onPointerDown={beginRotate}
+            className="absolute left-1/2 -translate-x-1/2 -top-9 w-5 h-5 rounded-full bg-[#7c3aed] border-2 border-white shadow-[0_0_12px_rgba(124,58,237,0.8)] pointer-events-auto cursor-grab flex items-center justify-center"
+            style={{ cursor: "grab" }}
+          >
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M4 4v6h6M20 20v-6h-6M20 10a8 8 0 0 0-14.9-3M4 14a8 8 0 0 0 14.9 3"
+                stroke="white"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+        </>
+      )}
 
       {/* Corner handles — uniform scale-from-center */}
       <div

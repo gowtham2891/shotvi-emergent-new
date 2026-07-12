@@ -282,25 +282,32 @@ const CaptionSection = ({ element }) => {
         />
       </div>
 
-      {/* Animation */}
+      {/* Animation — disabled: the burn path does not yet render caption
+          entrance animations (BUG-001 partial fix). Kept visible with a
+          "coming soon" hint, same pattern as the Font dropdown above, so the
+          UI intent is preserved without silently drifting preview from export. */}
       <div>
         <SectionTitle>Animation</SectionTitle>
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-1.5 opacity-50 pointer-events-none select-none">
           {ANIMATIONS.map((a) => (
             <button
               key={a.id}
               data-testid={EDITOR.animationBtn(a.id)}
-              onClick={() => patch({ animation: a.id })}
-              className={`px-2.5 py-1.5 rounded-md text-[11px] font-medium border transition-colors ${
-                animation === a.id
+              disabled
+              title="Caption animations coming soon — not applied in export yet."
+              className={`px-2.5 py-1.5 rounded-md text-[11px] font-medium border cursor-not-allowed ${
+                a.id === "none"
                   ? "border-[#7c3aed] bg-[#7c3aed]/12 text-white"
-                  : "border-[#22222c] bg-[#131318] text-[#9a9aa6] hover:border-[#7c3aed]/40"
+                  : "border-[#22222c] bg-[#131318] text-[#9a9aa6]"
               }`}
             >
               {a.label}
             </button>
           ))}
         </div>
+        <p className="text-[10px] text-[#5a5a66] mt-1.5">
+          Caption animations coming soon — not applied in export yet.
+        </p>
       </div>
 
       {/* Background pill */}

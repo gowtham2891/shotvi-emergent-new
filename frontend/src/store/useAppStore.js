@@ -435,6 +435,13 @@ export const useAppStore = create((set, get) => ({
       style: caption?.props?.presetId || DEFAULT_STYLE_ID,
       captionX: caption ? caption.x : 0.5,
       captionY: caption ? caption.y : 0.82,
+      // BUG-001 partial fix: expose the caption's fontSize (0–1 canvas
+      // fraction — same units the preview scales by) and pill so they can
+      // reach the burn. Nulls when there is no caption element so the
+      // backend can fall back to preset defaults; otherwise straight
+      // pass-through of the Inspector state.
+      captionFontSize: caption?.props?.fontSize ?? null,
+      captionPill: caption?.props?.pill ?? null,
     };
   },
 
@@ -489,6 +496,9 @@ export const useAppStore = create((set, get) => ({
       useAutocrop: s.exportSettings.useAutocrop,
       captionX: doc.captionX,
       captionY: doc.captionY,
+      // BUG-001 partial fix — thread the caption Size + Background Pill.
+      captionFontSize: doc.captionFontSize,
+      captionPill: doc.captionPill,
       elements: doc.elements,
     });
     try {
@@ -597,11 +607,22 @@ export const useAppStore = create((set, get) => ({
   setSelected: (id) => set({ selectedElementId: id }),
   clearSelection: () => set({ selectedElementId: null }),
 
+  // BUG-005 containment: keep `rotation` at 0 for element types whose
+  // rotation the export path cannot render yet (progress). This is a UI-only
+  // guard — the composite filtergraph is unchanged. When rotation is wired
+  // through the composite path, drop the type from this Set.
+  //
+  // Applied at the store boundary (not just the TransformBox UI) so keyboard
+  // nudges, mock data, and any future callers all funnel through here.
+
   updateElement: (id, patch) =>
     set((s) => ({
-      elements: s.elements.map((el) =>
-        el.id === id ? { ...el, ...patch } : el
-      ),
+      elements: s.elements.map((el) => {
+        if (el.id !== id) return el;
+        const next = { ...el, ...patch };
+        if (ROTATION_LOCKED_TYPES.has(next.type)) next.rotation = 0;
+        return next;
+      }),
     })),
 
   updateElementProps: (id, propsPatch) =>
@@ -736,6 +757,13 @@ export const useAppStore = create((set, get) => ({
 // -----------------------------------------------------------------
 // Element type factory — defaults per type
 // -----------------------------------------------------------------
+
+// BUG-005 containment: element types whose editor rotation the export path
+// cannot render yet. Store-level guard: any updateElement patch on these
+// types silently coerces `rotation` to 0. Progress bar has computed-but-
+// unapplied rotation in services/overlay_renderer.py.
+const ROTATION_LOCKED_TYPES = new Set(["progress"]);
+
 function defaultElementForType(type) {
   const base = {
     x: 0.5,

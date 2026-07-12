@@ -251,6 +251,8 @@ def rerender_clip_endpoint(job_id: str, clip_index: int, payload: RerenderReques
         caption_font=payload.caption_font,
         caption_x=payload.caption_x,
         caption_y=payload.caption_y,
+        caption_font_size=payload.caption_font_size,
+        caption_pill=payload.caption_pill,
     )
 
     return {"rerender_job_id": rerender_job_id}
@@ -340,14 +342,39 @@ Rules:
 
 @app.get("/clips/download")
 def download_clip(path: str):
-    """Download a single clip by file path."""
-    file_path = Path(path)
-    if not file_path.exists():
+    """Download a single clip by file path.
+
+    BUG-002 fix: confine the served path to OUTPUT_DIR. The endpoint takes
+    a user-controlled `path` query param (that used to be passed straight to
+    FileResponse), so without a containment check any readable file on the
+    container could be exfiltrated — including backend/.env with third-party
+    API keys. We resolve() both the request path and OUTPUT_DIR (which
+    canonicalises `..` and follows symlinks) and require the request to sit
+    strictly under the outputs directory. On breach we return 403, not 404,
+    so the caller can distinguish "not there" from "you may not touch that".
+    """
+    try:
+        requested = Path(path).resolve()
+        base = OUTPUT_DIR.resolve()
+    except (OSError, RuntimeError, ValueError):
+        # OSError: permission / IO failure while resolving.
+        # RuntimeError: pathlib raises for infinite symlink loops.
+        # ValueError: pathlib rejects paths with embedded null bytes.
+        raise HTTPException(status_code=400, detail="Invalid clip path")
+
+    try:
+        requested.relative_to(base)
+    except ValueError:
+        # requested is not inside base — traversal / absolute-escape attempt.
+        raise HTTPException(status_code=403, detail="Path outside outputs directory")
+
+    if not requested.is_file():
         raise HTTPException(status_code=404, detail="Clip not found")
+
     return FileResponse(
-        path=str(file_path),
+        path=str(requested),
         media_type="video/mp4",
-        filename=file_path.name,
+        filename=requested.name,
     )
 
 

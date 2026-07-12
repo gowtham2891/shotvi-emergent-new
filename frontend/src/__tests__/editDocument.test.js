@@ -172,3 +172,52 @@ describe("Commit 4 — untouched-caption anchor matches export contract", () => 
     expect(caption.y).toBeCloseTo(CAPTION_DEFAULT_POSITION.y);
   });
 });
+
+describe("BUG-001 partial fix — caption Size / Pill reach the export payload", () => {
+  // Pre-fix, the Inspector's Size slider and Background Pill toggle updated
+  // only the preview; the outgoing rerender payload never carried them, so
+  // the burned export ignored both edits (WYSIWYG break). Guards the
+  // frontend half of the wired chain — the backend half is asserted by
+  // tests/test_caption_size_pill.py.
+
+  test("captionFontSize is serialized as caption_font_size only when set", () => {
+    // Omitted → payload key absent (byte-identical to today's export).
+    const bare = buildRerenderRequest({});
+    expect("caption_font_size" in bare).toBe(false);
+
+    // Set → payload carries it.
+    const withSize = buildRerenderRequest({ captionFontSize: 0.075 });
+    expect(withSize.caption_font_size).toBeCloseTo(0.075);
+  });
+
+  test("caption_pill only serializes when the pill is enabled", () => {
+    // No pill at all → key absent.
+    expect("caption_pill" in buildRerenderRequest({})).toBe(false);
+    // Pill toggled off → key still absent (equivalent to no pill).
+    const offReq = buildRerenderRequest({
+      captionPill: { enabled: false, color: "#ff0000", opacity: 1, padding: 8, radius: 4 },
+    });
+    expect("caption_pill" in offReq).toBe(false);
+
+    // Enabled → payload carries the exact snake-case shape the API expects.
+    const onReq = buildRerenderRequest({
+      captionPill: { enabled: true, color: "#7c3aed", opacity: 0.6, padding: 10, radius: 6 },
+    });
+    expect(onReq.caption_pill).toEqual({
+      enabled: true,
+      color: "#7c3aed",
+      opacity: 0.6,
+      padding: 10,
+      radius: 6,
+    });
+  });
+
+  test("size + pill are ignored for zero/negative fontSize (guard against jitter)", () => {
+    const req = buildRerenderRequest({
+      captionFontSize: 0,
+      captionPill: { enabled: false, color: "#000000", opacity: 1, padding: 0, radius: 0 },
+    });
+    expect("caption_font_size" in req).toBe(false);
+    expect("caption_pill" in req).toBe(false);
+  });
+});

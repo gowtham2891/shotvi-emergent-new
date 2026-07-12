@@ -157,7 +157,8 @@ def rerender_clip(self, rerender_job_id: str, source_job_id: str, clip_index: in
                   use_autocrop: bool, trim_start: float, trim_end: float, video_id: str,
                   transcript_edits=None, crop_box=None, selected_subject=None,
                   crop_mode: str = "auto", elements=None, caption_font=None,
-                  caption_x=None, caption_y=None):
+                  caption_x=None, caption_y=None,
+                  caption_font_size=None, caption_pill=None):
     """
     Export a single clip with:
     - Source: auto-cropped vertical OR original cut
@@ -172,6 +173,12 @@ def rerender_clip(self, rerender_job_id: str, source_job_id: str, clip_index: in
       in their own pass before captions; None/[] renders exactly as before this existed
     - caption_font: bundled Telugu caption font (Noto Sans Telugu default, Ramabhadra/Mandali
       selectable); None → default. Resolved deterministically via fontsdir, not host fonts.
+    - caption_font_size (BUG-001 partial): 0-1 fraction of video height; None → the preset
+      default (byte-identical to today). Multiplied on top of the calibrated per-font k-values;
+      the calibration itself is spec (Noto 0.495, Ramabhadra/Mandali 0.660).
+    - caption_pill (BUG-001 partial): {enabled, color '#rrggbb', opacity, padding, radius}.
+      None or enabled=False → the preset's own back_color renders; a set pill overrides
+      the ASS BorderStyle+BackColour combo for the current burn.
     """
     try:
         from services.caption_renderer import render_captions_for_clip, STYLES, DEFAULT_STYLE
@@ -224,7 +231,22 @@ def rerender_clip(self, rerender_job_id: str, source_job_id: str, clip_index: in
         # ── Prepare source: crop + trim in a single FFmpeg pass ───────────────
         # crop_mode='manual' triggers crop regardless of format or use_autocrop.
         needs_crop = (crop_mode == "manual" and crop_box is not None)
-        needs_trim = trim_start > 0 or (trim_end > 0 and trim_end < _get_duration(source_path))
+        # trim_end < 0 sentinel means "no trim / to end of clip". When we know
+        # the duration, we further clamp `trim_end > 0 and trim_end < duration`
+        # to avoid an FFmpeg failure on an out-of-range -t. If duration is None
+        # (ffprobe failed — BUG-004), we treat it as "duration unknown" and
+        # opt to NOT clamp (previous behaviour: 0.0 collapsed every trim to
+        # zero length). This preserves the user's intent when the source is
+        # trimmable and skips silently only on the safest edge case.
+        _dur = _get_duration(source_path)
+        if _dur is None:
+            print(f"  [Export] duration unknown for {source_path!r}; skipping "
+                  f"the trim_end clamp (BUG-004: better to over-trim and hit "
+                  f"an FFmpeg error than to silently drop the entire clip)",
+                  flush=True)
+            needs_trim = trim_start > 0 or trim_end > 0
+        else:
+            needs_trim = trim_start > 0 or (trim_end > 0 and trim_end < _dur)
 
         if needs_crop or needs_trim:
             prepared_path = str(OUTPUT_DIR / f"{out_stem}_prepared.mp4")
@@ -277,6 +299,8 @@ def rerender_clip(self, rerender_job_id: str, source_job_id: str, clip_index: in
             caption_y=caption_y,
             video_width=target_w,
             video_height=target_h,
+            caption_font_size=caption_font_size,
+            caption_pill=caption_pill,
         )
 
         if not result:
@@ -319,14 +343,39 @@ def rerender_clip(self, rerender_job_id: str, source_job_id: str, clip_index: in
 # FFmpeg helpers
 # ══════════════════════════════════════════════════════════════
 
-def _get_duration(path: str) -> float:
+def _get_duration(path: str):
+    """Return the source's duration in seconds via ffprobe, or None if
+    duration is unknown (BUG-004 fix).
+
+    Historically this function had a bare `except: return 0.0` which
+    swallowed every failure — missing ffprobe binary, unreadable file,
+    subprocess timeout, malformed metadata — and returned 0.0. Callers used
+    the returned value in a `min(clip.end, duration)` clamp, so an ffprobe
+    failure silently collapsed every trim to zero length with no log and no
+    job failure. Now we narrow the except to the concrete failure modes,
+    log the specific failure, and return None so callers can detect and
+    handle "duration unknown" explicitly (skip clamp, warn, etc).
+    """
     import subprocess
-    r = subprocess.run([
-        "ffprobe", "-v", "quiet", "-show_entries", "format=duration",
-        "-of", "csv=p=0", path
-    ], capture_output=True, text=True)
-    try: return float(r.stdout.strip())
-    except: return 0.0
+    try:
+        r = subprocess.run(
+            ["ffprobe", "-v", "quiet", "-show_entries", "format=duration",
+             "-of", "csv=p=0", path],
+            capture_output=True, text=True, timeout=15,
+        )
+    except (FileNotFoundError, subprocess.SubprocessError) as e:
+        # ffprobe not on PATH, or process failed to start / timed out.
+        print(f"  [_get_duration] ffprobe unavailable / failed for {path!r}: {e}",
+              flush=True)
+        return None
+    out = r.stdout.strip()
+    try:
+        return float(out)
+    except (ValueError, TypeError) as e:
+        print(f"  [_get_duration] could not parse duration from ffprobe stdout "
+              f"{out!r} (stderr: {r.stderr[-200:]!r}): {e}",
+              flush=True)
+        return None
 
 
 def _trim_clip(input_path: str, output_path: str, start: float, end: float):
@@ -404,12 +453,16 @@ def _apply_canvas(input_path: str, output_path: str,
             output_path
         ]
     else:
-        # Solid color background
+        # Solid color background.
+        # BUG-007 fix: FFmpeg's `color=` filter parameter needs `#RRGGBB`,
+        # `0xRRGGBB`, or a named color. The previous code stripped `#` and
+        # passed a bare `rrggbb`, which FFmpeg interpreted as an unknown color
+        # NAME and rejected. Rebuild as `0x`-prefixed after the API-boundary
+        # regex already guaranteed it is a 6-hex-digit triple.
         if background == "white":
             pad_color = "white"
         elif background == "color":
-            # Strip # from hex
-            pad_color = bg_color.lstrip("#")
+            pad_color = "0x" + bg_color.lstrip("#")
         else:
             pad_color = "black"
 

@@ -381,6 +381,63 @@ def format_ass_time(seconds: float) -> str:
     return f"{h}:{m:02d}:{s:02d}.{cs:02d}"
 
 
+def _pill_to_ass_back_color(pill: dict) -> str:
+    """Convert an editor caption-pill spec to an ASS &HAABBGGRR BackColour.
+
+    Editor pill:
+      color    — '#rrggbb' hex from the color picker
+      opacity  — 0.0 (transparent) → 1.0 (opaque)
+    ASS BackColour is &HAABBGGRR where:
+      AA — 00 (opaque) → FF (transparent)  ← INVERSE of opacity
+      BB, GG, RR — 8-bit channels in swapped order
+    Returns a safe default when the pill dict is malformed (falls back to
+    the same near-opaque black the `hormozi` preset uses).
+    """
+    hex_rgb = str(pill.get("color", "#000000") or "#000000").lstrip("#")
+    if len(hex_rgb) != 6 or any(c not in "0123456789abcdefABCDEF" for c in hex_rgb):
+        hex_rgb = "000000"
+    r, g, b = hex_rgb[0:2], hex_rgb[2:4], hex_rgb[4:6]
+    try:
+        opacity = float(pill.get("opacity", 1.0))
+    except (TypeError, ValueError):
+        opacity = 1.0
+    opacity = max(0.0, min(1.0, opacity))
+    # opacity 0.0 → alpha FF (fully transparent); 1.0 → alpha 00 (opaque)
+    alpha_byte = int(round((1.0 - opacity) * 255))
+    return f"&H{alpha_byte:02X}{b.upper()}{g.upper()}{r.upper()}"
+
+
+
+def _escape_ass_text(text: str) -> str:
+    """Escape ASS control characters in transcript word text (BUG-008 fix).
+
+    Words are concatenated straight into a Dialogue line after our {\\1c...}
+    override block, so a literal `{` in the transcript opens a new override
+    tag, `}` closes one, and `\\` begins an escape sequence — all silently
+    corrupt the line (garbled formatting, dropped/blank words). Newlines
+    terminate the ASS event line entirely, cutting the caption off mid-word.
+
+    Called ONCE per word BEFORE we wrap it in {\\1c...} override tags, so the
+    tags we emit ourselves stay intact — only user/transcript text is escaped.
+
+    ASS rules used here:
+      - `\\`   → `\\\\` (literal backslash outside an override block)
+      - `{`    → `\\{`  (libass treats `\\{` as a literal `{`)
+      - `}`    → `\\}`
+      - CR/LF  → `\\N`  (hard line break within the same event)
+    """
+    if not text:
+        return ""
+    return (text
+            .replace("\\", "\\\\")
+            .replace("{",  "\\{")
+            .replace("}",  "\\}")
+            .replace("\r\n", "\\N")
+            .replace("\n",   "\\N")
+            .replace("\r",   "\\N"))
+
+
+
 def _color_tag(assc: str) -> str:
     """ASS override setting BOTH primary colour and primary alpha from an
     &HAABBGGRR value.
@@ -402,7 +459,9 @@ def generate_ass_karaoke(lines: list, style_name: str = DEFAULT_STYLE,
                          caption_position: float = 84.0,
                          video_width: int = 1080, video_height: int = 1920,
                          caption_font: str = None,
-                         caption_x: float = None, caption_y: float = None) -> str:
+                         caption_x: float = None, caption_y: float = None,
+                         caption_font_size_frac: float = None,
+                         caption_pill: dict = None) -> str:
     """
     Generate ASS with per-word color highlight animation.
     style_name must be one of: bold-yellow, white-minimal, red-pop, clean-dark,
@@ -425,6 +484,23 @@ def generate_ass_karaoke(lines: list, style_name: str = DEFAULT_STYLE,
     output pixels; the caller (worker) is responsible for passing the real render
     dimensions on non-9:16 formats.
 
+    caption_font_size_frac (BUG-001 partial fix): the editor's caption Size — a
+    0-1 fraction of video HEIGHT, matching the preview's `elHeight = canvasH *
+    fontSize` math (see frontend/src/components/editor/ElementBodies.jsx). When
+    provided, the resulting pixel size is used AS-IS (already sized for the
+    output canvas; the calibrated k-values in caption_font_size(...) exist to
+    match the preset defaults to Noto's cap-height and should NOT compound
+    with a user-provided absolute size — the preview does not apply them
+    either). When None, we keep the previous behaviour: preset default × the
+    calibrated per-font k.
+
+    caption_pill (BUG-001 partial fix): {enabled, color '#rrggbb', opacity 0-1,
+    padding, radius}. When enabled, overrides the preset's back_color +
+    border_style + outline (padding + radius aren't representable in ASS
+    without libass patches, so we ignore them for now — see KNOWN_ISSUES).
+    When None or enabled=False, the preset's own back_color renders exactly
+    as before this argument existed.
+
     caption_position is now dead for placement (kept in the signature for
     backwards compat; a future cleanup can remove it — see KNOWN_ISSUES).
     """
@@ -437,7 +513,24 @@ def generate_ass_karaoke(lines: list, style_name: str = DEFAULT_STYLE,
     s = STYLES[style_name]
 
     font_family, _ = get_caption_font(caption_font)          # deterministic family name
-    font_size = caption_font_size(s['font_size'], font_family)  # cap-height-calibrated
+    # BUG-001 partial: user-set Size (0-1 fraction of video HEIGHT) → absolute
+    # pixel size. Falls back to the calibrated preset default when omitted.
+    if caption_font_size_frac is not None and caption_font_size_frac > 0:
+        font_size = max(round(float(caption_font_size_frac) * int(video_height)), 8)
+    else:
+        font_size = caption_font_size(s['font_size'], font_family)  # cap-height-calibrated
+
+    # BUG-001 partial: caption background pill — when enabled, override the
+    # preset's back_color/border_style/outline. The pill's `color` is a plain
+    # `#rrggbb` from the color picker; ASS BackColour wants &HAABBGGRR (alpha
+    # is INVERSE opacity in ASS: 00=opaque, FF=transparent), so build it here.
+    style_back_color   = s['back_color']
+    style_border_style = s['border_style']
+    style_outline      = s['outline_width']
+    if isinstance(caption_pill, dict) and caption_pill.get("enabled"):
+        style_back_color   = _pill_to_ass_back_color(caption_pill)
+        style_border_style = 4          # box (opaque background) around text
+        style_outline      = 0          # no stroke on top of the box
 
     # Commit 4: unified default anchor. Untouched captions (either coord missing)
     # fall back to the frontend's default center, so the export burns exactly
@@ -460,7 +553,7 @@ WrapStyle: 0
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,{font_family},{font_size},{s['color_unspoken']},&H000000FF,{s['outline_color']},{s['back_color']},{s['bold']},0,0,0,100,100,0,0,{s['border_style']},{s['outline_width']},{s['shadow']},5,40,40,{margin_v},1
+Style: Default,{font_family},{font_size},{s['color_unspoken']},&H000000FF,{s['outline_color']},{style_back_color},{s['bold']},0,0,0,100,100,0,0,{style_border_style},{style_outline},{s['shadow']},5,40,40,{margin_v},1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -484,15 +577,19 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             if evt_end <= evt_start:
                 evt_end = evt_start + 0.05
 
-            # Build colored line
+            # Build colored line — every word runs through _escape_ass_text
+            # BEFORE being wrapped in the {\1c...} override tag so ASS control
+            # characters in transcript text ({, }, \, newline) don't break out
+            # of the run, corrupt override syntax, or drop text (BUG-008).
             parts = []
             for j, w in enumerate(words):
+                safe_word = _escape_ass_text(w['word'])
                 if j < idx:
-                    parts.append(f"{{{_color_tag(s['color_spoken'])}}}{w['word']}")
+                    parts.append(f"{{{_color_tag(s['color_spoken'])}}}{safe_word}")
                 elif j == idx:
-                    parts.append(f"{{{_color_tag(s['color_highlight'])}}}{w['word']}")
+                    parts.append(f"{{{_color_tag(s['color_highlight'])}}}{safe_word}")
                 else:
-                    parts.append(f"{{{_color_tag(s['color_unspoken'])}}}{w['word']}")
+                    parts.append(f"{{{_color_tag(s['color_unspoken'])}}}{safe_word}")
 
             line_text = pos_override + " ".join(parts)
             events.append(
@@ -588,6 +685,8 @@ def render_captions_for_clip(
     caption_font: str = None,
     caption_x: float = None,
     caption_y: float = None,
+    caption_font_size: float = None,   # BUG-001 partial: 0-1 fraction of video height
+    caption_pill: dict = None,         # BUG-001 partial: {enabled, color, opacity, padding, radius}
 ) -> str:
     """words → ASS → burn for a single clip with given style + caption font.
 
@@ -745,7 +844,9 @@ def render_captions_for_clip(
                                        video_height=video_height,
                                        caption_font=caption_font,
                                        caption_x=caption_x,
-                                       caption_y=caption_y)
+                                       caption_y=caption_y,
+                                       caption_font_size_frac=caption_font_size,
+                                       caption_pill=caption_pill)
     with open(ass_path, "w", encoding="utf-8") as f:
         f.write(ass_content)
     print(f"   ✓ ASS: {ass_path}")
