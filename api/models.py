@@ -57,7 +57,7 @@ class RerenderRequest(BaseModel):
     selected_subject: Optional[str]             = None
     crop_keyframes:   List[dict]                = []
     version:          Optional[int]             = None
-    elements:         Optional[List[dict]]      = None  # EditDocument overlay elements (progress/logo/headline/sticker) — None/[] renders exactly as today
+    elements:         Optional[List[dict]]      = None  # EditDocument overlay elements (progress/logo/headline) — None/[] renders exactly as today; unknown/retired types (old sticker) are skipped
     caption_font:     Optional[str]             = None  # bundled caption font (Noto Sans Telugu default, Ramabhadra/Mandali selectable) — None → default
     caption_x:        Optional[float]           = None  # caption center X (0–1); None = unpositioned → default centered path (Stage 6)
     caption_y:        Optional[float]           = None  # caption center Y (0–1); None = unpositioned → default 84% path (Stage 6)

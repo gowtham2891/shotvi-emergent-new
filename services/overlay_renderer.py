@@ -1,12 +1,12 @@
 """
 ClipForge AI — Canvas Overlay Renderer
 ========================================
-Burns EditDocument overlay elements (progress bar, logo, headline, sticker)
-onto a clip, closing the preview/export parity gap — these elements exist
-in the editor's draft today but the render pipeline has always ignored
-them. Runs as its own FFmpeg pass, appended after _apply_canvas (format/
-background) and before caption burn-in, so it never touches the existing,
-working caption path.
+Burns EditDocument overlay elements (progress bar, logo, headline) onto a
+clip, closing the preview/export parity gap — these elements exist in the
+editor's draft today but the render pipeline has always ignored them. Runs
+as its own FFmpeg pass, appended after _apply_canvas (format/background)
+and before caption burn-in, so it never touches the existing, working
+caption path.
 
 Performance-driven architecture: the full-resolution libx264 re-encode
 dominates render_progress_bar's cost (~19s of ~23s for a 50s 1080x1920
@@ -27,12 +27,14 @@ clip). The progress bar's fill is instead computed in PIL, one frame per
 tick — directly inspectable/testable — encoded once to a small lossless
 clip, then composited like any other layer.
 
-Stage 1: progress bar. Stage 2: sticker. Stage 3: logo (a synthetic
-avatar-circle + handle-text widget — see _prepare_logo_layer for the
-approved scope note on why this isn't an uploaded image). Stage 4:
-headline (bundled Outfit variable font via services/fonts.py, drop
-shadow + optional stroke, matching HeadlineBody's CSS spec) — follows
-the same _prepare_<type>_layer(...) -> Layer pattern.
+Stage 1: progress bar. Stage 3: logo (a synthetic avatar-circle +
+handle-text widget — see _prepare_logo_layer for the approved scope note
+on why this isn't an uploaded image). Stage 4: headline (bundled Outfit
+variable font via services/fonts.py, drop shadow + optional stroke,
+matching HeadlineBody's CSS spec) — follows the same
+_prepare_<type>_layer(...) -> Layer pattern. (Stage 2, the sticker
+element, was removed as a product decision — a burned emoji added no
+value for the Telugu virality use case and was a recurring bug source.)
 """
 
 import math
@@ -48,21 +50,6 @@ from services.canvas_coords import to_pixel_center, to_pixel_size, center_to_top
 from services.fonts import get_font_path
 
 BAR_FPS = 15  # a slow linear reveal doesn't need more; keeps frame count low
-STICKERS_DIR = os.path.join(os.path.dirname(__file__), "assets", "stickers")
-
-# Frontend's fixed sticker choices (Inspector.jsx :: STICKER_CHOICES) mapped
-# to bundled Twemoji PNGs — see services/assets/stickers/NOTICE.md for the
-# required CC-BY 4.0 attribution.
-STICKER_FILES = {
-    "🔥": "1f525.png",
-    "😂": "1f602.png",
-    "💯": "1f4af.png",
-    "👀": "1f440.png",
-    "🚀": "1f680.png",
-    "❤️": "2764.png",
-    "😱": "1f631.png",
-    "🎯": "1f3af.png",
-}
 
 
 @dataclass
@@ -179,42 +166,6 @@ def _prepare_progress_layer(element: dict, video_width: int, video_height: int,
     ox, oy = center_to_topleft(center.cx, center.cy, out_w, out_h)
 
     return Layer(path=bar_clip, is_video=True, width=out_w, height=out_h, ox=ox, oy=oy)
-
-
-def _prepare_sticker_layer(element: dict, video_width: int, video_height: int,
-                           tmp_dir: str) -> Optional[Layer]:
-    """Sticker: a static bundled Twemoji PNG (frontend's picker is a fixed
-    8-emoji set — see STICKER_FILES), scaled/rotated once in PIL."""
-    p = element.get("props", {})
-    emoji = p.get("emoji")
-    filename = STICKER_FILES.get(emoji)
-    if not filename:
-        return None  # unknown/unsupported emoji — skip, don't fail the render
-
-    src_path = os.path.join(STICKERS_DIR, filename)
-    if not os.path.exists(src_path):
-        return None
-
-    scale = element.get("scale", 1) or 1
-    rotation = element.get("rotation", 0) or 0
-    # fontSize is the frontend's own sizing knob for stickers (StickerBody
-    # renders the emoji glyph at fontSize*canvasH) — treat it as the
-    # sticker's pixel size fraction of render height, matching that intent.
-    size_frac = p.get("fontSize", 0.13)
-    target_h = max(round(size_frac * video_height * scale), 4)
-
-    img = Image.open(src_path).convert("RGBA")
-    aspect = img.width / img.height
-    target_w = max(round(target_h * aspect), 4)
-    img = img.resize((target_w, target_h), Image.LANCZOS)
-    img = _rotate_png_if_needed(img, rotation)
-
-    out_path = os.path.join(tmp_dir, f"sticker_{element.get('id', id(element))}.png")
-    img.save(out_path)
-
-    center = to_pixel_center(element.get("x", 0.78), element.get("y", 0.6), video_width, video_height)
-    ox, oy = center_to_topleft(center.cx, center.cy, img.width, img.height)
-    return Layer(path=out_path, is_video=False, width=img.width, height=img.height, ox=ox, oy=oy)
 
 
 def _draw_gradient_circle(diameter: int, color1: tuple, color2: tuple) -> Image.Image:
@@ -394,7 +345,6 @@ def _prepare_headline_layer(element: dict, video_width: int, video_height: int,
 
 _PREPARERS = {
     "progress": lambda el, vw, vh, tmp, dur: _prepare_progress_layer(el, vw, vh, tmp, dur),
-    "sticker": lambda el, vw, vh, tmp, dur: _prepare_sticker_layer(el, vw, vh, tmp),
     "logo": lambda el, vw, vh, tmp, dur: _prepare_logo_layer(el, vw, vh, tmp),
     "headline": lambda el, vw, vh, tmp, dur: _prepare_headline_layer(el, vw, vh, tmp),
 }
@@ -412,11 +362,22 @@ def render_elements(input_path: str, output_path: str, elements: list,
     see module docstring for why this matters. Unsupported/invisible
     elements are skipped (not an error). Returns input_path unchanged
     (zero FFmpeg calls) if there's nothing to burn.
+
+    A visible element whose type is not in _PREPARERS (e.g. a retired
+    `sticker` element left in an old draft, or a future type an older
+    backend doesn't understand) is skipped with a logged warning rather
+    than crashing the render — old payloads stay forward/backward safe.
     """
-    supported = [
-        el for el in (elements or [])
-        if el.get("visible", True) and el.get("type") in _PREPARERS
-    ]
+    supported = []
+    for el in (elements or []):
+        if not el.get("visible", True):
+            continue
+        etype = el.get("type")
+        if etype in _PREPARERS:
+            supported.append(el)
+        else:
+            print(f"  [Overlay] Skipping unsupported element type {etype!r} "
+                  f"(id={el.get('id')!r}) — not burned", flush=True)
     if not supported:
         return input_path
 

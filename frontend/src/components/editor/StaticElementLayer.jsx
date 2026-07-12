@@ -7,7 +7,7 @@ import { ElementBody } from "@/components/editor/ElementBodies";
  * ElementRenderer (normalized x/y -> % position, centered, rotate+scale),
  * without drag/select/TransformBox. Used by any non-interactive canvas
  * preview; currently the Export page's live draft preview, so the same
- * caption/headline/progress/logo/sticker rendering the editor canvas shows
+ * caption/headline/progress/logo rendering the editor canvas shows
  * appears there too, reusing ElementBody rather than duplicating it.
  */
 export const StaticElementLayer = ({ canvasH }) => {

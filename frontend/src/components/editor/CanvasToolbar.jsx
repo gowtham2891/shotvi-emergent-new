@@ -8,7 +8,6 @@ import {
   Type,
   MessageSquare,
   BarChart3,
-  Sticker,
   Image as ImageIcon,
   Check,
 } from "lucide-react";
@@ -23,7 +22,6 @@ const SAFE_ZONES = [
 
 const ADD_TYPES = [
   { type: "headline", label: "Hook headline", icon: Type },
-  { type: "sticker", label: "Emoji sticker", icon: Sticker },
   { type: "progress", label: "Progress bar", icon: BarChart3 },
   { type: "logo", label: "Logo / handle", icon: ImageIcon },
 ];

@@ -79,7 +79,7 @@ export const INITIAL_ELEMENTS = [
     locked: false,
     props: {
       presetId: "bold-yellow",
-      font: "Outfit",
+      font: "Noto Sans Telugu",
       fontSize: 0.055,
       animation: "karaoke",
       pill: PILL_DEFAULTS_BY_PRESET["bold-yellow"],
@@ -134,20 +134,6 @@ export const INITIAL_ELEMENTS = [
       avatar: "R",
       font: "Manrope",
       fontSize: 0.022,
-    },
-  },
-  {
-    id: "el_sticker_1",
-    type: "sticker",
-    x: 0.78,
-    y: 0.6,
-    scale: 1,
-    rotation: -12,
-    visible: false,
-    locked: false,
-    props: {
-      emoji: "🔥",
-      fontSize: 0.13,
     },
   },
 ];

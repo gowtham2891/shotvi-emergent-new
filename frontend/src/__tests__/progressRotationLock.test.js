@@ -30,14 +30,14 @@ describe("Progress element rotation is locked to 0 (BUG-005 containment)", () =>
 
   test("non-progress elements CAN still be rotated", () => {
     const store = useAppStore.getState();
-    let sticker = store.elements.find((el) => el.type === "sticker");
-    if (!sticker) {
-      store.addElement("sticker");
-      sticker = useAppStore.getState().elements.find((el) => el.type === "sticker");
+    let headline = store.elements.find((el) => el.type === "headline");
+    if (!headline) {
+      store.addElement("headline");
+      headline = useAppStore.getState().elements.find((el) => el.type === "headline");
     }
-    expect(sticker).toBeTruthy();
-    store.updateElement(sticker.id, { rotation: 30 });
-    const after = useAppStore.getState().elements.find((el) => el.id === sticker.id);
+    expect(headline).toBeTruthy();
+    store.updateElement(headline.id, { rotation: 30 });
+    const after = useAppStore.getState().elements.find((el) => el.id === headline.id);
     expect(after.rotation).toBeCloseTo(30);
   });
 

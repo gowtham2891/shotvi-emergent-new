@@ -12,15 +12,17 @@ import {
   Sparkles,
   MessageSquare,
   BarChart3,
-  Sticker as StickerIcon,
   AtSign,
   Play,
 } from "lucide-react";
 import { useAppStore } from "@/store/useAppStore";
-import { FONTS, MUSIC_LIBRARY } from "@/data/mockData";
+import { MUSIC_LIBRARY } from "@/data/mockData";
 // Caption presets mirror the backend's caption style ids (STYLES in
 // services/caption_renderer.py) so exports always burn the selected style.
-import { CAPTION_STYLES } from "@/api/renders";
+// CAPTION_FONTS are the three bundled Telugu caption fonts the backend
+// resolves deterministically via fontsdir (services/fonts.py :: CAPTION_FONTS).
+import { CAPTION_STYLES, CAPTION_FONTS } from "@/api/renders";
+import { getCaptionFontStack } from "@/data/captionStylePreview";
 import { getCaptionStylePreview } from "@/data/captionStylePreview";
 import { EDITOR } from "@/constants/testIds";
 
@@ -35,7 +37,6 @@ const TYPE_ICONS = {
   headline: MessageSquare,
   progress: BarChart3,
   logo: AtSign,
-  sticker: StickerIcon,
 };
 
 const ANIMATIONS = [
@@ -102,7 +103,6 @@ const StyleTab = () => {
       <PositionSection />
       {selected?.type === "caption" && <CaptionSection element={selected} />}
       {selected?.type === "headline" && <HeadlineSection element={selected} />}
-      {selected?.type === "sticker" && <StickerSection element={selected} />}
       {!selected && (
         <p className="text-[11px] text-[#5a5a66] leading-relaxed">
           Select an element on the canvas — or toggle one on above — to edit
@@ -245,26 +245,25 @@ const CaptionSection = ({ element }) => {
         </div>
       </div>
 
-      {/* Font — disabled for captions: the backend fixes font per style
-          (services/caption_renderer.py's font_name), so this control can't
-          actually change what gets burned into the export. */}
+      {/* Font — the three bundled Telugu caption fonts. The backend resolves
+          the selection deterministically via libass fontsdir (services/fonts.py
+          :: CAPTION_FONTS) and the preview renders the same @font-face family
+          from /public/fonts, so the dropdown is true WYSIWYG. Decoupled from
+          the preset (Stage 5): font is chosen here, style only drives colors. */}
       <div>
         <SectionTitle>Font</SectionTitle>
         <select
           data-testid={EDITOR.fontSelect}
           value={font}
-          disabled
-          title="Font is set by the caption preset to match export."
           onChange={(e) => patch({ font: e.target.value })}
-          className="w-full bg-[#131318] border border-[#22222c] rounded-md px-2 py-2 text-xs text-[#d7d7de] outline-none focus:border-[#7c3aed]/60 opacity-50 cursor-not-allowed"
+          className="w-full bg-[#131318] border border-[#22222c] rounded-md px-2 py-2 text-xs text-[#d7d7de] outline-none focus:border-[#7c3aed]/60"
         >
-          {FONTS.map((f) => (
-            <option key={f} value={f}>{f}</option>
+          {CAPTION_FONTS.map((f) => (
+            <option key={f} value={f} style={{ fontFamily: getCaptionFontStack(f) }}>
+              {f}
+            </option>
           ))}
         </select>
-        <p className="text-[10px] text-[#5a5a66] mt-1.5">
-          Font is set by the caption preset to match export.
-        </p>
       </div>
 
       {/* Size */}
@@ -385,31 +384,6 @@ const HeadlineSection = ({ element }) => {
           className="w-8 h-8 rounded cursor-pointer bg-transparent border border-[#22222c]"
         />
         <span className="text-[11px] text-[#9a9aa6] font-mono">{p.color}</span>
-      </div>
-    </div>
-  );
-};
-
-const STICKER_CHOICES = ["🔥", "😂", "💯", "👀", "🚀", "❤️", "😱", "🎯"];
-const StickerSection = ({ element }) => {
-  const updateElementProps = useAppStore((s) => s.updateElementProps);
-  return (
-    <div>
-      <SectionTitle>Sticker</SectionTitle>
-      <div className="flex flex-wrap gap-1.5">
-        {STICKER_CHOICES.map((e) => (
-          <button
-            key={e}
-            onClick={() => updateElementProps(element.id, { emoji: e })}
-            className={`w-9 h-9 rounded-md text-lg flex items-center justify-center border transition-colors ${
-              element.props.emoji === e
-                ? "border-[#7c3aed] bg-[#7c3aed]/12"
-                : "border-[#22222c] bg-[#131318] hover:border-[#7c3aed]/40"
-            }`}
-          >
-            {e}
-          </button>
-        ))}
       </div>
     </div>
   );

@@ -18,7 +18,7 @@ from google import genai as google_genai
 from google.genai import types as genai_types
 
 from api.models import JobCreate, JobOut, ClipOut, JobStatus, RerenderRequest, MetadataRequest
-from api.database import create_job, get_job, get_job_by_video_id, update_job, get_redis
+from api.database import create_job, get_job, get_job_by_video_id, update_job, get_redis, delete_job
 from api.worker import process_video, rerender_clip
 from services.video_cutter import extract_thumbnail
 
@@ -76,8 +76,28 @@ def create_job_endpoint(payload: JobCreate):
         # ── 1. Redis cache hit ────────────────────────────────
         existing = get_job_by_video_id(video_id)
         if existing:
-            print(f"  [API] Redis hit — returning existing job for {video_id}")
-            return _job_to_out(existing)
+            missing = _missing_artifacts(video_id, existing)
+            if not missing:
+                print(f"  [API] Redis hit — all artifacts present, returning existing job for {video_id}")
+                return _job_to_out(existing)
+
+            # Stale cache: the record says 'done' but files it references were
+            # deleted from storage/outputs. Returning it would 404 the frontend
+            # forever with nothing ever re-rendering. Regenerate only what's
+            # missing, REUSING surviving checkpoints (crucially the transcript —
+            # re-transcribing costs external API credits).
+            stages = _regeneration_stages(video_id)
+            print(f"  [API] Redis hit but STALE for {video_id} — missing artifacts "
+                  f"{sorted(set(missing))}; re-running stages {stages} "
+                  f"(reusing any surviving download/transcript/clip-selection checkpoints)")
+            # Drop the dead record so a future video-id scan doesn't re-find it.
+            delete_job(existing["job_id"])
+            job_id = str(uuid.uuid4())
+            create_job(job_id, url=payload.url, language=payload.language)
+            if payload.email:
+                update_job(job_id, email=payload.email)
+            process_video.delay(job_id, payload.url, payload.language, known_video_id=video_id)
+            return _job_to_out(get_job(job_id))
 
         # ── 2. Storage hit — recover without pipeline ─────────
         recovered = _recover_from_storage(video_id)
@@ -379,6 +399,67 @@ def download_clip(path: str):
 
 
 # ── Helpers ───────────────────────────────────────────────────
+
+def _missing_artifacts(video_id: str, job: dict) -> list:
+    """Which artifacts a 'done' job record references but are NOT on disk.
+
+    A cache hit is only safe to return if the files it points at still exist.
+    We check the transcript (the editor fetches it to build caption timing) and
+    every clip's captioned output file. Returns a list of tokens describing
+    what's gone (empty list = everything present → safe to return the cache):
+      'transcript'    — the word-timestamp JSON is missing
+      'clips'         — the job record carries no clips at all
+      'clip_outputs'  — at least one clip's captioned_path file is missing
+    """
+    missing = []
+
+    transcript_path = UPLOAD_DIR / f"{video_id}_audio_transcript.json"
+    if not transcript_path.exists():
+        missing.append("transcript")
+
+    clips = job.get("clips", []) or []
+    if not clips:
+        missing.append("clips")
+    else:
+        for c in clips:
+            captioned = c.get("captioned_path") or ""
+            if not captioned or not Path(captioned).exists():
+                missing.append("clip_outputs")
+                break
+
+    return missing
+
+
+def _regeneration_stages(video_id: str) -> list:
+    """Pipeline stages that must re-run to rebuild missing outputs, given which
+    checkpoint files survive on disk. Mirrors process_video's own checkpoint
+    guards so the log reflects what the worker will actually do — the whole
+    point is to NOT re-run expensive stages whose outputs still exist:
+
+      - download     : only if the source .mp4 is gone
+      - transcribe   : only if the transcript JSON is gone (external API credits)
+      - select_clips : if the clips JSON is gone, OR we had to re-transcribe
+                       (a fresh transcript can renumber sentence ids)
+      - cut/crop/caption : always — they're local ffmpeg (no external cost) and
+                       we only reach here because some output file is missing.
+    """
+    transcript_path = UPLOAD_DIR / f"{video_id}_audio_transcript.json"
+    clips_json      = UPLOAD_DIR / f"{video_id}_audio_clips.json"
+    video_file      = UPLOAD_DIR / f"{video_id}.mp4"
+
+    transcript_missing = not transcript_path.exists()
+    clips_missing      = not clips_json.exists()
+
+    stages = []
+    if not video_file.exists():
+        stages.append("download")
+    if transcript_missing:
+        stages.append("transcribe")
+    if transcript_missing or clips_missing:
+        stages.append("select_clips")
+    stages += ["cut", "crop", "caption"]
+    return stages
+
 
 def _recover_from_storage(video_id: str) -> Optional[dict]:
     """

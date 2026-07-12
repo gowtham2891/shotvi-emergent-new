@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { useAppStore } from "@/store/useAppStore";
-import { getCaptionStylePreview } from "@/data/captionStylePreview";
+import { getCaptionStylePreview, getCaptionFontStack } from "@/data/captionStylePreview";
 import { buildCaptionLines, findActiveLine, findActiveWordIndex } from "@/lib/captionLines";
 
 /**
@@ -20,8 +20,6 @@ export const ElementBody = ({ element, canvasH }) => {
       return <ProgressBody element={element} canvasH={canvasH} />;
     case "logo":
       return <LogoBody element={element} canvasH={canvasH} />;
-    case "sticker":
-      return <StickerBody element={element} canvasH={canvasH} />;
     default:
       return null;
   }
@@ -47,6 +45,11 @@ const CaptionBody = ({ element, canvasH }) => {
   const { presetId, font, fontSize, animation, pill } = element.props;
   const preview = getCaptionStylePreview(presetId);
   const isKaraoke = animation === "karaoke";
+  // Font is chosen in the Inspector (one of the three bundled caption fonts),
+  // decoupled from the preset — mirrors the backend, where the style drives
+  // only colors and caption_font selects the family. getCaptionFontStack loads
+  // the SAME @font-face .ttf the backend burns via fontsdir, so preview == export.
+  const fontFamily = getCaptionFontStack(font);
 
   // Mirrors services/caption_renderer.py's group_words_into_lines: chunk
   // into wordsPerLine-word lines (4, or 2 for big-bold), each held on
@@ -93,7 +96,7 @@ const CaptionBody = ({ element, canvasH }) => {
             key={`${gIdx}-${w.text}`}
             className={gIdx === activeWordIdx ? animationClass(animation) : ""}
             style={{
-              fontFamily: preview.fontFamily,
+              fontFamily,
               fontWeight: preview.fontWeight,
               color,
               textShadow: preview.textShadow,
@@ -185,18 +188,6 @@ const LogoBody = ({ element, canvasH }) => {
     </div>
   );
 };
-
-const StickerBody = ({ element, canvasH }) => (
-  <div
-    style={{
-      fontSize: element.props.fontSize * canvasH,
-      filter: "drop-shadow(0 6px 14px rgba(0,0,0,0.45))",
-      lineHeight: 1,
-    }}
-  >
-    {element.props.emoji}
-  </div>
-);
 
 function hexToRgba(hex, alpha = 1) {
   const h = hex.replace("#", "");

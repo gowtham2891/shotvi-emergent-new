@@ -23,6 +23,16 @@ export const CAPTION_STYLES = [
 export const DEFAULT_STYLE_ID = "bold-yellow";
 export const isKnownStyle = (id) => CAPTION_STYLES.some((s) => s.id === id);
 
+// ── Caption fonts ────────────────────────────────────────────────
+// The three bundled Telugu caption fonts the backend resolves deterministically
+// via libass fontsdir (services/fonts.py :: CAPTION_FONTS). Order = dropdown
+// order; the first is the default the backend falls back to when caption_font
+// is omitted, so an untouched default selection must NOT be serialized (keeps
+// default exports byte-identical to before the dropdown existed).
+export const CAPTION_FONTS = ["Noto Sans Telugu", "Ramabhadra", "Mandali"];
+export const DEFAULT_CAPTION_FONT = "Noto Sans Telugu";
+export const isKnownCaptionFont = (name) => CAPTION_FONTS.includes(name);
+
 // Formats supported by FORMAT_CONFIG in api/worker.py. Output is always mp4
 // at fixed 1080-based canvas sizes — resolution/container are NOT selectable.
 export const EXPORT_FORMATS = ["9:16", "1:1", "16:9"];
@@ -40,7 +50,7 @@ const CAPTION_POS_EPS = 1e-3;
 // flows via caption_x/caption_y and the backend burns captions in a separate
 // pass (render_elements ignores non-overlay types anyway; excluding here just
 // keeps the payload clean).
-export const OVERLAY_ELEMENT_TYPES = new Set(["progress", "sticker", "logo", "headline"]);
+export const OVERLAY_ELEMENT_TYPES = new Set(["progress", "logo", "headline"]);
 
 // ── EditDocument → RerenderRequest ───────────────────────────────
 //
@@ -64,6 +74,7 @@ export function buildRerenderRequest(editDoc = {}) {
     cropBox = null, // {x, y, w, h} as 0–1 fractions
     selectedSubject = null,
     transcriptEdits = null, // {wordEdits, mergedGroups, lineSplits}
+    captionFont = null, // one of CAPTION_FONTS; sent as caption_font only when non-default (see below)
     captionX = null, // 0–1 fraction of canvas width (caption center)
     captionY = null, // 0–1 fraction of canvas height (caption center)
     // BUG-001 partial fix — caption Size (0–1 fraction of canvas height, same
@@ -88,6 +99,14 @@ export function buildRerenderRequest(editDoc = {}) {
   };
   if (cropBox) req.crop_box = cropBox;
   if (selectedSubject) req.selected_subject = selectedSubject;
+  // Caption font: serialize ONLY when it's a known caption font other than the
+  // default. The default (Noto Sans Telugu) is what the backend renders when
+  // caption_font is omitted, so leaving it out keeps default exports byte-
+  // identical; an unknown/legacy value (e.g. an old draft's "Outfit") is also
+  // omitted so the backend falls back to its own default rather than crashing.
+  if (isKnownCaptionFont(captionFont) && captionFont !== DEFAULT_CAPTION_FONT) {
+    req.caption_font = captionFont;
+  }
   if (transcriptEdits) req.transcript_edits = transcriptEdits;
   // Send caption center only when moved from default (both coords required by the
   // backend); epsilon stops float-noise from flipping default↔positioned paths.
@@ -117,7 +136,7 @@ export function buildRerenderRequest(editDoc = {}) {
       radius: captionPill.radius,
     };
   }
-  // Serialize the visible overlay elements (progress/sticker/logo/headline) for
+  // Serialize the visible overlay elements (progress/logo/headline) for
   // the backend burn-in pass. Coords stay 0–1 normalized — no pixel math here
   // (the server converts in canvas_coords). Omit the field entirely when there
   // are no visible overlays so a captions-only draft's payload is unchanged

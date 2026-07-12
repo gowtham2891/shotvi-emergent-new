@@ -60,6 +60,14 @@ def set_job_clips(job_id: str, clips: list):
     r.hset(f"job:{job_id}", "clips", json.dumps(clips))
 
 
+def delete_job(job_id: str) -> int:
+    """Remove a job record from Redis. Used to drop a stale 'done' job whose
+    output files were deleted from storage, so a fresh regeneration job takes
+    its place and future video-id scans don't re-find the dead record.
+    Returns the number of keys deleted (0 if it was already gone)."""
+    return get_redis().delete(f"job:{job_id}")
+
+
 def get_job_by_video_id(video_id: str) -> Optional[dict]:
     """
     Scan Redis for an existing *done* job with this video_id.

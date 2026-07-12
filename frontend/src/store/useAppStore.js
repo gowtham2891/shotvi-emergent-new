@@ -34,6 +34,13 @@ const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 let elementIdCounter = 100;
 const nextElementId = (type) => `el_${type}_${++elementIdCounter}`;
 
+// Element types the editor can render/burn. Drafts saved before a type was
+// removed (e.g. the retired `sticker`) may still reference it — filter those
+// out on load so an old draft neither crashes nor renders a ghost element.
+const KNOWN_ELEMENT_TYPES = new Set(["caption", "headline", "progress", "logo"]);
+const sanitizeDraftElements = (elements) =>
+  (elements || []).filter((el) => el && KNOWN_ELEMENT_TYPES.has(el.type));
+
 // JobStatus (backend enum) → dashboard project status keys (STATUS_META)
 const JOB_TO_PROJECT_STATUS = {
   pending: "uploading",
@@ -370,7 +377,9 @@ export const useAppStore = create((set, get) => ({
     try {
       const draft = await loadDraft(jobId, clipId);
       if (draft?.elements?.length) {
-        set({ elements: draft.elements });
+        // Drop elements of retired types (e.g. old `sticker` drafts) so they
+        // never crash the editor or render as invisible ghosts.
+        set({ elements: sanitizeDraftElements(draft.elements) });
       }
       if (draft?.exportSettings) {
         set((s) => ({ exportSettings: { ...s.exportSettings, ...draft.exportSettings } }));
@@ -433,6 +442,11 @@ export const useAppStore = create((set, get) => ({
       elements: s.elements.map((el) => ({ ...el, props: { ...el.props } })),
       exportSettings: { ...s.exportSettings },
       style: caption?.props?.presetId || DEFAULT_STYLE_ID,
+      // Caption font (one of the three bundled Telugu fonts). Null when there is
+      // no caption element so the backend falls back to its default; otherwise a
+      // straight pass-through — buildRerenderRequest omits it when it's the
+      // default, keeping default exports byte-identical.
+      captionFont: caption?.props?.font ?? null,
       captionX: caption ? caption.x : 0.5,
       captionY: caption ? caption.y : 0.82,
       // BUG-001 partial fix: expose the caption's fontSize (0–1 canvas
@@ -494,6 +508,7 @@ export const useAppStore = create((set, get) => ({
       background: s.exportSettings.background,
       bgColor: s.exportSettings.bgColor,
       useAutocrop: s.exportSettings.useAutocrop,
+      captionFont: doc.captionFont,
       captionX: doc.captionX,
       captionY: doc.captionY,
       // BUG-001 partial fix — thread the caption Size + Background Pill.
@@ -791,7 +806,7 @@ function defaultElementForType(type) {
         y: 0.82,
         props: {
           presetId: "bold-yellow",
-          font: "Outfit",
+          font: "Noto Sans Telugu", // one of the three bundled caption fonts; backend default
           fontSize: 0.055, // fraction of canvas height
           animation: "karaoke", // 'none'|'pop'|'fade'|'bounce'|'karaoke'
           pill: {
@@ -841,18 +856,6 @@ function defaultElementForType(type) {
           avatar: "R",
           font: "Manrope",
           fontSize: 0.02,
-        },
-      };
-    case "sticker":
-      return {
-        ...base,
-        type: "sticker",
-        x: 0.78,
-        y: 0.6,
-        rotation: -12,
-        props: {
-          emoji: "🔥",
-          fontSize: 0.13,
         },
       };
     default:

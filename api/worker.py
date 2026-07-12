@@ -42,7 +42,18 @@ BACKGROUND_OPTIONS = ["blur", "black", "white", "color"]
 # ══════════════════════════════════════════════════════════════
 
 @celery_app.task(bind=True, name="process_video")
-def process_video(self, job_id: str, url: str, language: str = "te"):
+def process_video(self, job_id: str, url: str, language: str = "te", known_video_id: str = None):
+    """Full pipeline. Checkpoint-based: each stage's output on disk lets a
+    re-run skip it. This is what makes stale-cache regeneration cheap — when
+    POST /jobs finds a 'done' job whose output files were deleted, it re-runs
+    this task with known_video_id so surviving checkpoints (crucially the
+    transcript, which costs external API credits, and the Gemini clip
+    selection) are REUSED and only the missing local ffmpeg stages re-run.
+
+    known_video_id: when set and the source .mp4 is still on disk, the
+    download+transcribe+select stages are skipped where their outputs survive.
+    None (the normal first-run path) → download derives the id as before.
+    """
     try:
         from services.video_downloader import download_youtube
         from services.transcriber import transcribe_audio, save_transcript
@@ -52,30 +63,64 @@ def process_video(self, job_id: str, url: str, language: str = "te"):
         from services.caption_renderer import render_all_captions
 
         update_job(job_id, status="downloading", progress=5, current_stage="Downloading video")
-        # Local file from POST /jobs/upload — FastAPI and this worker share the
-        # filesystem (both run from the repo root on one machine), so the saved
-        # path resolves here. YouTube URLs never exist as local paths.
-        if Path(url).exists():
+        # ── Download (or reuse a surviving source) ────────────────────────────
+        # Regeneration checkpoint: if the original source .mp4 is still on disk
+        # for known_video_id, skip the (network) download entirely. Re-extract
+        # the audio only if it too was deleted (cheap local ffmpeg) and only
+        # when a later stage will actually need it (transcription).
+        reuse_source = None
+        if known_video_id and (UPLOAD_DIR / f"{known_video_id}.mp4").exists():
+            reuse_source = str(UPLOAD_DIR / f"{known_video_id}.mp4")
+
+        if reuse_source:
+            video_id   = known_video_id
+            video_path = reuse_source
+            audio_path = str(UPLOAD_DIR / f"{video_id}_audio.wav")
+            print(f"  [Resume] Reusing downloaded source for {video_id} — skipping download", flush=True)
+        elif Path(url).exists():
+            # Local file from POST /jobs/upload — FastAPI and this worker share the
+            # filesystem (both run from the repo root on one machine), so the saved
+            # path resolves here. YouTube URLs never exist as local paths.
             from services.video_downloader import handle_upload
             update_job(job_id, current_stage="Preparing upload")
             result = handle_upload(url, filename=Path(url).stem)
+            video_id   = result["video_id"]
+            video_path = result["video_path"]
+            audio_path = result["audio_path"]
         else:
             result = download_youtube(url)
-        video_id   = result["video_id"]
-        video_path = result["video_path"]
-        audio_path = result["audio_path"]
+            video_id   = result["video_id"]
+            video_path = result["video_path"]
+            audio_path = result["audio_path"]
         update_job(job_id, video_id=video_id, progress=15)
 
         update_job(job_id, status="transcribing", progress=20, current_stage="Transcribing audio")
         transcript_path = str(UPLOAD_DIR / f"{video_id}_audio_transcript.json")
+        # Transcription checkpoint: reuse an existing transcript (external API
+        # credits) rather than re-transcribing. did_transcribe drives whether we
+        # must also re-select clips below (a fresh transcript can renumber
+        # sentence ids, invalidating an old clip selection).
+        did_transcribe = False
         if not Path(transcript_path).exists():
+            if not Path(audio_path).exists():
+                from services.video_downloader import extract_audio
+                update_job(job_id, current_stage="Re-extracting audio")
+                extract_audio(video_path, audio_path)
             transcript = transcribe_audio(audio_path, language=language)
             save_transcript(transcript, transcript_path)
+            did_transcribe = True
+        else:
+            print(f"  [Resume] Reusing existing transcript for {video_id} — skipping transcription", flush=True)
         update_job(job_id, progress=40)
 
         update_job(job_id, status="selecting", progress=45, current_stage="Selecting best moments")
         clips_path = str(UPLOAD_DIR / f"{video_id}_audio_clips.json")
-        select_clips(transcript_path)
+        # Clip-selection checkpoint: reuse an existing clip selection (Gemini
+        # credits) UNLESS we just re-transcribed (which can shift sentence ids).
+        if did_transcribe or not Path(clips_path).exists():
+            select_clips(transcript_path)
+        else:
+            print(f"  [Resume] Reusing existing clip selection for {video_id} — skipping selection", flush=True)
         update_job(job_id, progress=60)
 
         update_job(job_id, status="cutting", progress=65, current_stage="Cutting clips")
@@ -169,8 +214,9 @@ def rerender_clip(self, rerender_job_id: str, source_job_id: str, clip_index: in
     - transcript_edits: {mergedGroups, lineSplits, wordEdits} applied before caption render
     - crop_box: {x,y,w,h} fractions applied when crop_mode='manual' regardless of format
     - selected_subject: informational only (face re-tracking on pre-cropped source not implemented)
-    - elements: EditDocument overlay elements (progress bar, logo, headline, sticker) burned
-      in their own pass before captions; None/[] renders exactly as before this existed
+    - elements: EditDocument overlay elements (progress bar, logo, headline) burned
+      in their own pass before captions; None/[] renders exactly as before this existed.
+      Unknown/retired types (e.g. an old draft's sticker) are skipped with a warning.
     - caption_font: bundled Telugu caption font (Noto Sans Telugu default, Ramabhadra/Mandali
       selectable); None → default. Resolved deterministically via fontsdir, not host fonts.
     - caption_font_size (BUG-001 partial): 0-1 fraction of video height; None → the preset

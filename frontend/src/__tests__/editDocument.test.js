@@ -140,11 +140,11 @@ describe("buildRerenderRequest (EditDocument → backend schema)", () => {
     const elements = [
       { id: "c", type: "caption", x: 0.5, y: 0.82, visible: true, props: {} },
       { id: "p", type: "progress", x: 0.5, y: 0.96, visible: true, props: { color: "#7c3aed" } },
-      { id: "s", type: "sticker", x: 0.82, y: 0.2, visible: true, props: { emoji: "🔥" } },
+      { id: "h", type: "headline", x: 0.5, y: 0.14, visible: true, props: { text: "hi", color: "#22ff9c" } },
       { id: "l", type: "logo", x: 0.2, y: 0.1, visible: false, props: {} }, // hidden
     ];
     const req = buildRerenderRequest({ elements });
-    expect(req.elements.map((e) => e.type)).toEqual(["progress", "sticker"]);
+    expect(req.elements.map((e) => e.type)).toEqual(["progress", "headline"]);
     // normalized 0–1 preserved, never pixels
     expect(collectCoordinateViolations({ elements: req.elements })).toEqual([]);
     // pass-through: the serialized element is the original (coords untouched)
@@ -219,5 +219,45 @@ describe("BUG-001 partial fix — caption Size / Pill reach the export payload",
     });
     expect("caption_font_size" in req).toBe(false);
     expect("caption_pill" in req).toBe(false);
+  });
+});
+
+describe("Caption font dropdown — selection reaches the export payload", () => {
+  // The Inspector's Font dropdown offers exactly the three bundled caption
+  // fonts. A non-default pick must serialize as caption_font; the default and
+  // any legacy/unknown value must be OMITTED so the backend renders its own
+  // default (byte-identical to before the dropdown existed). The backend half
+  // (ASS Fontname) is asserted in tests/test_caption_font.py.
+
+  test("a non-default caption font is serialized as caption_font", () => {
+    expect(buildRerenderRequest({ captionFont: "Ramabhadra" }).caption_font).toBe("Ramabhadra");
+    expect(buildRerenderRequest({ captionFont: "Mandali" }).caption_font).toBe("Mandali");
+  });
+
+  test("the default caption font (Noto Sans Telugu) is omitted", () => {
+    // Omitting the default keeps a default export identical to today's payload.
+    expect("caption_font" in buildRerenderRequest({ captionFont: "Noto Sans Telugu" })).toBe(false);
+  });
+
+  test("no selection at all omits caption_font", () => {
+    expect("caption_font" in buildRerenderRequest({})).toBe(false);
+    expect("caption_font" in buildRerenderRequest({ captionFont: null })).toBe(false);
+  });
+
+  test("an unknown/legacy font value is omitted (backend falls back to default)", () => {
+    // Old drafts carried non-caption fonts like "Outfit"; never send those —
+    // the backend would only fall back anyway, and omitting avoids drift.
+    expect("caption_font" in buildRerenderRequest({ captionFont: "Outfit" })).toBe(false);
+  });
+
+  test("getEditDocument exposes the caption element's font as captionFont", () => {
+    const store = useAppStore.getState();
+    const caption = store.getCaptionElement();
+    store.updateElementProps(caption.id, { font: "Mandali" });
+    const doc = useAppStore.getState().getEditDocument();
+    expect(doc.captionFont).toBe("Mandali");
+    // …and it flows through into the rerender payload.
+    const req = buildRerenderRequest({ captionFont: doc.captionFont });
+    expect(req.caption_font).toBe("Mandali");
   });
 });

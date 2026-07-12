@@ -22,7 +22,7 @@ import pytest
 from PIL import Image
 
 from services.canvas_coords import to_pixel_center, to_pixel_size, center_to_topleft
-from services.overlay_renderer import render_elements, render_progress_bar, _ffprobe_duration, STICKER_FILES
+from services.overlay_renderer import render_elements, render_progress_bar, _ffprobe_duration
 
 
 def _ffmpeg_available():
@@ -79,7 +79,6 @@ def test_each_element_type_invisible_is_a_pure_noop():
     # exactly like the progress case above.
     for etype, props in (
         ("logo", {"handle": "@clipforge"}),
-        ("sticker", {"emoji": "🔥"}),
         ("headline", {"text": "hi", "color": "#22ff9c"}),
     ):
         el = {"type": etype, "visible": False, "x": 0.5, "y": 0.5, "props": props}
@@ -96,6 +95,42 @@ def test_unknown_element_type_is_a_pure_noop():
     result = render_elements("some_input.mp4", "unused_output.mp4", [el], 1080, 1920)
     assert result == "some_input.mp4"
     assert not os.path.exists("unused_output.mp4")
+
+
+def test_retired_sticker_payload_is_skipped_not_a_crash():
+    # The sticker element type was removed as a product decision. An old draft
+    # may still carry a visible sticker element; render_elements must skip it
+    # (it is no longer in _PREPARERS) with zero ffmpeg calls, never raise.
+    el = {"type": "sticker", "visible": True, "x": 0.78, "y": 0.6,
+          "props": {"emoji": "🔥", "fontSize": 0.13}}
+    result = render_elements("some_input.mp4", "unused_output.mp4", [el], 1080, 1920)
+    assert result == "some_input.mp4"
+    assert not os.path.exists("unused_output.mp4")
+
+
+def test_retired_sticker_mixed_with_supported_element_only_burns_supported(monkeypatch):
+    # A draft with BOTH a retired sticker and a real (progress) element must
+    # burn only the progress bar — the sticker is filtered out before the
+    # single composite pass, which still runs for the supported layer.
+    import services.overlay_renderer as ovr
+
+    captured = {}
+
+    def fake_composite(input_path, output_path, layers, duration):
+        captured["n_layers"] = len(layers)
+        return output_path
+
+    monkeypatch.setattr(ovr, "_ffprobe_duration", lambda p: 5.0)
+    monkeypatch.setattr(ovr, "_composite_layers", fake_composite)
+
+    elements = [
+        {"type": "sticker", "visible": True, "x": 0.8, "y": 0.6, "props": {"emoji": "🔥"}},
+        {"type": "progress", "visible": True, "x": 0.5, "y": 0.9, "scale": 1, "rotation": 0,
+         "props": {"color": "#7c3aed", "width": 0.8, "height": 0.03}},
+    ]
+    result = ovr.render_elements("in.mp4", "out.mp4", elements, 400, 600)
+    assert result == "out.mp4"
+    assert captured["n_layers"] == 1  # only the progress layer, sticker dropped
 
 
 # ── render_progress_bar — real render-and-verify ─────────────────────────────
@@ -154,98 +189,10 @@ def test_progress_bar_fill_width_matches_elapsed_time():
             )
 
 
-# ── stickers ──────────────────────────────────────────────────────────────────
-
-def test_all_frontend_sticker_choices_have_a_bundled_asset():
-    # Inspector.jsx :: STICKER_CHOICES is the frontend's fixed 8-emoji set —
-    # every one of them must resolve to a real, existing bundled PNG.
-    frontend_choices = ["🔥", "😂", "💯", "👀", "🚀", "❤️", "😱", "🎯"]
-    assets_dir = os.path.join(os.path.dirname(__file__), "..", "services", "assets", "stickers")
-    for emoji in frontend_choices:
-        assert emoji in STICKER_FILES, f"{emoji} has no STICKER_FILES entry"
-        path = os.path.join(assets_dir, STICKER_FILES[emoji])
-        assert os.path.exists(path), f"{emoji} -> {STICKER_FILES[emoji]} missing on disk"
-
-
-@requires_ffmpeg
-def test_unknown_sticker_emoji_is_skipped_not_a_crash():
-    # "sticker" is itself a known/supported type, so render_elements commits
-    # to preparing it — the unmapped-emoji skip happens one level down, in
-    # _prepare_sticker_layer, once it has a real file to probe.
-    with tempfile.TemporaryDirectory(prefix="overlay_test_") as tmp:
-        base = os.path.join(tmp, "base.mp4")
-        subprocess.run(
-            ["ffmpeg", "-y", "-f", "lavfi", "-i", "color=c=gray:s=200x300:d=2",
-             "-c:v", "libx264", "-pix_fmt", "yuv420p", base],
-            capture_output=True, timeout=30,
-        )
-        result = render_elements(base, os.path.join(tmp, "out.mp4"), [
-            {"type": "sticker", "visible": True, "props": {"emoji": "🦄"}},  # not in the fixed set
-        ], 1080, 1920)
-        assert result == base  # no supported layer -> no-op, same as no elements
-
-
-@requires_ffmpeg
-def test_sticker_persists_for_the_whole_clip_not_just_one_frame():
-    # Regression test: -loop 1 (still image input) combined with
-    # overlay's shortest=0 hung indefinitely (no bounded stream to stop
-    # on) during Stage 2 development, and separately, an earlier variant
-    # would drop the overlay after its first frame. Both are wrong —
-    # a static overlay must render at start, middle, AND end.
-    with tempfile.TemporaryDirectory(prefix="overlay_test_") as tmp:
-        base = os.path.join(tmp, "base.mp4")
-        out = os.path.join(tmp, "out.mp4")
-        duration = 6.0
-        video_w, video_h = 300, 400
-
-        r = subprocess.run(
-            ["ffmpeg", "-y", "-f", "lavfi",
-             "-i", f"color=c=gray:s={video_w}x{video_h}:d={duration}",
-             "-c:v", "libx264", "-pix_fmt", "yuv420p", base],
-            capture_output=True, text=True, timeout=60,
-        )
-        assert r.returncode == 0, r.stderr
-
-        element = {
-            "type": "sticker", "id": "s1", "x": 0.5, "y": 0.5,
-            "scale": 1, "rotation": 0, "visible": True,
-            "props": {"emoji": "🔥", "fontSize": 0.3},
-        }
-        render_elements(base, out, [element], video_w, video_h)
-        assert os.path.exists(out)
-
-        out_duration = _ffprobe_duration(out)
-        assert abs(out_duration - duration) < 0.2, (
-            f"output duration {out_duration} drifted from source {duration}"
-        )
-
-        center = to_pixel_center(0.5, 0.5, video_w, video_h)
-        half = 40
-
-        def has_non_gray_pixel(t):
-            frame_png = os.path.join(tmp, f"stk_{t}.png")
-            subprocess.run(
-                ["ffmpeg", "-y", "-ss", str(t), "-i", out,
-                 "-frames:v", "1", "-update", "1", frame_png],
-                capture_output=True, timeout=30,
-            )
-            img = Image.open(frame_png).convert("RGB")
-            px = img.load()
-            for x in range(center.cx - half, center.cx + half, 8):
-                for y in range(center.cy - half, center.cy + half, 8):
-                    r_, g_, b_ = px[x, y]
-                    if not (abs(r_ - g_) < 15 and abs(g_ - b_) < 15):
-                        return True
-            return False
-
-        for t in (0.2, duration / 2, duration - 0.3):
-            assert has_non_gray_pixel(t), f"sticker missing at t={t} (gray-only region)"
-
-
 # ── multiple elements together — single-pass architecture ───────────────────
 
 @requires_ffmpeg
-def test_progress_bar_and_stickers_together_stay_in_sync_and_in_bounds():
+def test_progress_bar_and_logo_together_stay_in_sync_and_in_bounds():
     with tempfile.TemporaryDirectory(prefix="overlay_test_") as tmp:
         base = os.path.join(tmp, "base.mp4")
         out = os.path.join(tmp, "out.mp4")
@@ -263,8 +210,8 @@ def test_progress_bar_and_stickers_together_stay_in_sync_and_in_bounds():
         elements = [
             {"type": "progress", "id": "p1", "x": 0.5, "y": 0.9, "scale": 1, "rotation": 0,
              "visible": True, "props": {"color": "#7c3aed", "width": 0.8, "height": 0.03}},
-            {"type": "sticker", "id": "s1", "x": 0.2, "y": 0.3, "scale": 1, "rotation": 0,
-             "visible": True, "props": {"emoji": "🎯", "fontSize": 0.15}},
+            {"type": "logo", "id": "l1", "x": 0.25, "y": 0.15, "scale": 1, "rotation": 0,
+             "visible": True, "props": {"text": "@test", "avatar": "T", "font": "Manrope", "fontSize": 0.04}},
         ]
         render_elements(base, out, elements, video_w, video_h)
         assert os.path.exists(out)
@@ -292,7 +239,7 @@ def test_progress_bar_and_stickers_together_stay_in_sync_and_in_bounds():
             if all(abs(a - b) <= 40 for a, b in zip(px[x, y], fill_rgb)):
                 rightmost = x - bar_ox + 1
         frac = rightmost / bar_w
-        # Progress bar still animates correctly with a sticker layer also
+        # Progress bar still animates correctly with a logo layer also
         # present in the same single composite pass.
         assert abs(frac - 0.5) <= 0.1, f"mid-clip fill fraction {frac:.2f}, expected ~0.5"
 
