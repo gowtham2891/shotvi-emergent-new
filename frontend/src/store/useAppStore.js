@@ -532,21 +532,30 @@ export const useAppStore = create((set, get) => ({
     set((s) => {
       if (job.status !== "done" || !s.exportTargetClipId) return patch;
 
-      // Root cause of "preview shows stale video": the clip's previewUrl/
-      // videoUrl were computed once from the ORIGINAL pipeline ClipOut and
-      // never refreshed after a rerender — the export page and editor
-      // canvas both read that same clip object, so neither ever saw the
-      // new file. Refresh both here so every consumer picks it up.
+      // Root cause of "preview shows stale video": the clip's previewUrl was
+      // computed once from the ORIGINAL pipeline ClipOut and never refreshed
+      // after a rerender — the export page read that same clip object, so it
+      // never saw the newly rendered file. Refresh previewUrl here so every
+      // consumer picks it up.
       //
       // Also cache-busted: the backend derives rerender output filenames
       // deterministically from export settings (format/background/style),
       // so re-exporting with identical settings overwrites the same path —
       // same URL, browser serves the cached old video without this.
+      //
+      // Editor canvas bug fix (return-from-export "double sticker"): the
+      // editor's `videoUrl` MUST stay pointed at the pipeline's ORIGINAL
+      // raw 9:16 crop (no overlays, no captions burned in). The rerender's
+      // `job.vertical_path` is the POST-overlay pre-caption composite, so
+      // refreshing `videoUrl` to it meant the editor canvas showed the
+      // sticker/progress-bar/logo TWICE — once burned into the pixels of
+      // the video the browser played, once as the live overlay element on
+      // top. Only refresh previewUrl (used by the Export page's captioned
+      // preview) + captionedPath/verticalPath (path bookkeeping for the
+      // download endpoint); videoUrl stays immutable across rerenders.
       const bust = job.job_id;
       const newPreviewUrl = outputFileUrl(job.captioned_path || job.vertical_path || null);
-      const newVideoUrl = outputFileUrl(job.vertical_path || job.captioned_path || null);
       const bustedPreview = newPreviewUrl ? `${newPreviewUrl}?v=${bust}` : undefined;
-      const bustedVideo = newVideoUrl ? `${newVideoUrl}?v=${bust}` : undefined;
 
       const refreshClip = (c) =>
         c.id === s.exportTargetClipId
@@ -555,7 +564,7 @@ export const useAppStore = create((set, get) => ({
               captionedPath: job.captioned_path || c.captionedPath,
               verticalPath: job.vertical_path || c.verticalPath,
               previewUrl: bustedPreview || c.previewUrl,
-              videoUrl: bustedVideo || c.videoUrl,
+              // videoUrl intentionally NOT refreshed — see comment above.
             }
           : c;
 
