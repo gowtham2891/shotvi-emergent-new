@@ -1,0 +1,15 @@
+{
+  "summary": "Frontend-only verification of double-sticker bug fix in useAppStore.applyExportUpdate. Ran full Jest suite: 88 passed / 0 failed across 8 suites. exportPreviewRefresh.test.js (7 sub-cases including the regression gate 'videoUrl stays pointed at the pipeline's ORIGINAL raw vertical after rerender') and progressRotationLock.test.js (3 tests) all pass. Backend tests skipped per request (no backend code touched).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": ["/app/frontend/src/__tests__/exportPreviewRefresh.test.js", "/app/frontend/src/__tests__/progressRotationLock.test.js"],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (skipped)", "frontend": "100% (88/88)"},
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Bug fix for double-sticker after export verified via Jest. applyExportUpdate no longer refreshes videoUrl (only previewUrl gets updated + cache-busted). Regression gate is in exportPreviewRefresh.test.js. Progress bar animation confirmed correct by static reading of services/overlay_renderer.py:_prepare_progress_layer (no code change was needed).",
+  "rca of the issue": "Root cause: applyExportUpdate was rewriting currentClip.videoUrl to job.vertical_path (a post-overlay composite with sticker/progress/logo baked into pixels). CanvasArea.jsx uses currentClip.videoUrl as <video> src, so on return-to-editor it loaded burned pixels AND rendered live overlays on top => double sticker. Fix: stop refreshing videoUrl in applyExportUpdate; keep only previewUrl (used by Export page) refreshed with cache-bust. videoUrl stays pinned to pipeline's original raw crop from clips.js mapping."
+}
