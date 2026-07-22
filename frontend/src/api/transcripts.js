@@ -1,5 +1,6 @@
 import axios from "axios";
 import { client, toApiError, outputFileUrl, pathBasename } from "@/api/client";
+import { wordIdFromRef } from "@/lib/transcriptEdits";
 
 // ── Fetchers ─────────────────────────────────────────────────────
 
@@ -36,20 +37,41 @@ export async function getSegmentSidecar(verticalPath) {
 // tokenized, or re-segmented. Backend word boundaries are authoritative.
 
 // caption_renderer.get_words_for_clip: words overlapping [clipStart, clipEnd],
-// clamped and shifted to clip-local time.
+// clamped and shifted to clip-local time. Each word carries its GLOBAL
+// transcript ref (and the id derived from it) — the address transcript edits
+// use on the wire (apply_transcript_edits.py). The ref must be captured here,
+// before the empty-text filter below, because dropping empties means a word's
+// clip-local array position no longer matches its global index.
 export function getWordsForRange(transcript, clipStart, clipEnd) {
-  let rawWords = transcript?.word_timestamps || [];
+  let rawWords = (transcript?.word_timestamps || []).map((w, index) => ({
+    w,
+    ref: { type: "flat", index },
+  }));
   if (!rawWords.length) {
     // Whisper-format fallback: words nested inside segments
-    rawWords = (transcript?.segments || []).flatMap((s) => s.words || []);
+    rawWords = (transcript?.segments || []).flatMap((s, segIndex) =>
+      (s.words || []).map((w, wordIndex) => ({
+        w,
+        ref: { type: "segment", segIndex, wordIndex },
+      }))
+    );
   }
   const words = [];
-  for (const w of rawWords) {
+  for (const { w, ref } of rawWords) {
     if (w.end > clipStart && w.start < clipEnd) {
       const text = (w.word ?? w.text ?? "").trim();
       if (!text) continue;
+      // Tanglish sibling of the word text (Telugu ⇄ Tanglish toggle). The
+      // backend serves word_tanglish on every transcript (derived at
+      // transcribe time, or backfilled at serve time for old clips); null
+      // only if the backfill itself failed — the display resolver then
+      // falls back to the Telugu text rather than showing nothing.
+      const tanglish = (w.word_tanglish ?? "").trim();
       words.push({
+        id: wordIdFromRef(ref),
+        ref,
         text,
+        text_tanglish: tanglish || null,
         start: round3(Math.max(w.start, clipStart) - clipStart),
         end: round3(Math.min(w.end, clipEnd) - clipStart),
       });
@@ -73,7 +95,9 @@ export function getClipWords(transcript, clip) {
     const sStart = sentById.get(Number(seg.start_sent_id))?.start ?? 0;
     const sEnd = sentById.get(Number(seg.end_sent_id))?.end ?? 0;
     for (const w of getWordsForRange(transcript, sStart, sEnd)) {
-      all.push({ text: w.text, start: round3(outputOffset + w.start), end: round3(outputOffset + w.end) });
+      // Spread keeps id/ref intact: the global address survives the stacking,
+      // even though the word's output-timeline position has moved.
+      all.push({ ...w, start: round3(outputOffset + w.start), end: round3(outputOffset + w.end) });
     }
     outputOffset += sEnd - sStart;
   }

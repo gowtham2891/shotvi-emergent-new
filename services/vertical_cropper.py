@@ -5,6 +5,7 @@ single FFmpeg pass with face-aware centre crop.
 """
 
 import cv2
+import json
 import os
 import sys
 import subprocess
@@ -147,15 +148,23 @@ def calculate_crop_x(video_width: int, video_height: int, face_positions: list) 
 # Main crop function
 # ──────────────────────────────────────────────────────────────────────────────
 
-def crop_to_vertical(input_path: str, output_path: str, use_blur_bg: bool = False) -> bool:
-    """Crop a horizontal clip to 9:16 vertical in a single FFmpeg pass."""
+def crop_to_vertical(input_path: str, output_path: str, use_blur_bg: bool = False):
+    """Crop a horizontal clip to 9:16 vertical in a single FFmpeg pass.
+
+    Returns the crop expressed as a fractional window over the SOURCE frame
+    ({x, y, w, h}, each 0–1) on success, or None on failure. Sprint 4: this
+    window is persisted as the clip's default_crop_box so the editor can
+    reproduce the exact AI framing over the 16:9 master. Truthiness matches
+    the old bool return (dict ⇔ True, None ⇔ False).
+    """
     vid_w, vid_h = get_video_dimensions(input_path)
     print(f"  Source: {vid_w}x{vid_h}")
 
     if vid_h >= vid_w:
         print("  ⏭ Already vertical — copying as-is")
         shutil.copy2(input_path, output_path)
-        return True
+        # No spatial crop happened: the "window" is the whole frame.
+        return {"x": 0.0, "y": 0.0, "w": 1.0, "h": 1.0}
 
     frames = sample_frames(input_path)
     print(f"  Sampled {len(frames)} frames")
@@ -187,11 +196,16 @@ def crop_to_vertical(input_path: str, output_path: str, use_blur_bg: bool = Fals
         )
         if result.returncode != 0:
             print(f"  ✗ FFmpeg error: {result.stderr[-300:]}")
-            return False
-        return True
+            return None
+        return {
+            "x": crop_x / vid_w,
+            "y": 0.0,
+            "w": crop_width / vid_w,
+            "h": 1.0,
+        }
     except subprocess.TimeoutExpired:
         print("  ✗ FFmpeg timed out")
-        return False
+        return None
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -227,11 +241,22 @@ def crop_all_clips(input_dir: str, output_dir: str = None, video_id: str = None)
         output_path = os.path.join(output_dir, output_name).replace("\\", "/")
 
         print(f"🎬 [{i}/{len(clips)}] {clip}")
-        success = crop_to_vertical(input_path, output_path)
+        crop_box = crop_to_vertical(input_path, output_path)
 
-        if success:
+        if crop_box:
             size_mb = os.path.getsize(output_path) / (1024 * 1024)
             print(f"  ✓ Saved: {output_path} ({size_mb:.1f} MB)\n")
+            # Sidecar: the AI framing as a fractional window over the 16:9
+            # master (default_crop_box). Written next to the vertical so the
+            # worker/rescan paths can adopt it, and so it survives a Redis
+            # flush the same way the media files do. Cleaned up and
+            # regenerated together with the vertical on pipeline re-runs.
+            sidecar_path = output_path[: -len(".mp4")] + ".cropbox.json"
+            try:
+                with open(sidecar_path, "w", encoding="utf-8") as f:
+                    json.dump(crop_box, f)
+            except OSError as e:
+                print(f"  ⚠ Could not write crop sidecar (non-fatal): {e}")
             results.append(output_path)
         else:
             print(f"  ✗ Failed: {clip}\n")

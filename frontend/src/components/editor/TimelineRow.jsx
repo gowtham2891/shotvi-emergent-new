@@ -1,13 +1,16 @@
-import React from "react";
+import React, { useRef } from "react";
 import {
   Play,
   Pause,
-  Scissors,
   Rewind,
   FastForward,
+  Scissors,
 } from "lucide-react";
 import { useAppStore } from "@/store/useAppStore";
 import { EDITOR } from "@/constants/testIds";
+import EditableTranscript from "@/components/editor/EditableTranscript";
+
+const clamp01 = (v) => Math.max(0, Math.min(1, v));
 
 const formatTime = (t) => {
   const m = Math.floor(t / 60)
@@ -29,15 +32,48 @@ export const TimelineRow = () => {
   const isPlaying = useAppStore((s) => s.isPlaying);
   const togglePlay = useAppStore((s) => s.togglePlay);
   const seek = useAppStore((s) => s.seek);
-  const transcript = useAppStore((s) => s.transcript);
   const transcriptStatus = useAppStore((s) => s.transcriptStatus);
   const transcriptError = useAppStore((s) => s.transcriptError);
   const transcriptWarning = useAppStore((s) => s.transcriptWarning);
   const retryTranscript = useAppStore((s) => s.retryTranscript);
+  const trimStart = useAppStore((s) => s.exportSettings.trimStart);
+  const trimEnd = useAppStore((s) => s.exportSettings.trimEnd);
+  const resetTrim = useAppStore((s) => s.resetTrim);
 
-  const activeIdx = transcript.findIndex(
-    (w) => currentTime >= w.start && currentTime < w.end
-  );
+  const barRef = useRef(null);
+
+  // Effective trim window (trimEnd -1 sentinel → clip end) — same math as
+  // the store's getTrimBounds, kept local for render.
+  const effStart = duration ? Math.min(Math.max(trimStart || 0, 0), duration) : 0;
+  const effEnd = duration ? (trimEnd > 0 ? Math.min(trimEnd, duration) : duration) : 0;
+  const trimmed = effStart > 0 || (duration > 0 && effEnd < duration);
+  const startPct = duration ? (effStart / duration) * 100 : 0;
+  const endPct = duration ? (effEnd / duration) * 100 : 100;
+
+  // Drag a trim handle: pointer x → clip time → store (clamped there). The
+  // whole drag coalesces into ONE undo frame; pointerup closes the gesture.
+  const startTrimDrag = (which) => (e) => {
+    if (!duration) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const rect = barRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const move = (ev) => {
+      const t = clamp01((ev.clientX - rect.left) / rect.width) * duration;
+      const s = useAppStore.getState();
+      const { start, end } = s.getTrimBounds();
+      if (which === "start") s.setTrimRange(t, end);
+      else s.setTrimRange(start, t);
+    };
+    const up = () => {
+      useAppStore.getState().endHistoryCoalescing();
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+    move(e); // apply the grab position immediately
+  };
 
   const playheadPct = Math.max(
     0,
@@ -74,13 +110,6 @@ export const TimelineRow = () => {
           >
             <FastForward size={14} />
           </button>
-          <div className="h-4 w-px bg-[#2a2a35] mx-2" />
-          <button
-            data-testid={EDITOR.splitBtn}
-            className="inline-flex items-center gap-1.5 text-xs text-[#a1a1aa] hover:text-white bg-[#111116] border border-[#2a2a35] hover:border-[#7c3aed]/50 px-2.5 py-1.5 rounded-md transition-colors"
-          >
-            <Scissors size={12} /> Split
-          </button>
         </div>
 
         <div className="font-mono text-xs text-[#a1a1aa]">
@@ -101,9 +130,9 @@ export const TimelineRow = () => {
         </div>
       </div>
 
-      {/* Waveform / playhead scrubber */}
+      {/* Waveform / playhead scrubber + trim handles */}
       <div className="relative h-12 border-b border-[#1c1c24] px-4 flex items-center">
-        <div className="relative flex-1 h-8 bg-[#111116] rounded overflow-hidden">
+        <div ref={barRef} className="relative flex-1 h-8 bg-[#111116] rounded overflow-hidden">
           <div className="absolute inset-0 flex items-center gap-[2px] px-1">
             {Array.from({ length: 120 }).map((_, i) => {
               const h =
@@ -138,17 +167,84 @@ export const TimelineRow = () => {
               seek(x * duration);
             }}
           />
+
+          {/* Trimmed-out regions (excluded from playback + export) */}
+          {startPct > 0 && (
+            <div
+              className="absolute top-0 bottom-0 left-0 bg-black/60 pointer-events-none z-10"
+              style={{ width: `${startPct}%` }}
+            />
+          )}
+          {endPct < 100 && (
+            <div
+              className="absolute top-0 bottom-0 right-0 bg-black/60 pointer-events-none z-10"
+              style={{ width: `${100 - endPct}%` }}
+            />
+          )}
+
+          {/* Trim handles — drag to contract the clip's start/end. The
+              backend re-cuts the clip's own file (trim_start/trim_end in
+              api/renders.js), so handles only move inward from the bounds. */}
+          {duration > 0 && (
+            <>
+              <div
+                data-testid={EDITOR.trimStartHandle}
+                onPointerDown={startTrimDrag("start")}
+                title="Drag to trim the clip start"
+                className="absolute top-0 bottom-0 w-2 -ml-1 z-20 cursor-ew-resize group"
+                style={{ left: `${startPct}%` }}
+              >
+                <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-1 rounded bg-[#22ff9c] group-hover:bg-white transition-colors" />
+              </div>
+              <div
+                data-testid={EDITOR.trimEndHandle}
+                onPointerDown={startTrimDrag("end")}
+                title="Drag to trim the clip end"
+                className="absolute top-0 bottom-0 w-2 -ml-1 z-20 cursor-ew-resize group"
+                style={{ left: `${endPct}%` }}
+              >
+                <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-1 rounded bg-[#22ff9c] group-hover:bg-white transition-colors" />
+              </div>
+            </>
+          )}
         </div>
       </div>
 
-      {/* Word-level track */}
-      <div className="px-4 py-3 min-h-[76px] max-h-[100px] overflow-y-auto">
+      {/* Trim readout — only when a trim is active */}
+      {trimmed && (
+        <div className="flex items-center gap-2 px-4 py-1.5 border-b border-[#1c1c24] text-[11px] text-[#9a9aa6]">
+          <Scissors size={11} className="text-[#22ff9c]" />
+          <span>
+            Trimmed: <span className="font-mono text-white">{formatTime(effStart)}</span>
+            {" – "}
+            <span className="font-mono text-white">{formatTime(effEnd)}</span>
+            {" · exports "}
+            <span className="font-mono text-white">{(effEnd - effStart).toFixed(1)}s</span>
+          </span>
+          <button
+            data-testid={EDITOR.trimReset}
+            onClick={resetTrim}
+            className="ml-auto text-[10px] font-semibold text-[#c4b5fd] hover:text-white transition-colors"
+          >
+            Reset trim
+          </button>
+        </div>
+      )}
+
+      {/* Editable transcript (caption lines = preview/export grouping) */}
+      <div className="px-4 py-3 min-h-[76px] max-h-[132px] overflow-y-auto">
         <div className="flex items-center justify-between mb-2">
           <p className="text-[10px] uppercase tracking-[0.22em] text-[#5a5a66]">
-            Transcript · Word-level
+            Transcript · Editable
           </p>
           <span className="text-[10px] text-[#71717a]">
-            Click a word to jump
+            <kbd className="px-1 py-0.5 rounded bg-[#111116] border border-[#2a2a35] font-mono text-[9px] mr-1">Enter</kbd>
+            split
+            <span className="mx-1.5 text-[#3a3a44]">·</span>
+            <kbd className="px-1 py-0.5 rounded bg-[#111116] border border-[#2a2a35] font-mono text-[9px] mr-1">⌫</kbd>
+            merge
+            <span className="mx-1.5 text-[#3a3a44]">·</span>
+            type to fix
           </span>
         </div>
         {transcriptStatus === "loading" && (
@@ -170,31 +266,7 @@ export const TimelineRow = () => {
             {transcriptWarning}
           </div>
         )}
-        <div className="flex flex-wrap gap-1">
-          {transcript.map((w, i) => {
-            const isActive = i === activeIdx;
-            const isPast = i < activeIdx;
-            return (
-              <button
-                key={i}
-                data-testid={EDITOR.timelineWord(i)}
-                onClick={() => seek(w.start + 0.02)}
-                className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium transition-all border ${
-                  isActive
-                    ? "bg-[#7c3aed] text-white border-[#7c3aed] scale-110 shadow-[0_0_12px_rgba(124,58,237,0.6)]"
-                    : isPast
-                      ? "bg-[#1a1a24] text-[#a1a1aa] border-[#2a2a35] hover:border-[#7c3aed]/40"
-                      : "bg-[#111116] text-[#71717a] border-[#2a2a35] hover:text-white hover:border-[#7c3aed]/40"
-                }`}
-              >
-                <span className="font-mono text-[9px] mr-1 opacity-60">
-                  {w.start.toFixed(1)}s
-                </span>
-                {w.text}
-              </button>
-            );
-          })}
-        </div>
+        {transcriptStatus === "ready" && <EditableTranscript />}
       </div>
     </div>
   );

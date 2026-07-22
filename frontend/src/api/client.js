@@ -1,4 +1,5 @@
 import axios from "axios";
+import { supabase, AUTH_ENABLED, getCachedSession } from "@/lib/supabaseClient";
 
 // Base URL for the Shotvi FastAPI backend. Override via frontend .env —
 // never hardcode deployment URLs here.
@@ -14,6 +15,68 @@ export const client = axios.create({
   baseURL: API_BASE_URL,
   timeout: 30_000,
 });
+
+// ── Auth wiring ──────────────────────────────────────────────────
+// Every backend call carries the Supabase access token. The synchronous
+// session cache (lib/supabaseClient.js) is preferred — right after SIGNED_IN,
+// getSession() can race supabase-js's internal auth lock and resolve null,
+// which used to send login-triggered requests out bare. getSession() remains
+// the fallback for a cold cache. supabase-js owns refresh. In dev mode (no
+// Supabase env) requests go out bare and the backend's DEV_MODE accepts them.
+const freshestSession = async () => {
+  const cached = getCachedSession();
+  if (cached) return cached;
+  const { data } = await supabase.auth.getSession();
+  return data?.session || null;
+};
+
+// A session the auth client considers live: has a token and is not within
+// 5s of its expiry (skew margin). Exported for tests.
+export const isSessionUsable = (session, nowMs = Date.now()) =>
+  Boolean(session?.access_token) &&
+  (!session.expires_at || session.expires_at * 1000 > nowMs + 5000);
+
+client.interceptors.request.use(async (config) => {
+  if (AUTH_ENABLED) {
+    const session = await freshestSession();
+    if (session?.access_token) {
+      config.headers.Authorization = `Bearer ${session.access_token}`;
+    }
+  }
+  return config;
+});
+
+// 401 handling. Genuinely dead session (refresh exhausted or revoked) →
+// trigger re-auth instead of leaving a silently dead app. But a 401 is NOT
+// by itself proof of a dead session: a request racing a just-created session
+// (post-login) may simply have been sent before the token was attached. So:
+//   - a usable session exists and this request hasn't been retried
+//       → retry ONCE with the fresh token attached; no logout.
+//   - no session, session locally expired, or the retry ALSO came back 401
+//     (token the auth client thinks is live, rejected by the backend —
+//     revoked server-side) → invoke the unauthorized handler as before.
+// The handler is registered by the auth store (clears state → route guard
+// shows the auth screen); default is a no-op so tests/dev mode are unaffected.
+let onUnauthorized = null;
+export const setUnauthorizedHandler = (fn) => {
+  onUnauthorized = fn;
+};
+
+client.interceptors.response.use(
+  (res) => res,
+  async (err) => {
+    if (AUTH_ENABLED && err?.response?.status === 401) {
+      const session = await freshestSession();
+      if (isSessionUsable(session) && err.config && !err.config._authRetried) {
+        const cfg = { ...err.config, _authRetried: true };
+        cfg.headers = { ...(cfg.headers || {}), Authorization: `Bearer ${session.access_token}` };
+        return client.request(cfg);
+      }
+      if (typeof onUnauthorized === "function") onUnauthorized();
+    }
+    return Promise.reject(err);
+  }
+);
 
 export class ApiError extends Error {
   constructor(message, { status = null, detail = null, cause = null, retryable = false } = {}) {

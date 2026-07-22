@@ -36,10 +36,62 @@ class MetadataRequest(BaseModel):
     transcript_text: str
 
 
+# Phonetic-typing support for the editable transcript (frontend
+# api/transliterate.js adapter). Latin token in, Telugu candidates out.
+class TransliterateRequest(BaseModel):
+    text: str
+    lang: str = "te"
+
+
+class TransliterateResponse(BaseModel):
+    suggestions: List[str] = []
+
+
+# Telugu→Tanglish word derivation for the caption toggle's edit seam: when a
+# word-fix commits new Telugu text, the frontend re-derives its Tanglish here
+# (deterministic services/tanglish.py — NOT the IndicXlit stub above, which is
+# the reverse direction). Order-preserving: tanglish[i] romanizes words[i].
+class TanglishRequest(BaseModel):
+    words: List[str] = []
+
+
+class TanglishResponse(BaseModel):
+    tanglish: List[str] = []
+
+
 class TranscriptEdits(BaseModel):
     wordEdits:    List[Any] = []   # [{ref:{type,index|segIndex+wordIndex}, word, start, end}]
     mergedGroups: List[int] = []   # lineIdx values where adjacent lines are merged
     lineSplits:   List[int] = []   # rawIndex values where forced line breaks occur
+    # Line-level re-alignments (Descript-style line edit with changed word
+    # count). Each entry replaces ONE caption line's words with freshly
+    # aligned ones INSIDE the line's fixed span: {startIdx, endIdx (raw index
+    # range of the ORIGINAL words the line covered — same index space as
+    # lineSplits), words: [{word, start, end, word_tanglish}], approximate}.
+    # Applied AFTER line grouping (apply_line_realignments), so an entry is
+    # inert unless the grouping still yields a line spanning exactly that
+    # range — grouping-changed lines safely render their original words.
+    lineRealignments: List[Any] = []
+
+
+# POST /realign-line (line-level caption editing): the line's fixed span +
+# the user's new word list in; per-word timestamps within that span out.
+class RealignLineRequest(BaseModel):
+    line_start: float          # clip-relative seconds — FIXED line span start
+    line_end:   float          # clip-relative seconds — FIXED line span end
+    words:      List[str]      # new Telugu word list (text authority)
+
+
+class RealignedWord(BaseModel):
+    word:          str
+    start:         float       # clip-relative, within [line_start, line_end]
+    end:           float
+    word_tanglish: Optional[str] = None  # deterministic services/tanglish.py derivation
+
+
+class RealignLineResponse(BaseModel):
+    words:       List[RealignedWord]
+    approximate: bool = False  # True → even-distribution fallback timing was used
 
 
 class RerenderRequest(BaseModel):
@@ -69,6 +121,12 @@ class RerenderRequest(BaseModel):
     caption_font_size: Optional[float]           = None  # 0–1 fraction of video height (same units the preview scales by)
     caption_pill:      Optional[dict]            = None  # {enabled, color: '#rrggbb', opacity: 0–1, padding, radius} — None disables the pill
 
+    # Telugu ⇄ Tanglish caption toggle: which script the burn renders.
+    # 'telugu' (default, omitted by the frontend → byte-identical old payloads)
+    # or 'tanglish' (captions render word_tanglish through the same ASS path —
+    # same fonts, same k-values, same \an5\pos; timestamps untouched).
+    caption_script:    str                       = "telugu"
+
     @field_validator("bg_color")
     @classmethod
     def _bg_color_must_be_hex_triplet(cls, v: str) -> str:
@@ -79,6 +137,32 @@ class RerenderRequest(BaseModel):
                 "got: %r" % (v,)
             )
         return v
+
+
+# ── Billing (PHASE 2 BUILD 2) ───────────────────────────────────────────────
+
+class PlanInfo(BaseModel):
+    key:           str        # 'studio'
+    name:          str        # 'Studio Plan'
+    price_display: str        # '₹499/mo' (display placeholder; real price = Razorpay Plan)
+    interval:      str        # 'monthly'
+
+
+class BillingStatusOut(BaseModel):
+    """What the frontend reads to render plan state and decide (in a future
+    build) whether a paid feature is unlocked — `plan == 'studio'`."""
+    plan:                str            # 'free' | 'studio'
+    subscription_status: str = ""       # '' | 'created' | 'active' | 'cancelled' | 'halted' | ...
+    subscription_id:     str = ""
+    configured:          bool = False   # False → Razorpay env absent; UI shows a "not configured" state
+    plan_info:           Optional[PlanInfo] = None  # the paid plan on offer (price/name), when configured
+
+
+class SubscriptionCreateOut(BaseModel):
+    """Everything Razorpay Checkout.js needs to open the payment modal."""
+    subscription_id: str
+    key_id:          str        # public Razorpay key id
+    plan:            PlanInfo
 
 
 class ClipOut(BaseModel):
@@ -97,6 +181,11 @@ class ClipOut(BaseModel):
     vertical_path:    Optional[str] = None
     captioned_path:   Optional[str] = None
     thumbnail_path:   Optional[str] = None
+    # Sprint 4: the AI face-crop as a fractional window {x,y,w,h} (0–1) over
+    # the 16:9 master (raw_path). The editor initializes its crop window from
+    # this; None for pre-Sprint-4 jobs (frontend falls back to a centered
+    # default). The 9:16 vertical_path stays byte-identical to this window.
+    default_crop_box: Optional[dict] = None
 
 
 class JobOut(BaseModel):

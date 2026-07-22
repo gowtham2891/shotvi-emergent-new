@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Type,
-  Music2,
   Download,
   Eye,
   EyeOff,
@@ -13,22 +12,26 @@ import {
   MessageSquare,
   BarChart3,
   AtSign,
-  Play,
+  Bookmark,
+  Image as ImageIcon,
 } from "lucide-react";
 import { useAppStore } from "@/store/useAppStore";
-import { MUSIC_LIBRARY } from "@/data/mockData";
 // Caption presets mirror the backend's caption style ids (STYLES in
 // services/caption_renderer.py) so exports always burn the selected style.
 // CAPTION_FONTS are the three bundled Telugu caption fonts the backend
 // resolves deterministically via fontsdir (services/fonts.py :: CAPTION_FONTS).
-import { CAPTION_STYLES, CAPTION_FONTS } from "@/api/renders";
+import {
+  CAPTION_STYLES,
+  CAPTION_FONTS,
+  EXPORT_FORMATS,
+  BACKGROUND_OPTIONS,
+} from "@/api/renders";
 import { getCaptionFontStack } from "@/data/captionStylePreview";
 import { getCaptionStylePreview } from "@/data/captionStylePreview";
 import { EDITOR } from "@/constants/testIds";
 
 const TABS = [
   { key: "style", label: "Style", icon: Type, testId: EDITOR.tabStyle },
-  { key: "music", label: "Music", icon: Music2, testId: EDITOR.tabMusic },
   { key: "export", label: "Export", icon: Download, testId: EDITOR.tabExport },
 ];
 
@@ -37,6 +40,7 @@ const TYPE_ICONS = {
   headline: MessageSquare,
   progress: BarChart3,
   logo: AtSign,
+  image: ImageIcon,
 };
 
 const ANIMATIONS = [
@@ -55,10 +59,11 @@ const POSITION_PRESETS = [
 ];
 
 /**
- * Inspector — right panel. Style / Music / Export tabs.
+ * Inspector — right panel. Style / Export tabs.
+ * `defaultTab` only sets the initial tab (used by tests and deep links).
  */
-export const Inspector = () => {
-  const [tab, setTab] = useState("style");
+export const Inspector = ({ defaultTab = "style" }) => {
+  const [tab, setTab] = useState(defaultTab);
 
   return (
     <aside className="border-l border-[#1c1c24] bg-[#0a0a0f] flex flex-col overflow-hidden">
@@ -83,7 +88,6 @@ export const Inspector = () => {
 
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5">
         {tab === "style" && <StyleTab />}
-        {tab === "music" && <MusicTab />}
         {tab === "export" && <ExportTab />}
       </div>
     </aside>
@@ -103,6 +107,7 @@ const StyleTab = () => {
       <PositionSection />
       {selected?.type === "caption" && <CaptionSection element={selected} />}
       {selected?.type === "headline" && <HeadlineSection element={selected} />}
+      {selected?.type === "image" && <ImageSection element={selected} />}
       {!selected && (
         <p className="text-[11px] text-[#5a5a66] leading-relaxed">
           Select an element on the canvas — or toggle one on above — to edit
@@ -360,7 +365,113 @@ const CaptionSection = ({ element }) => {
           </div>
         )}
       </div>
+
+      <MyStyleSection />
     </>
+  );
+};
+
+/* ============================ MY STYLE ============================ */
+
+// Saved caption template: ONE named style (preset, font, size, pill,
+// position) per user, persisted server-side. New clips WITHOUT a draft start
+// from it automatically (openClip's no-draft branch); a clip's own draft
+// always wins — see the store's caption template slice.
+const MyStyleSection = () => {
+  const template = useAppStore((s) => s.captionTemplate);
+  const saving = useAppStore((s) => s.captionTemplateSaving);
+  const saveMyStyle = useAppStore((s) => s.saveMyStyle);
+  const clearMyStyle = useAppStore((s) => s.clearMyStyle);
+  const applyMyStyleToCurrentClip = useAppStore((s) => s.applyMyStyleToCurrentClip);
+
+  const templateName = template?.name;
+  const [name, setName] = useState(templateName || "My style");
+  // A template saved/fetched elsewhere refreshes the field — it only tracks
+  // the persisted name.
+  useEffect(() => {
+    if (templateName) setName(templateName);
+  }, [templateName]);
+
+  return (
+    <div>
+      <SectionTitle>My Style</SectionTitle>
+      <p className="text-[10px] text-[#5a5a66] leading-relaxed mb-2">
+        Save this caption look (preset, font, size, pill, position). New clips
+        you haven't edited yet will start with it.
+      </p>
+      <input
+        data-testid={EDITOR.myStyleName}
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        maxLength={60}
+        placeholder="Style name"
+        className="w-full bg-[#131318] border border-[#22222c] rounded-md px-2 py-2 text-xs text-[#d7d7de] outline-none focus:border-[#7c3aed]/60 mb-2"
+      />
+      <div className="flex flex-wrap gap-1.5">
+        <button
+          data-testid={EDITOR.myStyleSave}
+          onClick={() => saveMyStyle(name)}
+          disabled={saving}
+          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] font-semibold bg-[#7c3aed] hover:bg-[#6d28d9] text-white disabled:opacity-50 transition-colors"
+        >
+          <Bookmark size={11} />
+          {template ? "Update style" : "Save as my style"}
+        </button>
+        {template && (
+          <>
+            <button
+              data-testid={EDITOR.myStyleApply}
+              onClick={applyMyStyleToCurrentClip}
+              disabled={saving}
+              className="px-2.5 py-1.5 rounded-md text-[11px] font-medium bg-[#131318] border border-[#22222c] text-[#9a9aa6] hover:border-[#7c3aed]/50 hover:text-white disabled:opacity-50 transition-colors"
+              title="Apply your saved style to this clip"
+            >
+              Apply here
+            </button>
+            <button
+              data-testid={EDITOR.myStyleClear}
+              onClick={clearMyStyle}
+              disabled={saving}
+              className="px-2.5 py-1.5 rounded-md text-[11px] font-medium bg-[#131318] border border-[#22222c] text-[#9a9aa6] hover:border-red-400/60 hover:text-red-300 disabled:opacity-50 transition-colors"
+            >
+              Remove
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// User image overlay — size (height fraction of canvas, width follows the
+// image's own ratio) and opacity, both burned identically by
+// services/overlay_renderer.py :: _prepare_image_layer.
+const ImageSection = ({ element }) => {
+  const updateElementProps = useAppStore((s) => s.updateElementProps);
+  const p = element.props;
+  const patch = (np) => updateElementProps(element.id, np);
+  return (
+    <div className="space-y-3">
+      <div>
+        <SectionTitle>Image Size</SectionTitle>
+        <input
+          data-testid={EDITOR.imageSize}
+          type="range"
+          min={0.05}
+          max={0.6}
+          step={0.01}
+          value={p.height ?? 0.18}
+          onChange={(e) => patch({ height: parseFloat(e.target.value) })}
+          className="w-full accent-[#7c3aed]"
+        />
+      </div>
+      <LabeledSlider
+        testId={EDITOR.imageOpacity}
+        label="Opacity" min={0.05} max={1} step={0.05}
+        value={p.opacity ?? 1}
+        onChange={(v) => patch({ opacity: v })}
+      />
+    </div>
   );
 };
 
@@ -405,58 +516,18 @@ const LabeledSlider = ({ label, min, max, step, value, onChange, testId }) => (
   </div>
 );
 
-/* ============================ MUSIC ============================ */
-
-const MusicTab = () => {
-  const selectedTrackId = useAppStore((s) => s.selectedTrackId);
-  const setSelectedTrack = useAppStore((s) => s.setSelectedTrack);
-  const musicVolume = useAppStore((s) => s.musicVolume);
-  const setMusicVolume = useAppStore((s) => s.setMusicVolume);
-
-  return (
-    <>
-      <div>
-        <SectionTitle>Library</SectionTitle>
-        <div className="space-y-1.5">
-          {MUSIC_LIBRARY.map((t) => {
-            const isSel = t.id === selectedTrackId;
-            return (
-              <button
-                key={t.id}
-                data-testid={EDITOR.musicItem(t.id)}
-                onClick={() => setSelectedTrack(isSel ? null : t.id)}
-                className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md border text-left transition-colors ${
-                  isSel
-                    ? "border-[#7c3aed] bg-[#7c3aed]/12"
-                    : "border-[#22222c] bg-[#131318] hover:border-[#7c3aed]/40"
-                }`}
-              >
-                <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${isSel ? "bg-[#7c3aed]" : "bg-[#1c1c24]"}`}>
-                  <Play size={11} className="text-white" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[11px] font-medium text-[#d7d7de] truncate">{t.name}</p>
-                  <p className="text-[10px] text-[#5a5a66]">{t.mood} · {t.duration}</p>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-      <div>
-        <SectionTitle>Music Volume</SectionTitle>
-        <input
-          type="range" min={0} max={100} value={musicVolume}
-          onChange={(e) => setMusicVolume(parseInt(e.target.value, 10))}
-          className="w-full accent-[#7c3aed]"
-        />
-        <p className="text-[10px] text-[#5a5a66] mt-1 font-mono">{musicVolume}%</p>
-      </div>
-    </>
-  );
-};
-
 /* ============================ EXPORT ============================ */
+
+// NOTE: this tab deliberately has NO resolution/container rows. The pipeline
+// outputs 1080-based MP4 only (see Export.jsx), and a container row here once
+// wrote "mp4"/"mov" into exportSettings.format — the key that stores the
+// ASPECT ("9:16"|"1:1"|"16:9") — silently destroying the aspect choice.
+//
+// The ASPECT and BACKGROUND FILL are chosen HERE (Sprint 3): the canvas
+// preview reflects both live (CanvasArea stage shape + fill layer), and the
+// Export page only displays them read-only. Same exportSettings keys as
+// always — draft persistence, undo, and the export payload are unchanged.
+const ASPECT_LABELS = { "9:16": "Vertical", "1:1": "Square", "16:9": "Landscape" };
 
 const ExportTab = () => {
   const navigate = useNavigate();
@@ -464,31 +535,62 @@ const ExportTab = () => {
   const setExportSetting = useAppStore((s) => s.setExportSetting);
   const currentClipId = useAppStore((s) => s.currentClipId);
 
-  const Row = ({ label, k, options }) => (
-    <div>
-      <SectionTitle>{label}</SectionTitle>
-      <div className="flex flex-wrap gap-1.5">
-        {options.map((o) => (
-          <button
-            key={o}
-            onClick={() => setExportSetting(k, o)}
-            className={`px-2.5 py-1.5 rounded-md text-[11px] font-medium border transition-colors ${
-              exportSettings[k] === o
-                ? "border-[#7c3aed] bg-[#7c3aed]/12 text-white"
-                : "border-[#22222c] bg-[#131318] text-[#9a9aa6] hover:border-[#7c3aed]/40"
-            }`}
-          >
-            {o}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-
   return (
     <>
-      <Row label="Resolution" k="resolution" options={["720p", "1080p", "4K"]} />
-      <Row label="Format" k="format" options={["mp4", "mov", "webm"]} />
+      <div>
+        <SectionTitle>Canvas Aspect</SectionTitle>
+        <div className="flex flex-wrap gap-1.5">
+          {EXPORT_FORMATS.map((v) => (
+            <button
+              key={v}
+              data-testid={EDITOR.aspectBtn(v)}
+              onClick={() => setExportSetting("format", v)}
+              title={ASPECT_LABELS[v]}
+              className={`px-2.5 py-1.5 rounded-md text-[11px] font-mono font-semibold border transition-colors ${
+                exportSettings.format === v
+                  ? "border-[#7c3aed] bg-[#7c3aed]/12 text-white"
+                  : "border-[#22222c] bg-[#131318] text-[#9a9aa6] hover:border-[#7c3aed]/40"
+              }`}
+            >
+              {v}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <SectionTitle>Background Fill</SectionTitle>
+        <div className="flex flex-wrap gap-1.5 items-center">
+          {BACKGROUND_OPTIONS.map((b) => (
+            <button
+              key={b}
+              data-testid={EDITOR.bgFillBtn(b)}
+              onClick={() => setExportSetting("background", b)}
+              className={`px-2.5 py-1.5 rounded-md text-[11px] font-medium capitalize border transition-colors ${
+                exportSettings.background === b
+                  ? "border-[#7c3aed] bg-[#7c3aed]/12 text-white"
+                  : "border-[#22222c] bg-[#131318] text-[#9a9aa6] hover:border-[#7c3aed]/40"
+              }`}
+            >
+              {b}
+            </button>
+          ))}
+          {exportSettings.background === "color" && (
+            <input
+              data-testid={EDITOR.bgFillColor}
+              type="color"
+              value={exportSettings.bgColor}
+              onChange={(e) => setExportSetting("bgColor", e.target.value)}
+              className="w-7 h-7 rounded cursor-pointer bg-transparent border border-[#22222c]"
+            />
+          )}
+        </div>
+        <p className="text-[10px] text-[#5a5a66] mt-1.5 leading-relaxed">
+          Fills the bars when the footage doesn't match the canvas shape —
+          shown live on the canvas, burned the same way on export.
+        </p>
+      </div>
+
       <div className="flex items-center justify-between">
         <SectionTitle>Burn-in Captions</SectionTitle>
         <button

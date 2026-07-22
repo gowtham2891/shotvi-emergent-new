@@ -1912,7 +1912,16 @@ def transcribe_audio(audio_path: str, language: str = "te",
 
 
 def save_transcript(transcript: dict, output_path: str):
-    """Save transcript dict to JSON file."""
+    """Save transcript dict to JSON file.
+
+    Derives `word_tanglish` beside every `word` before writing (Tanglish
+    caption toggle) — one-time cost at transcription; old transcripts that
+    predate this are backfilled on serve instead (api/main.py GET /transcript).
+    """
+    from services.tanglish import ensure_word_tanglish
+    filled = ensure_word_tanglish(transcript)
+    if filled:
+        print(f"  [Tanglish] Derived word_tanglish for {filled} words")
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(transcript, f, ensure_ascii=False, indent=2)
     print(f"Transcript saved: {output_path}")

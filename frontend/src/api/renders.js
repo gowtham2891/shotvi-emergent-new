@@ -1,4 +1,5 @@
 import { client, toApiError } from "@/api/client";
+import { serializeTranscriptEdits } from "@/lib/transcriptEdits";
 
 // ── Caption styles ───────────────────────────────────────────────
 // The backend exposes no styles endpoint; these ids mirror STYLES in
@@ -49,8 +50,9 @@ const CAPTION_POS_EPS = 1e-3;
 // _PREPARERS). The `caption` element is intentionally excluded — its position
 // flows via caption_x/caption_y and the backend burns captions in a separate
 // pass (render_elements ignores non-overlay types anyway; excluding here just
-// keeps the payload clean).
-export const OVERLAY_ELEMENT_TYPES = new Set(["progress", "logo", "headline"]);
+// keeps the payload clean). `image` carries an opaque image_id the backend
+// resolves + burns through the same single composite pass.
+export const OVERLAY_ELEMENT_TYPES = new Set(["progress", "logo", "headline", "image"]);
 
 // ── EditDocument → RerenderRequest ───────────────────────────────
 //
@@ -73,7 +75,7 @@ export function buildRerenderRequest(editDoc = {}) {
     cropMode = "auto",
     cropBox = null, // {x, y, w, h} as 0–1 fractions
     selectedSubject = null,
-    transcriptEdits = null, // {wordEdits, mergedGroups, lineSplits}
+    transcriptEdits = null, // STORE shape: {wordEdits: {[wordId]: {text, …}}, mergedGroups, lineSplits} — serialized to the backend list shape below
     captionFont = null, // one of CAPTION_FONTS; sent as caption_font only when non-default (see below)
     captionX = null, // 0–1 fraction of canvas width (caption center)
     captionY = null, // 0–1 fraction of canvas height (caption center)
@@ -84,6 +86,11 @@ export function buildRerenderRequest(editDoc = {}) {
     // rendering the preset defaults byte-identically to today.
     captionFontSize = null,
     captionPill = null,
+    // Telugu ⇄ Tanglish toggle: sent as caption_script ONLY when 'tanglish'.
+    // 'telugu' is the backend default, so omitting it keeps script-untouched
+    // export payloads byte-identical to before the toggle existed; junk
+    // values (old drafts) are also omitted → backend renders telugu.
+    captionScript = null,
     elements = null, // full EditDocument elements (0–1 coords); filtered below
   } = editDoc;
 
@@ -107,7 +114,13 @@ export function buildRerenderRequest(editDoc = {}) {
   if (isKnownCaptionFont(captionFont) && captionFont !== DEFAULT_CAPTION_FONT) {
     req.caption_font = captionFont;
   }
-  if (transcriptEdits) req.transcript_edits = transcriptEdits;
+  // Transcript edits cross the wire in the backend's TranscriptEdits shape
+  // (wordEdits as a ref-addressed LIST — api/models.py:39-42), never the
+  // store's id-keyed dict: pydantic 422s on a dict, even an empty one. The
+  // serializer returns null when there's nothing to send, so the field is
+  // omitted and an edit-free export payload stays byte-identical to today.
+  const wireTranscriptEdits = serializeTranscriptEdits(transcriptEdits);
+  if (wireTranscriptEdits) req.transcript_edits = wireTranscriptEdits;
   // Send caption center only when moved from default (both coords required by the
   // backend); epsilon stops float-noise from flipping default↔positioned paths.
   if (captionX != null && captionY != null) {
@@ -125,6 +138,9 @@ export function buildRerenderRequest(editDoc = {}) {
   // regression test green.
   if (typeof captionFontSize === "number" && captionFontSize > 0) {
     req.caption_font_size = captionFontSize;
+  }
+  if (captionScript === "tanglish") {
+    req.caption_script = "tanglish";
   }
   if (captionPill && captionPill.enabled) {
     // Snake-case for the API; only the fields the backend consumes.

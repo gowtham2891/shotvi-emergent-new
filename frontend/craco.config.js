@@ -72,9 +72,18 @@ if (config.enableHealthCheck) {
 let webpackConfig = {
   jest: {
     configure: {
-      moduleNameMapper: { "^@/(.*)$": "<rootDir>/src/$1" },
-      // axios/sonner ship ESM that CRA's default jest config won't transform
-      transformIgnorePatterns: ["node_modules/(?!(axios|sonner)/)"],
+      moduleNameMapper: {
+        "^@/(.*)$": "<rootDir>/src/$1",
+        // react-router-dom v7's package `main` points at a file that doesn't
+        // exist (dist/main.js), and jest 27 doesn't read `exports` maps — so
+        // route the package (and the `react-router/dom` subpath its CJS entry
+        // requires) straight to the real CJS files for tests that render
+        // router context.
+        "^react-router-dom$": "<rootDir>/node_modules/react-router-dom/dist/index.js",
+        "^react-router/dom$": "<rootDir>/node_modules/react-router/dist/development/dom-export.js",
+      },
+      // axios/sonner/@supabase ship ESM that CRA's default jest config won't transform
+      transformIgnorePatterns: ["node_modules/(?!(axios|sonner|@supabase)/)"],
     },
   },
   eslint: {

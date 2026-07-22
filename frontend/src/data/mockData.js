@@ -326,7 +326,7 @@ export const getClipsForProject = (projectId) => {
 
 // Word-level transcript for the editor — one clip's worth (mixed te/tenglish)
 // Each word has: text, start (sec), end (sec)
-export const WORD_TRANSCRIPT = [
+const WORD_TRANSCRIPT_RAW = [
   { text: "ఈ", start: 0.0, end: 0.28 },
   { text: "ఒక్క", start: 0.28, end: 0.72 },
   { text: "AI", start: 0.72, end: 1.06 },
@@ -359,16 +359,17 @@ export const WORD_TRANSCRIPT = [
   { text: "అంతే!", start: 12.68, end: 13.3 },
 ];
 
-export const CLIP_DURATION = 13.6; // seconds — matches transcript
+// Decorated with the id/ref shape real transcripts carry (see
+// api/transcripts.js getWordsForRange + lib/transcriptEdits.js) so mock-mode
+// words are addressable by transcript edits exactly like live ones. Inlined
+// rather than importing wordIdFromRef to keep mockData dependency-free.
+export const WORD_TRANSCRIPT = WORD_TRANSCRIPT_RAW.map((w, index) => ({
+  id: `w_flat_${index}`,
+  ref: { type: "flat", index },
+  ...w,
+}));
 
-export const MUSIC_LIBRARY = [
-  { id: "m1", name: "Trap Beat — Late Night", duration: "0:32", mood: "Hype" },
-  { id: "m2", name: "Cinematic Rise", duration: "0:45", mood: "Emotional" },
-  { id: "m3", name: "Lo-Fi Chill", duration: "0:58", mood: "Calm" },
-  { id: "m4", name: "Bollywood Groove", duration: "0:42", mood: "Fun" },
-  { id: "m5", name: "Epic Trailer Drop", duration: "0:38", mood: "Bold" },
-  { id: "m6", name: "South Indie Percussion", duration: "0:51", mood: "Vibe" },
-];
+export const CLIP_DURATION = 13.6; // seconds — matches transcript
 
 export const STATUS_META = {
   uploading: { label: "Uploading", color: "#7c3aed" },

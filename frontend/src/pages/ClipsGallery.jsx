@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -12,10 +12,13 @@ import {
   Loader2,
   AlertTriangle,
   FileVideo,
+  PartyPopper,
+  X,
 } from "lucide-react";
 import { AppShell } from "@/components/shotvi/AppShell";
 import { useAppStore } from "@/store/useAppStore";
-import { CLIPS } from "@/constants/testIds";
+import { CLIPS, CLIPS_CUE } from "@/constants/testIds";
+import { hasSeenFirstClipCue, markFirstClipCueSeen } from "@/lib/onboarding";
 
 const ViralityGauge = ({ score }) => {
   const color =
@@ -140,12 +143,29 @@ export default function ClipsGallery() {
     title: "Project",
     status: "ready",
   };
+  const user = useAppStore((s) => s.user);
 
   const setCurrentClip = useAppStore((s) => s.setCurrentClip);
 
   useEffect(() => {
     loadProjectClips(projectId);
   }, [projectId, loadProjectClips]);
+
+  // First-clip completion cue (PHASE 2 BUILD 3): a brand-new user's first
+  // arrival here — right after their first job finishes — gets a one-time
+  // "your first clips are ready" pointer. Eligibility is read once on mount
+  // (before clips even load) so a re-render after clips arrive can't flip it
+  // back on; markFirstClipCueSeen fires the instant it's shown, so it never
+  // appears again for this user, on this project or any later one.
+  const cueEligibleRef = useRef(!hasSeenFirstClipCue(user?.id));
+  const [showFirstClipCue, setShowFirstClipCue] = useState(false);
+  useEffect(() => {
+    if (clips.length > 0 && cueEligibleRef.current) {
+      cueEligibleRef.current = false;
+      setShowFirstClipCue(true);
+      markFirstClipCueSeen(user?.id);
+    }
+  }, [clips.length, user?.id]);
 
   const onEdit = (clip) => {
     setCurrentClip(clip.id);
@@ -247,6 +267,34 @@ export default function ClipsGallery() {
       }
     >
       <div data-testid={CLIPS.root} className="p-8 max-w-[1400px] mx-auto">
+        {/* First-clip completion cue — one-time only, never shown again */}
+        {showFirstClipCue && (
+          <div
+            data-testid={CLIPS_CUE.root}
+            className="mb-6 rounded-xl border border-[#22ff9c]/30 bg-gradient-to-r from-[#22ff9c]/10 via-[#7c3aed]/5 to-transparent p-5 flex items-center gap-4"
+          >
+            <div className="w-11 h-11 rounded-full bg-[#22ff9c]/15 border border-[#22ff9c]/40 flex items-center justify-center shrink-0">
+              <PartyPopper size={18} className="text-[#22ff9c]" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-white mb-0.5">
+                Your first clips are ready 🎉
+              </p>
+              <p className="text-xs text-[#a1a1aa]">
+                Click any clip to edit captions, toggle Telugu/Tanglish, and export.
+              </p>
+            </div>
+            <button
+              data-testid={CLIPS_CUE.dismiss}
+              onClick={() => setShowFirstClipCue(false)}
+              className="text-[#71717a] hover:text-white p-1 shrink-0"
+              title="Dismiss"
+            >
+              <X size={15} />
+            </button>
+          </div>
+        )}
+
         {/* Insight banner */}
         <div className="mb-8 rounded-xl border border-[#7c3aed]/30 bg-gradient-to-r from-[#7c3aed]/10 via-[#7c3aed]/5 to-transparent p-5 flex items-center gap-4">
           <div className="w-11 h-11 rounded-full bg-[#7c3aed]/20 border border-[#7c3aed]/40 flex items-center justify-center">

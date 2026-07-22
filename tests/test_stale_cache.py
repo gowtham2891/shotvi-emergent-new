@@ -26,11 +26,17 @@ import pytest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import api.main as main
+from api.auth import AuthUser
 from api.models import JobCreate
 
 
 VIDEO_ID = "vid12345678"
 YT_URL = f"https://youtu.be/{VIDEO_ID}"
+
+# Identity for direct endpoint calls (auth itself is covered in
+# test_auth_ownership); the cached job below is stamped with the same owner
+# so the owner-scoped cache path behaves exactly as before auth existed.
+USER = AuthUser(id="owner-1")
 
 
 # ── Fixtures / helpers ──────────────────────────────────────────────────────
@@ -84,6 +90,7 @@ def storage(tmp_path, monkeypatch):
 def _existing_job(captioned_path):
     return {
         "job_id": "old-job-123",
+        "owner": USER.id,
         "status": "done",
         "progress": 100,
         "current_stage": "Complete",
@@ -189,13 +196,14 @@ def test_cache_hit_all_present_returns_immediately_no_pipeline(storage, monkeypa
 
     fake_pv = _FakeTask()
     deleted = []
-    monkeypatch.setattr(main, "get_job_by_video_id", lambda vid: existing)
+    monkeypatch.setattr(main, "get_job_by_video_id", lambda vid, **kw: existing)
     monkeypatch.setattr(main, "process_video", fake_pv)
     monkeypatch.setattr(main, "delete_job", lambda jid: deleted.append(jid))
     # These must NOT be reached on the all-present path — make them explode if they are.
-    monkeypatch.setattr(main, "_recover_from_storage", lambda vid: pytest.fail("recovery must not run"))
+    monkeypatch.setattr(main, "_recover_from_storage",
+                        lambda vid, **kw: pytest.fail("recovery must not run"))
 
-    out = main.create_job_endpoint(JobCreate(url=YT_URL))
+    out = main.create_job_endpoint(JobCreate(url=YT_URL), user=USER)
 
     assert out.job_id == "old-job-123"       # the cached record, unchanged
     assert out.status.value == "done"
@@ -215,22 +223,23 @@ def test_cache_hit_missing_outputs_triggers_regeneration(storage, monkeypatch):
     deleted = []
     store = {}
 
-    def fake_create_job(job_id, url, language="te"):
+    def fake_create_job(job_id, url, language="te", owner=""):
         store[job_id] = {
-            "job_id": job_id, "status": "pending", "progress": 0,
+            "job_id": job_id, "owner": owner, "status": "pending", "progress": 0,
             "current_stage": "queued", "video_id": "", "error": "",
             "clips": [], "captioned_path": "", "vertical_path": "",
         }
         return store[job_id]
 
-    monkeypatch.setattr(main, "get_job_by_video_id", lambda vid: existing)
+    monkeypatch.setattr(main, "get_job_by_video_id", lambda vid, **kw: existing)
     monkeypatch.setattr(main, "process_video", fake_pv)
     monkeypatch.setattr(main, "delete_job", lambda jid: deleted.append(jid))
+    monkeypatch.setattr(main, "video_lock_held", lambda vid: False)
     monkeypatch.setattr(main, "create_job", fake_create_job)
     monkeypatch.setattr(main, "get_job", lambda jid: store.get(jid))
     monkeypatch.setattr(main, "update_job", lambda *a, **k: None)
 
-    out = main.create_job_endpoint(JobCreate(url=YT_URL))
+    out = main.create_job_endpoint(JobCreate(url=YT_URL), user=USER)
 
     # A fresh regeneration job was created (not the stale one returned as-is).
     assert out.job_id != "old-job-123"
@@ -252,18 +261,20 @@ def test_cache_hit_missing_transcript_still_regenerates(storage, monkeypatch):
 
     fake_pv = _FakeTask()
     store = {}
-    monkeypatch.setattr(main, "get_job_by_video_id", lambda vid: existing)
+    monkeypatch.setattr(main, "get_job_by_video_id", lambda vid, **kw: existing)
     monkeypatch.setattr(main, "process_video", fake_pv)
     monkeypatch.setattr(main, "delete_job", lambda jid: None)
+    monkeypatch.setattr(main, "video_lock_held", lambda vid: False)
     monkeypatch.setattr(main, "create_job",
-                        lambda job_id, url, language="te": store.setdefault(
-                            job_id, {"job_id": job_id, "status": "pending", "progress": 0,
+                        lambda job_id, url, language="te", owner="": store.setdefault(
+                            job_id, {"job_id": job_id, "owner": owner, "status": "pending",
+                                     "progress": 0,
                                      "current_stage": "queued", "video_id": "", "error": "",
                                      "clips": [], "captioned_path": "", "vertical_path": ""}))
     monkeypatch.setattr(main, "get_job", lambda jid: store.get(jid))
     monkeypatch.setattr(main, "update_job", lambda *a, **k: None)
 
-    out = main.create_job_endpoint(JobCreate(url=YT_URL))
+    out = main.create_job_endpoint(JobCreate(url=YT_URL), user=USER)
     assert out.job_id != "old-job-123"
     assert len(fake_pv.calls) == 1
 
@@ -316,6 +327,9 @@ def _wire_pipeline(tmp_path, monkeypatch, vid, *, video, transcript, clips_json)
     monkeypatch.setattr(worker, "update_job", lambda *a, **k: None)
     monkeypatch.setattr(worker, "set_job_clips", lambda *a, **k: None)
     monkeypatch.setattr(worker, "get_job", lambda jid: {})
+    # Per-video pipeline lock (FIX SPRINT 1): no Redis here — stub it held-free.
+    monkeypatch.setattr(worker, "acquire_video_lock", lambda vid, tok, ttl=None: True)
+    monkeypatch.setattr(worker, "release_video_lock", lambda vid, tok: None)
     return worker, called
 
 

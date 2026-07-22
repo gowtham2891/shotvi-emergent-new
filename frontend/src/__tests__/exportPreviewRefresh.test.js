@@ -18,8 +18,12 @@ const baseClip = {
   index: 0,
   captionedPath: "storage\\outputs\\abc123_c1_bold-yellow_captioned.mp4",
   verticalPath: "storage\\outputs\\abc123_c1_vertical.mp4",
+  rawPath: "storage\\outputs\\abc123_c1_raw.mp4",
   previewUrl: `${API_BASE_URL}/outputs/abc123_c1_bold-yellow_captioned.mp4`,
-  videoUrl: `${API_BASE_URL}/outputs/abc123_c1_vertical.mp4`,
+  // Sprint 4: the editor canvas plays the 16:9 MASTER (raw_path). The
+  // immutability contract below is unchanged — videoUrl is set once per clip
+  // (mapClipToUi) and never refreshed by rerenders.
+  videoUrl: `${API_BASE_URL}/outputs/abc123_c1_raw.mp4`,
 };
 
 function seedStore() {
@@ -48,14 +52,15 @@ describe("applyExportUpdate refreshes the rerendered clip's preview URL only", (
     expect(clip.previewUrl).not.toContain("bold-yellow_captioned.mp4");
   });
 
-  test("videoUrl stays pointed at the pipeline's ORIGINAL raw vertical after rerender", () => {
+  test("videoUrl stays pointed at the pipeline's ORIGINAL 16:9 master after rerender", () => {
     // Real-world bug from a user: after export they returned to the editor
     // and saw TWO stickers on the canvas — one that could be moved (the live
     // overlay element), one that could NOT (baked into the rerender's
     // vertical_path, which is the post-overlay pre-caption composite).
     // Fix: applyExportUpdate must NOT overwrite videoUrl; the editor canvas
-    // stays pointed at the pipeline's raw crop, which never has overlays
-    // burned into pixels. See useAppStore.js applyExportUpdate for the fix.
+    // stays pointed at the pipeline's clean source (Sprint 4: the 16:9
+    // master, raw_path), which never has overlays burned into pixels.
+    // See useAppStore.js applyExportUpdate for the fix.
     const originalVideoUrl = useAppStore.getState().currentClip.videoUrl;
     useAppStore.getState().applyExportUpdate({
       job_id: "rerender-job-42",
@@ -109,7 +114,7 @@ describe("applyExportUpdate refreshes the rerendered clip's preview URL only", (
     });
     const cached = useAppStore.getState().clipsByJob["job-1"][0];
     expect(cached.previewUrl).toContain("abc123_c1_new_captioned.mp4");
-    // videoUrl stays as the pipeline's original — editor never sees the burned file.
+    // videoUrl stays as the pipeline's original master — editor never sees the burned file.
     expect(cached.videoUrl).toBe(baseClip.videoUrl);
   });
 

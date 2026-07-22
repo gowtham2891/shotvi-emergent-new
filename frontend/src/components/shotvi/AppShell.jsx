@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutGrid,
@@ -10,10 +10,11 @@ import {
   Search,
   CreditCard,
   HelpCircle,
+  Check,
 } from "lucide-react";
 import { Logo } from "./Logo";
 import { useAppStore } from "@/store/useAppStore";
-import { DASHBOARD } from "@/constants/testIds";
+import { DASHBOARD, BILLING } from "@/constants/testIds";
 
 const NAV = [
   { key: "dashboard", label: "Projects", icon: LayoutGrid, path: "/dashboard" },
@@ -29,8 +30,27 @@ export const AppShell = ({ children, title, subtitle, actions }) => {
   const navigate = useNavigate();
   const user = useAppStore((s) => s.user);
   const signOut = useAppStore((s) => s.signOut);
+  const billingStatus = useAppStore((s) => s.billingStatus);
+  const billingActionPending = useAppStore((s) => s.billingActionPending);
+  const loadBillingStatus = useAppStore((s) => s.loadBillingStatus);
+  const startUpgrade = useAppStore((s) => s.startUpgrade);
+  const cancelPlan = useAppStore((s) => s.cancelPlan);
+
+  // Read plan state once the shell mounts (any authenticated page).
+  useEffect(() => {
+    loadBillingStatus();
+  }, [loadBillingStatus]);
 
   const active = (path) => location.pathname === path;
+
+  const isPaid = billingStatus?.plan === "studio";
+  const configured = Boolean(billingStatus?.configured);
+  const planLabel = isPaid ? "Studio" : "Free";
+  const handleCancel = () => {
+    if (window.confirm("Cancel your Studio Plan? You'll return to the Free plan at the end of the billing cycle.")) {
+      cancelPlan();
+    }
+  };
 
   return (
     <div className="min-h-screen w-full text-white bg-[#060608] flex">
@@ -83,19 +103,70 @@ export const AppShell = ({ children, title, subtitle, actions }) => {
           })}
         </nav>
 
-        {/* Upgrade card */}
-        <div className="m-3 p-4 rounded-xl border border-[#2a2a35] bg-gradient-to-br from-[#7c3aed]/15 via-[#111116] to-[#111116] relative overflow-hidden">
+        {/* Billing / upgrade card — reflects real plan state (PHASE 2 BUILD 2) */}
+        <div
+          data-testid={BILLING.card}
+          className="m-3 p-4 rounded-xl border border-[#2a2a35] bg-gradient-to-br from-[#7c3aed]/15 via-[#111116] to-[#111116] relative overflow-hidden"
+        >
           <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-[#7c3aed]/25 blur-2xl" />
           <p className="text-xs uppercase tracking-wider text-[#a78bfa] mb-1">
-            Studio Plan
+            {billingStatus?.plan_info?.name || "Studio Plan"}
           </p>
-          <p className="text-sm font-semibold mb-2">Unlock 4K exports</p>
-          <p className="text-xs text-[#a1a1aa] mb-3 leading-relaxed">
-            Team seats, API access & priority renders.
-          </p>
-          <button className="text-xs font-semibold text-white bg-[#7c3aed] hover:bg-[#6d28d9] px-3 py-1.5 rounded-md w-full transition-colors">
-            Upgrade
-          </button>
+
+          {isPaid ? (
+            <>
+              <p
+                data-testid={BILLING.planStatus}
+                className="text-sm font-semibold mb-2 flex items-center gap-1.5"
+              >
+                <Check size={15} className="text-[#22ff9c]" />
+                {billingStatus?.subscription_status === "cancelling"
+                  ? "Active — cancelling"
+                  : "Active"}
+              </p>
+              <p className="text-xs text-[#a1a1aa] mb-3 leading-relaxed">
+                Thanks for supporting Shotvi. You're on the {billingStatus?.plan_info?.name || "Studio Plan"}.
+              </p>
+              {billingStatus?.subscription_status !== "cancelling" && (
+                <button
+                  data-testid={BILLING.cancelButton}
+                  onClick={handleCancel}
+                  disabled={billingActionPending}
+                  className="text-xs font-semibold text-[#a1a1aa] hover:text-white border border-[#2a2a35] hover:border-[#3a3a45] px-3 py-1.5 rounded-md w-full transition-colors disabled:opacity-50"
+                >
+                  {billingActionPending ? "Working…" : "Cancel plan"}
+                </button>
+              )}
+            </>
+          ) : configured ? (
+            <>
+              <p data-testid={BILLING.planStatus} className="text-sm font-semibold mb-2">
+                Upgrade to {billingStatus?.plan_info?.name || "Studio Plan"}
+              </p>
+              <p className="text-xs text-[#a1a1aa] mb-3 leading-relaxed">
+                {billingStatus?.plan_info?.price_display
+                  ? `${billingStatus.plan_info.price_display}, billed monthly.`
+                  : "Support Shotvi with a monthly plan."}
+              </p>
+              <button
+                data-testid={BILLING.upgradeButton}
+                onClick={startUpgrade}
+                disabled={billingActionPending}
+                className="text-xs font-semibold text-white bg-[#7c3aed] hover:bg-[#6d28d9] px-3 py-1.5 rounded-md w-full transition-colors disabled:opacity-50"
+              >
+                {billingActionPending ? "Opening checkout…" : "Upgrade"}
+              </button>
+            </>
+          ) : (
+            <>
+              <p data-testid={BILLING.planStatus} className="text-sm font-semibold mb-2">
+                Billing not configured
+              </p>
+              <p className="text-xs text-[#a1a1aa] leading-relaxed">
+                Set up Razorpay on the server to enable upgrades (see SETUP_BILLING.md).
+              </p>
+            </>
+          )}
         </div>
 
         {/* User pill */}
@@ -108,7 +179,7 @@ export const AppShell = ({ children, title, subtitle, actions }) => {
               {user?.name || "Rahul K"}
             </p>
             <p className="text-[11px] text-[#71717a] truncate">
-              {user?.plan || "Creator"} · {user?.email || "creator@shotvi.app"}
+              {planLabel} · {user?.email || "creator@shotvi.app"}
             </p>
           </div>
           <button

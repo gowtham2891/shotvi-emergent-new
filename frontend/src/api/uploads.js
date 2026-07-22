@@ -49,9 +49,20 @@ export async function createJobFromFile({ file, language = "te", onUploadProgres
 export async function getJob(jobId) {
   try {
     const { data } = await client.get(`/jobs/${encodeURIComponent(jobId)}`);
-    return data; // JobOut
+    return data;
   } catch (err) {
     throw toApiError(err, "Could not fetch job status");
+  }
+}
+
+// Backend-enforced job list: only jobs owned by the authenticated caller
+// come back (GET /jobs). The dashboard displays exactly this population.
+export async function listJobs() {
+  try {
+    const { data } = await client.get("/jobs");
+    return data; // JobOut[], newest first
+  } catch (err) {
+    throw toApiError(err, "Could not fetch your projects");
   }
 }
 

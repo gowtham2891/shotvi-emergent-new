@@ -204,3 +204,89 @@ def test_9_16_manual_crop_condition():
     # Old behaviour (buggy): would have been 'not use_autocrop'
     old_condition = (crop_box is not None and not use_autocrop)
     assert old_condition is False, "old condition incorrectly skips crop for 9:16 format"
+
+
+# ── Line re-alignments (apply_line_realignments) ─────────────────────────────
+
+from services.apply_transcript_edits import apply_line_realignments
+
+
+def _realign_entry(start_idx, end_idx, words):
+    return {"startIdx": start_idx, "endIdx": end_idx, "words": words,
+            "approximate": False}
+
+
+def test_realign_replaces_matching_line_words_only():
+    lines = group_words_with_splits(words_list(), wpl=4, line_splits=set())
+    new_words = [
+        {"word": "క", "start": 0.1, "end": 0.6, "word_tanglish": "ka"},
+        {"word": "ఖ", "start": 0.7, "end": 1.2, "word_tanglish": "kha"},
+        {"word": "గ", "start": 1.3, "end": 1.9, "word_tanglish": "ga"},
+    ]
+    n = apply_line_realignments(lines, [_realign_entry(0, 3, new_words)])
+    assert n == 1
+    # Line 1 replaced (3 words now, fresh timing), line 2 untouched.
+    assert [w["word"] for w in lines[0]["words"]] == ["క", "ఖ", "గ"]
+    assert [w["word"] for w in lines[1]["words"]] == ["E", "F", "G", "H"]
+    # Line boundaries NEVER move.
+    assert lines[0]["line_start"] == pytest.approx(0.0)
+    assert lines[0]["line_end"] == pytest.approx(2.0)
+
+
+def test_realign_inert_when_grouping_no_longer_matches():
+    # Entry addressed lines grouped at wpl=4; regroup at wpl=2 → no line spans
+    # exactly 0..3, so the entry must be inert (original words render).
+    lines = group_words_with_splits(words_list(), wpl=2, line_splits=set())
+    new_words = [{"word": "క", "start": 0.1, "end": 0.6, "word_tanglish": "ka"}]
+    n = apply_line_realignments(lines, [_realign_entry(0, 3, new_words)])
+    assert n == 0
+    assert [w["word"] for w in lines[0]["words"]] == ["A", "B"]
+
+
+def test_realign_clamps_into_fixed_line_span():
+    lines = group_words_with_splits(words_list(), wpl=4, line_splits=set())
+    new_words = [
+        {"word": "క", "start": -1.0, "end": 0.6, "word_tanglish": "ka"},
+        {"word": "ఖ", "start": 0.7, "end": 99.0, "word_tanglish": "kha"},
+    ]
+    n = apply_line_realignments(lines, [_realign_entry(0, 3, new_words)])
+    assert n == 1
+    for w in lines[0]["words"]:
+        assert lines[0]["line_start"] <= w["start"] <= w["end"] <= lines[0]["line_end"]
+
+
+def test_realign_tanglish_script_renders_word_tanglish():
+    lines = group_words_with_splits(words_list(), wpl=4, line_splits=set())
+    new_words = [
+        {"word": "ఒకటి", "start": 0.1, "end": 0.9, "word_tanglish": "okati"},
+        {"word": "రెండు", "start": 1.0, "end": 1.9, "word_tanglish": None},
+    ]
+    n = apply_line_realignments(lines, [_realign_entry(0, 3, new_words)],
+                                script="tanglish")
+    assert n == 1
+    texts = [w["word"] for w in lines[0]["words"]]
+    assert texts[0] == "okati"
+    # Missing word_tanglish derives on demand (deterministic tanglish.py) —
+    # ASCII out, never the raw Telugu.
+    assert texts[1].isascii() and texts[1]
+
+
+def test_realign_malformed_entry_skipped_line_untouched():
+    lines = group_words_with_splits(words_list(), wpl=4, line_splits=set())
+    bad = [{"word": "క", "start": "not-a-number", "end": 0.6}]
+    n = apply_line_realignments(lines, [_realign_entry(0, 3, bad)])
+    assert n == 0
+    assert [w["word"] for w in lines[0]["words"]] == ["A", "B", "C", "D"]
+
+
+def test_realign_second_line_matches_by_cumulative_index():
+    lines = group_words_with_splits(words_list(), wpl=4, line_splits=set())
+    new_words = [
+        {"word": "ఐదు", "start": 2.1, "end": 2.8, "word_tanglish": "aidu"},
+        {"word": "ఆరు", "start": 2.9, "end": 3.4, "word_tanglish": "aaru"},
+        {"word": "ఏడు", "start": 3.5, "end": 3.9, "word_tanglish": "edu"},
+    ]
+    n = apply_line_realignments(lines, [_realign_entry(4, 7, new_words)])
+    assert n == 1
+    assert [w["word"] for w in lines[0]["words"]] == ["A", "B", "C", "D"]
+    assert [w["word"] for w in lines[1]["words"]] == ["ఐదు", "ఆరు", "ఏడు"]

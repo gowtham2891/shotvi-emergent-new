@@ -27,6 +27,12 @@ import { BACKGROUND_OPTIONS } from "@/api/renders";
 import { EXPORT } from "@/constants/testIds";
 import { getClipsForProject } from "@/data/mockData";
 import { StaticElementLayer } from "@/components/editor/StaticElementLayer";
+import {
+  OUTPUT_ASPECTS,
+  inferMasterAspect,
+  initialWindowForAspect,
+  cropVideoLayout,
+} from "@/lib/cropWindow";
 
 const ASPECTS = [
   { v: "9:16", label: "Vertical", desc: "Reels, Shorts, TikTok" },
@@ -148,6 +154,28 @@ export default function Export() {
   const showLiveDraft = !USE_MOCKS && status !== "done";
   const hasCleanVideo = !!clip?.videoUrl;
 
+  // Sprint 4: videoUrl is the 16:9 MASTER, so the live-draft preview must
+  // view it through the same per-aspect crop window the editor canvas (and
+  // the burn's _prepare_source) uses — otherwise the master shows up
+  // letterboxed here while the export correctly crops. Same parity-tested
+  // math (lib/cropWindow.js), at this preview box's own scale. The box's CSS
+  // enforces the output aspect exactly, so its width derives from the
+  // measured height.
+  const storedWindow = useAppStore(
+    (s) => s.exportSettings.cropWindows?.[s.exportSettings.format]
+  );
+  const masterDims = useAppStore((s) => s.masterDims);
+  const previewFormat = exportSettings.format || "9:16";
+  const masterAR = inferMasterAspect(clip?.defaultCropBox, masterDims);
+  const cropBox =
+    storedWindow || initialWindowForAspect(previewFormat, masterAR, clip?.defaultCropBox);
+  const previewW = canvasH * (OUTPUT_ASPECTS[previewFormat] || OUTPUT_ASPECTS["9:16"]);
+  const draftLayout = cropVideoLayout(cropBox, previewW, canvasH, masterAR);
+  // Aspect-locked windows fill the canvas; bars only exist in edge cases
+  // (legacy media, rounding) — the fill note below shows only then.
+  const draftHasBars =
+    draftLayout.box.width < previewW - 1 || draftLayout.box.height < canvasH - 1;
+
   const onStartExport = () => {
     if (USE_MOCKS) {
       setMockProgress(0);
@@ -204,28 +232,68 @@ export default function Export() {
             <p className="text-[10px] uppercase tracking-[0.22em] text-[#71717a] mb-3">
               Preview
             </p>
-            <div ref={previewBoxRef} className="aspect-[9/16] rounded-xl overflow-hidden relative bg-black">
+            <div
+              ref={previewBoxRef}
+              className="rounded-xl overflow-hidden relative bg-black"
+              style={{ aspectRatio: (exportSettings.format || "9:16").replace(":", " / ") }}
+            >
               {showLiveDraft && hasCleanVideo ? (
                 <>
-                  {/* Live draft: clean base video (no burned captions) +
+                  {/* Live draft: the clean 16:9 MASTER viewed through the
+                      per-aspect crop window (same lib/cropWindow.js layout
+                      the editor canvas and the burn use — Sprint 4), plus
                       the same element overlay the editor canvas renders,
                       reused via StaticElementLayer/ElementBody — not
-                      duplicated. */}
-                  <video
-                    src={clip.videoUrl}
-                    className="absolute inset-0 w-full h-full object-contain"
-                    controls
-                    playsInline
-                    preload="metadata"
-                    onTimeUpdate={(e) => useAppStore.getState().seek(e.currentTarget.currentTime)}
-                  />
+                      duplicated. Native controls are clipped by the crop
+                      viewport, so tap-to-play replaces them. */}
+                  <div
+                    data-testid={EXPORT.livePreviewViewport}
+                    className="absolute overflow-hidden"
+                    style={{
+                      left: draftLayout.box.left,
+                      top: draftLayout.box.top,
+                      width: draftLayout.box.width,
+                      height: draftLayout.box.height,
+                    }}
+                  >
+                    <video
+                      data-testid={EXPORT.livePreviewVideo}
+                      src={clip.videoUrl}
+                      style={{
+                        position: "absolute",
+                        left: draftLayout.video.left,
+                        top: draftLayout.video.top,
+                        width: draftLayout.video.width,
+                        height: draftLayout.video.height,
+                        maxWidth: "none",
+                        maxHeight: "none",
+                        objectFit: "fill",
+                        cursor: "pointer",
+                      }}
+                      playsInline
+                      preload="metadata"
+                      onClick={(e) => {
+                        const v = e.currentTarget;
+                        if (v.paused) v.play().catch(() => {});
+                        else v.pause();
+                      }}
+                      onLoadedMetadata={(e) => {
+                        const v = e.currentTarget;
+                        if (v.videoWidth > 0 && v.videoHeight > 0) {
+                          useAppStore.getState().setMasterDims({ w: v.videoWidth, h: v.videoHeight });
+                        }
+                      }}
+                      onTimeUpdate={(e) => useAppStore.getState().seek(e.currentTarget.currentTime)}
+                    />
+                  </div>
                   <StaticElementLayer canvasH={canvasH} />
                   <div className="absolute top-3 right-3 text-[10px] px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm border border-white/10 text-white/80 font-medium">
-                    Preview (live draft)
+                    Preview (live draft) · tap to play
                   </div>
-                  {exportSettings.format !== "9:16" && (
+                  {draftHasBars && (
                     <div className="absolute bottom-3 inset-x-3 text-center text-[10px] px-2 py-1 rounded-md bg-black/70 text-[#fcd34d]">
-                      Aspect changes apply at render — shown in original 9:16 crop
+                      Bars fill with "{exportSettings.background}" at render — see the
+                      editor canvas for the live fill preview
                     </div>
                   )}
                 </>
@@ -325,26 +393,31 @@ export default function Export() {
 
         {/* Right: options */}
         <div className="space-y-6">
-          {/* Aspect ratio */}
+          {/* Aspect ratio — chosen IN THE EDITOR (canvas shape is WYSIWYG
+              there); shown read-only here so this page can never be the
+              place the aspect is set. */}
           <section className="rounded-2xl border border-[#2a2a35] bg-[#0b0b10] p-6">
             <div className="flex items-center gap-2 mb-4">
               <Ratio size={14} className="text-[#c4b5fd]" />
               <h3 className="font-display font-semibold text-sm tracking-wide">
                 Aspect ratio
               </h3>
+              <span className="ml-auto text-[11px] text-[#71717a]">
+                Set in the editor
+              </span>
             </div>
             <div className="grid sm:grid-cols-3 gap-3">
               {ASPECTS.map((a) => {
                 const active = exportSettings.format === a.v;
                 return (
-                  <button
+                  <div
                     key={a.v}
                     data-testid={EXPORT.aspectBtn(a.v)}
-                    onClick={() => setExportSetting("format", a.v)}
-                    className={`rounded-lg border p-4 text-left transition-colors ${
+                    aria-disabled="true"
+                    className={`rounded-lg border p-4 text-left ${
                       active
                         ? "border-[#7c3aed] bg-[#7c3aed]/10"
-                        : "border-[#2a2a35] bg-[#111116] hover:border-[#7c3aed]/40"
+                        : "border-[#2a2a35] bg-[#111116] opacity-50"
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2">
@@ -353,10 +426,16 @@ export default function Export() {
                     </div>
                     <p className="text-sm text-white mb-1">{a.label}</p>
                     <p className="text-[11px] text-[#71717a]">{a.desc}</p>
-                  </button>
+                  </div>
                 );
               })}
             </div>
+            <button
+              onClick={() => navigate(`/editor/${clip?.id || clipId}`)}
+              className="mt-3 text-[11px] font-semibold text-[#c4b5fd] hover:text-white transition-colors"
+            >
+              Change canvas shape in the editor →
+            </button>
           </section>
 
           {/* Background (letterbox fill for 1:1 / 16:9) */}

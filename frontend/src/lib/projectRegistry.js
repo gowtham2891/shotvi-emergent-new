@@ -1,8 +1,9 @@
-// localStorage registry of submitted jobs — the backend has no job-list
-// endpoint (jobs live in Redis, fetchable by id only, 24h TTL), so this is
-// the dashboard's only memory of past projects. Known temporary limitation:
-// entries outlive their jobs and are shown as "expired" once GET /jobs/{id}
-// 404s.
+// localStorage registry of submitted jobs. Since PHASE 2 BUILD 1 the
+// dashboard's source of truth is GET /jobs (backend-enforced, owner-scoped);
+// this registry only supplies display titles and keeps jobs that fell out of
+// Redis (24h TTL) visible as "expired" cards. Entries are stamped with the
+// creating user's id (`userId`) so a shared browser never shows one
+// account's titles to another.
 
 const KEY = "shotvi.projects.v1";
 

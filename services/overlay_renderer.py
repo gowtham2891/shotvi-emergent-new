@@ -39,6 +39,7 @@ value for the Telugu virality use case and was a recurring bug source.)
 
 import math
 import os
+import re
 import subprocess
 import tempfile
 from dataclasses import dataclass
@@ -50,6 +51,59 @@ from services.canvas_coords import to_pixel_center, to_pixel_size, center_to_top
 from services.fonts import get_font_path
 
 BAR_FPS = 15  # a slow linear reveal doesn't need more; keeps frame count low
+
+# ── User image overlays (Stage: "image" elements) ─────────────────────────
+# An image element's props carry an OPAQUE image_id — never a path. The id is
+# the exact basename the upload endpoint minted for this clip's video:
+# {video_id}_useroverlay_{8 hex}.png|.jpg. resolve_image_overlays() is the
+# ONLY place an id becomes a filesystem path, and it pins the id to the
+# rendering job's own video_id — so a payload can never reference another
+# user's uploads (ownership rides the video, exactly like every other
+# rerender artifact) and can never traverse (the regex admits no separators).
+_IMAGE_ID_TEMPLATE = r"{video_id}_useroverlay_[0-9a-f]{{8}}\.(?:png|jpg)"
+
+
+def valid_overlay_image_id(image_id, video_id: str) -> bool:
+    """True iff image_id is a well-formed overlay-image basename minted for
+    THIS video. Shared by the API boundary (422 early) and the worker-side
+    resolver (defense in depth)."""
+    if not isinstance(image_id, str) or not video_id:
+        return False
+    pattern = _IMAGE_ID_TEMPLATE.format(video_id=re.escape(video_id))
+    return re.fullmatch(pattern, image_id) is not None
+
+
+def resolve_image_overlays(elements: list, video_id: str, outputs_dir: str) -> list:
+    """Worker-side pre-pass: validate each image element's image_id against
+    the job's own video_id and inject the resolved absolute path
+    (props._resolved_path) for _prepare_image_layer. Invalid ids and missing
+    files are DROPPED with a warning, never rendered and never an error —
+    the same forward/backward-safety stance render_elements takes for
+    unknown element types. Non-image elements pass through untouched;
+    with no image elements the input list is returned as-is (identity), so
+    existing payloads take a byte-identical code path."""
+    if not elements or not any(
+        isinstance(el, dict) and el.get("type") == "image" for el in elements
+    ):
+        return elements
+    resolved = []
+    for el in elements:
+        if not isinstance(el, dict) or el.get("type") != "image":
+            resolved.append(el)
+            continue
+        image_id = (el.get("props") or {}).get("image_id")
+        if not valid_overlay_image_id(image_id, video_id):
+            print(f"  [Overlay] Dropping image element {el.get('id')!r}: "
+                  f"image_id {image_id!r} is not a valid overlay image for this video",
+                  flush=True)
+            continue
+        path = os.path.join(outputs_dir, image_id)
+        if not os.path.exists(path):
+            print(f"  [Overlay] Dropping image element {el.get('id')!r}: "
+                  f"{image_id!r} not found in outputs", flush=True)
+            continue
+        resolved.append({**el, "props": {**el["props"], "_resolved_path": path}})
+    return resolved
 
 
 @dataclass
@@ -343,10 +397,64 @@ def _prepare_headline_layer(element: dict, video_width: int, video_height: int,
     return Layer(path=out_path, is_video=False, width=img.width, height=img.height, ox=ox, oy=oy)
 
 
+def _prepare_image_layer(element: dict, video_width: int, video_height: int,
+                         tmp_dir: str) -> Optional[Layer]:
+    """
+    User-uploaded image overlay. Sizing mirrors ImageBody.jsx exactly: the
+    element stores a HEIGHT fraction of the canvas (props.height, same
+    fraction-of-height convention as fontSize on logo/headline); width
+    follows from the image's own natural aspect ratio (the preview <img>
+    keeps `width: auto`), so preview and burn derive width from the same
+    ratio. element.scale multiplies uniformly (TransformBox), rotation goes
+    through the shared _rotate_png_if_needed, and position converts through
+    the SAME to_pixel_center/center_to_topleft as every other overlay.
+    props.opacity (0-1) multiplies the alpha channel, matching CSS opacity.
+
+    props._resolved_path is injected server-side by resolve_image_overlays
+    (never client-supplied — the client only ever sends the opaque
+    image_id). No path here → the element was not resolved → skip.
+    """
+    p = element.get("props", {})
+    src = p.get("_resolved_path")
+    if not src or not os.path.exists(src):
+        print(f"  [Overlay] Skipping image element {element.get('id')!r}: "
+              f"no resolved source image", flush=True)
+        return None
+
+    height_frac = p.get("height", 0.18)
+    opacity = p.get("opacity", 1)
+    scale = element.get("scale", 1) or 1
+    rotation = element.get("rotation", 0) or 0
+
+    img = Image.open(src).convert("RGBA")
+    target_h = max(round(height_frac * video_height * scale), 2)
+    target_w = max(round(target_h * img.width / img.height), 2)
+    img = img.resize((target_w, target_h), Image.LANCZOS)
+
+    try:
+        opacity = float(opacity)
+    except (TypeError, ValueError):
+        opacity = 1.0
+    opacity = min(max(opacity, 0.0), 1.0)
+    if opacity < 1.0:
+        alpha = img.split()[3].point(lambda a: round(a * opacity))
+        img.putalpha(alpha)
+
+    img = _rotate_png_if_needed(img, rotation)
+    out_path = os.path.join(tmp_dir, f"image_{element.get('id', id(element))}.png")
+    img.save(out_path)
+
+    center = to_pixel_center(element.get("x", 0.5), element.get("y", 0.5),
+                             video_width, video_height)
+    ox, oy = center_to_topleft(center.cx, center.cy, img.width, img.height)
+    return Layer(path=out_path, is_video=False, width=img.width, height=img.height, ox=ox, oy=oy)
+
+
 _PREPARERS = {
     "progress": lambda el, vw, vh, tmp, dur: _prepare_progress_layer(el, vw, vh, tmp, dur),
     "logo": lambda el, vw, vh, tmp, dur: _prepare_logo_layer(el, vw, vh, tmp),
     "headline": lambda el, vw, vh, tmp, dur: _prepare_headline_layer(el, vw, vh, tmp),
+    "image": lambda el, vw, vh, tmp, dur: _prepare_image_layer(el, vw, vh, tmp),
 }
 
 
@@ -373,6 +481,14 @@ def render_elements(input_path: str, output_path: str, elements: list,
         if not el.get("visible", True):
             continue
         etype = el.get("type")
+        if etype == "image" and not (el.get("props") or {}).get("_resolved_path"):
+            # Image elements must arrive through resolve_image_overlays (which
+            # validates ownership and injects the path). An unresolved one is
+            # skipped like an unknown type — never an error, and never a
+            # reason to spin up the composite pass.
+            print(f"  [Overlay] Skipping unresolved image element "
+                  f"(id={el.get('id')!r}) — not burned", flush=True)
+            continue
         if etype in _PREPARERS:
             supported.append(el)
         else:

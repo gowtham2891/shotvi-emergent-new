@@ -31,6 +31,18 @@ export function collectCoordinateViolations(doc) {
     }
   }
 
+  // Sprint 4 — per-aspect crop windows are fractional windows over the 16:9
+  // master; the backend multiplies them straight into an FFmpeg crop filter,
+  // so pixels here would crop garbage.
+  const windows = doc?.exportSettings?.cropWindows;
+  if (windows && typeof windows === "object") {
+    for (const [aspect, box] of Object.entries(windows)) {
+      for (const k of ["x", "y", "w", "h"]) {
+        check(`exportSettings.cropWindows[${aspect}].${k}`, box?.[k]);
+      }
+    }
+  }
+
   return violations;
 }
 

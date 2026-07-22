@@ -25,6 +25,9 @@ export const AUTH = {
   submit: "auth-submit-button",
   googleBtn: "auth-google-button",
   backHome: "auth-back-home",
+  error: "auth-error",
+  notice: "auth-notice",
+  forgot: "auth-forgot-link",
 };
 
 export const DASHBOARD = {
@@ -34,6 +37,17 @@ export const DASHBOARD = {
   projectOpen: (id) => `dashboard-project-open-${id}`,
   sidebarLink: (key) => `sidebar-link-${key}`,
   userMenu: "sidebar-user-menu",
+
+  // First-run empty state (zero projects) — hero URL-paste moment
+  firstRunRoot: "dashboard-firstrun-root",
+  heroUrlInput: "dashboard-hero-url-input",
+  heroSubmit: "dashboard-hero-submit-button",
+  heroError: "dashboard-hero-error",
+};
+
+export const CLIPS_CUE = {
+  root: "clips-firstclip-cue",
+  dismiss: "clips-firstclip-cue-dismiss",
 };
 
 export const UPLOAD = {
@@ -62,6 +76,8 @@ export const EDITOR = {
   root: "editor-root",
   backBtn: "editor-back-button",
   exportBtn: "editor-export-button",
+  undoBtn: "editor-undo-button",
+  redoBtn: "editor-redo-button",
 
   // Clip list panel
   clipListItem: (id) => `editor-clip-${id}`,
@@ -70,15 +86,27 @@ export const EDITOR = {
   canvas: "editor-canvas",
   canvasStage: "editor-canvas-stage",
   playBtn: "editor-play-button",
-  splitBtn: "editor-split-button",
   seekBackBtn: "editor-seek-back",
   seekFwdBtn: "editor-seek-fwd",
   timelineWord: (idx) => `timeline-word-${idx}`,
   timelinePlayhead: "timeline-playhead",
+  splitMarker: (idx) => `timeline-split-marker-${idx}`,
+  translitSuggestion: (i) => `translit-suggestion-${i}`,
+  translitKeepTyped: "translit-keep-typed",
+
+  // Line-level caption editing (key = the line's startIdx)
+  editLineBtn: (startIdx) => `timeline-edit-line-${startIdx}`,
+  lineEditorInput: (startIdx) => `timeline-line-editor-${startIdx}`,
+  realignedWord: (startIdx, i) => `timeline-realigned-${startIdx}-${i}`,
+  lineApproxBadge: (startIdx) => `timeline-line-approx-${startIdx}`,
+
+  // Telugu ⇄ Tanglish caption script toggle (topbar)
+  scriptToggle: "editor-script-toggle",
+  scriptTelugu: "editor-script-telugu",
+  scriptTanglish: "editor-script-tanglish",
 
   // Inspector tabs
   tabStyle: "editor-tab-style",
-  tabMusic: "editor-tab-music",
   tabExport: "editor-tab-export",
 
   // Style inspector
@@ -95,8 +123,42 @@ export const EDITOR = {
   pillPadding: "editor-pill-padding",
   pillRadius: "editor-pill-radius",
 
-  // Music
-  musicItem: (id) => `editor-music-${id}`,
+  // Clip trim handles (timeline)
+  trimStartHandle: "editor-trim-start-handle",
+  trimEndHandle: "editor-trim-end-handle",
+  trimReset: "editor-trim-reset",
+
+  // Saved caption template ("My Style")
+  myStyleName: "editor-mystyle-name",
+  myStyleSave: "editor-mystyle-save",
+  myStyleApply: "editor-mystyle-apply",
+  myStyleClear: "editor-mystyle-clear",
+
+  // Draft version history (topbar)
+  historyBtn: "editor-history-button",
+  historyPanel: "editor-history-panel",
+  historyRestore: (i) => `editor-history-restore-${i}`,
+
+  // Canvas aspect + background fill (WYSIWYG canvas — Sprint 3)
+  aspectBtn: (v) => `editor-aspect-${v}`,
+  bgFillBtn: (v) => `editor-bgfill-${v}`,
+  bgFillColor: "editor-bgfill-color",
+  canvasFillBlur: "editor-canvas-fill-blur",
+  canvasFillColor: "editor-canvas-fill-color",
+
+  // Crop window / drag-to-reframe (16:9 master — Sprint 4)
+  canvasVideo: "editor-canvas-video",
+  cropViewport: "editor-crop-viewport",
+  reframeToggle: "editor-reframe-toggle",
+  reframeReset: "editor-reframe-reset",
+  reframeDone: "editor-reframe-done",
+  cropRect: "editor-crop-rect",
+  cropHandle: (pos) => `editor-crop-handle-${pos}`, // tl|tr|bl|br
+
+  // User image overlays
+  addImageInput: "editor-add-image-input",
+  imageOpacity: "editor-image-opacity",
+  imageSize: "editor-image-size",
 
   // Canvas toolbar
   zoomIn: "editor-zoom-in",
@@ -123,8 +185,18 @@ export const EDITOR = {
   elementDelete: (id) => `elements-delete-${id}`,
 };
 
+export const BILLING = {
+  card: "billing-card",
+  planStatus: "billing-plan-status",
+  upgradeButton: "billing-upgrade-button",
+  cancelButton: "billing-cancel-button",
+};
+
 export const EXPORT = {
   root: "export-root",
+  // Live-draft preview (Sprint 4: master + crop-window simulation)
+  livePreviewViewport: "export-live-preview-viewport",
+  livePreviewVideo: "export-live-preview-video",
   resolutionBtn: (v) => `export-resolution-${v}`,
   formatBtn: (v) => `export-format-${v}`,
   burnToggle: "export-burn-toggle",

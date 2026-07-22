@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, User, ArrowLeft, ArrowRight } from "lucide-react";
+import { toast } from "sonner";
 import { Logo } from "@/components/shotvi/Logo";
 import { useAppStore } from "@/store/useAppStore";
 import { AUTH } from "@/constants/testIds";
@@ -10,13 +11,76 @@ export default function Auth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const signIn = useAppStore((s) => s.signIn);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(null);
+  const [notice, setNotice] = useState(null);
+
+  const user = useAppStore((s) => s.user);
+  const authEnabled = useAppStore((s) => s.authEnabled);
+  const passwordRecovery = useAppStore((s) => s.passwordRecovery);
+  const signInWithPassword = useAppStore((s) => s.signInWithPassword);
+  const signUpWithPassword = useAppStore((s) => s.signUpWithPassword);
+  const signInWithGoogle = useAppStore((s) => s.signInWithGoogle);
+  const resetPassword = useAppStore((s) => s.resetPassword);
+  const updatePassword = useAppStore((s) => s.updatePassword);
   const navigate = useNavigate();
+
+  // Already signed in (session restored, OAuth redirect landed here, or dev
+  // mode's permanent fake user) → straight to the app. Skipped mid password
+  // recovery: that flow signs the user in but they came to set a password.
+  useEffect(() => {
+    if (user && !passwordRecovery) navigate("/dashboard", { replace: true });
+  }, [user, passwordRecovery, navigate]);
+
+  const run = async (fn) => {
+    setError(null);
+    setNotice(null);
+    setBusy(true);
+    try {
+      await fn();
+    } catch (err) {
+      setError(err?.message || "Something went wrong — please try again");
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    signIn(email || "creator@shotvi.app");
-    navigate("/dashboard");
+    if (!authEnabled) return; // dev mode: form is decorative, guard is open
+    run(async () => {
+      if (passwordRecovery) {
+        await updatePassword(password);
+        toast.success("Password updated");
+        navigate("/dashboard", { replace: true });
+      } else if (tab === "signin") {
+        await signInWithPassword(email, password);
+        // navigation happens via the user effect above
+      } else {
+        const { needsConfirmation } = await signUpWithPassword(email, password, name);
+        if (needsConfirmation) {
+          setNotice("Check your inbox — confirm your email to finish creating the account.");
+        }
+      }
+    });
+  };
+
+  const handleGoogle = () => {
+    if (!authEnabled) return;
+    run(() => signInWithGoogle()); // redirects away on success
+  };
+
+  const handleForgot = (e) => {
+    e.preventDefault();
+    if (!authEnabled) return;
+    if (!email) {
+      setError("Enter your email above first, then hit Forgot again.");
+      return;
+    }
+    run(async () => {
+      await resetPassword(email);
+      setNotice(`Password reset link sent to ${email}.`);
+    });
   };
 
   return (
@@ -85,17 +149,52 @@ export default function Auth() {
           </div>
           <div className="mb-8">
             <h2 className="font-display text-3xl font-bold tracking-tight mb-2">
-              {tab === "signin" ? "Welcome back" : "Create your account"}
+              {passwordRecovery
+                ? "Set a new password"
+                : tab === "signin" ? "Welcome back" : "Create your account"}
             </h2>
             <p className="text-sm text-[#a1a1aa]">
-              {tab === "signin"
+              {passwordRecovery
+                ? "You followed a reset link — choose a new password below."
+                : tab === "signin"
                 ? "Sign in to keep clipping. Your projects are waiting."
                 : "Start with 3 free projects. No card required."}
             </p>
           </div>
 
+          {!authEnabled && (
+            <div className="mb-6 p-3 rounded-md border border-amber-500/30 bg-amber-500/10 text-xs text-amber-200 leading-relaxed">
+              Authentication isn't configured (no Supabase env vars) — running
+              in <span className="font-semibold">dev mode</span>.{" "}
+              <button
+                type="button"
+                onClick={() => navigate("/dashboard")}
+                className="underline font-semibold hover:text-white"
+              >
+                Continue to the app
+              </button>
+            </div>
+          )}
+
+          {error && (
+            <div
+              data-testid={AUTH.error}
+              className="mb-4 p-3 rounded-md border border-red-500/30 bg-red-500/10 text-xs text-red-300 leading-relaxed"
+            >
+              {error}
+            </div>
+          )}
+          {notice && (
+            <div
+              data-testid={AUTH.notice}
+              className="mb-4 p-3 rounded-md border border-emerald-500/30 bg-emerald-500/10 text-xs text-emerald-200 leading-relaxed"
+            >
+              {notice}
+            </div>
+          )}
+
           {/* Tabs */}
-          <div className="flex p-1 bg-[#0b0b10] border border-[#2a2a35] rounded-md mb-6">
+          <div className={`flex p-1 bg-[#0b0b10] border border-[#2a2a35] rounded-md mb-6 ${passwordRecovery ? "hidden" : ""}`}>
             <button
               data-testid={AUTH.tabSignIn}
               onClick={() => setTab("signin")}
@@ -120,10 +219,12 @@ export default function Auth() {
             </button>
           </div>
 
+          {!passwordRecovery && (
           <button
             data-testid={AUTH.googleBtn}
-            onClick={handleSubmit}
-            className="w-full flex items-center justify-center gap-2 bg-white text-black text-sm font-semibold py-2.5 rounded-md hover:bg-[#e5e5e5] transition-colors mb-4"
+            onClick={handleGoogle}
+            disabled={busy || !authEnabled}
+            className="w-full flex items-center justify-center gap-2 bg-white text-black text-sm font-semibold py-2.5 rounded-md hover:bg-[#e5e5e5] transition-colors mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg width="16" height="16" viewBox="0 0 24 24">
               <path
@@ -145,7 +246,9 @@ export default function Auth() {
             </svg>
             Continue with Google
           </button>
+          )}
 
+          {!passwordRecovery && (
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-[#2a2a35]" />
@@ -156,9 +259,10 @@ export default function Auth() {
               </span>
             </div>
           </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {tab === "signup" && (
+            {tab === "signup" && !passwordRecovery && (
               <div>
                 <label className="text-xs uppercase tracking-widest text-[#71717a] mb-2 block">
                   Full Name
@@ -179,7 +283,7 @@ export default function Auth() {
                 </div>
               </div>
             )}
-            <div>
+            <div className={passwordRecovery ? "hidden" : ""}>
               <label className="text-xs uppercase tracking-widest text-[#71717a] mb-2 block">
                 Email
               </label>
@@ -201,11 +305,13 @@ export default function Auth() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="text-xs uppercase tracking-widest text-[#71717a]">
-                  Password
+                  {passwordRecovery ? "New password" : "Password"}
                 </label>
-                {tab === "signin" && (
+                {tab === "signin" && !passwordRecovery && (
                   <a
                     href="#"
+                    data-testid={AUTH.forgot}
+                    onClick={handleForgot}
                     className="text-xs text-[#a78bfa] hover:text-white transition-colors"
                   >
                     Forgot?
@@ -230,9 +336,14 @@ export default function Auth() {
             <button
               data-testid={AUTH.submit}
               type="submit"
-              className="w-full flex items-center justify-center gap-2 bg-[#7c3aed] hover:bg-[#6d28d9] text-white text-sm font-semibold py-2.5 rounded-md transition-colors shadow-[0_10px_30px_-10px_rgba(124,58,237,0.6)]"
+              disabled={busy || !authEnabled}
+              className="w-full flex items-center justify-center gap-2 bg-[#7c3aed] hover:bg-[#6d28d9] text-white text-sm font-semibold py-2.5 rounded-md transition-colors shadow-[0_10px_30px_-10px_rgba(124,58,237,0.6)] disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {tab === "signin" ? "Sign in" : "Create account"}
+              {busy
+                ? "Please wait…"
+                : passwordRecovery
+                ? "Update password"
+                : tab === "signin" ? "Sign in" : "Create account"}
               <ArrowRight size={14} />
             </button>
           </form>

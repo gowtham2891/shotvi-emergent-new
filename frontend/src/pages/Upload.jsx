@@ -18,6 +18,7 @@ import { useJobPolling } from "@/hooks/useJobPolling";
 import { USE_MOCKS } from "@/api/client";
 import { UPLOAD } from "@/constants/testIds";
 import { LANGUAGES } from "@/data/mockData";
+import { isValidYoutubeUrl } from "@/lib/youtubeUrl";
 
 const STEPS = [
   { key: "uploading", label: "Uploading video" },
@@ -57,6 +58,16 @@ export default function Upload() {
 
   const [processing, setProcessing] = useState(false);
   const [failure, setFailure] = useState(null); // {message, retryable}
+  const [urlError, setUrlError] = useState(null); // inline pre-submit validation
+
+  // Pick up a job already in flight when this page mounts (e.g. the
+  // dashboard's first-run hero submits the URL and navigates straight here)
+  // — jump directly to the processing view instead of showing the picker
+  // form over a job that's already running.
+  useEffect(() => {
+    if (!USE_MOCKS && activeJobId) setProcessing(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Mock-mode simulation state (offline dev path)
   const [activeStep, setActiveStep] = useState(0);
@@ -88,6 +99,14 @@ export default function Upload() {
   const startProcessing = async () => {
     if (mode === "file" && !file) return;
     if (mode === "url" && !url.trim()) return;
+
+    // Inline validation BEFORE submitting — an obviously-invalid YouTube
+    // link never becomes a job that runs and fails at the download stage.
+    if (mode === "url" && !USE_MOCKS && !isValidYoutubeUrl(url.trim())) {
+      setUrlError("That doesn't look like a YouTube link — try a youtube.com or youtu.be URL.");
+      return;
+    }
+    setUrlError(null);
 
     if (USE_MOCKS) {
       setProcessing(true);
@@ -280,12 +299,20 @@ export default function Upload() {
                   <input
                     data-testid={UPLOAD.urlInput}
                     value={url}
-                    onChange={(e) => setUrl(e.target.value)}
+                    onChange={(e) => {
+                      setUrl(e.target.value);
+                      if (urlError) setUrlError(null);
+                    }}
                     type="url"
                     placeholder="https://youtube.com/watch?v=..."
                     className="w-full bg-[#111116] border border-[#2a2a35] rounded-md py-3 pl-10 pr-3 text-sm text-white placeholder-[#5a5a66] focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed] outline-none transition-colors"
                   />
                 </div>
+                {urlError && (
+                  <p className="mt-3 text-sm text-[#fca5a5] flex items-center gap-2">
+                    <AlertTriangle size={14} /> {urlError}
+                  </p>
+                )}
               </div>
             )}
 

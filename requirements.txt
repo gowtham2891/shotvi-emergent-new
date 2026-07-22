@@ -19,7 +19,20 @@ fastapi
 uvicorn
 celery
 redis
+# Supabase JWT verification (api/auth.py). HS256 needs PyJWT alone; the
+# JWKS path (new Supabase projects, ES256) also needs the crypto extra.
+PyJWT[crypto]
 sqlalchemy
 psycopg2-binary
 python-multipart
 resend
+ai4bharat-transliteration
+# Telugu→Tanglish caption toggle (services/tanglish.py). Pure Python
+# (sanscript schemes) — no torch/fairseq; NOT the same as
+# ai4bharat-transliteration (IndicXlit, Latin→Telugu suggestions).
+indic-transliteration
+# Billing (PHASE 2 BUILD 2). Razorpay Subscriptions API for the Studio Plan.
+# Only the subscription-creation / cancel paths import it; webhook signature
+# verification is plain hmac/hashlib (stdlib), so it works even if this is
+# absent. See SETUP_BILLING.md.
+razorpay

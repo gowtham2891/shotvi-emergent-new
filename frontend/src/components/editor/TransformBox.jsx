@@ -37,6 +37,8 @@ export const TransformBox = ({ element, canvasRect, elementRect }) => {
       updateElement(element.id, { scale: newScale });
     };
     const up = () => {
+      // One undo frame per resize gesture — close it on release.
+      useAppStore.getState().endHistoryCoalescing();
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", up);
     };
@@ -66,6 +68,8 @@ export const TransformBox = ({ element, canvasRect, elementRect }) => {
       updateElement(element.id, { rotation: deg });
     };
     const up = () => {
+      // One undo frame per rotate gesture — close it on release.
+      useAppStore.getState().endHistoryCoalescing();
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", up);
     };

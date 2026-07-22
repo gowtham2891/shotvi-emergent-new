@@ -15,7 +15,11 @@ load_dotenv()
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from api.database import get_job, update_job, set_job_clips
+from api.database import (
+    get_job, update_job, set_job_clips,
+    acquire_video_lock, release_video_lock,
+)
+from services.youtube_utils import extract_video_id
 
 REDIS_URL  = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
 
@@ -36,13 +40,46 @@ FORMAT_CONFIG = {
 
 BACKGROUND_OPTIONS = ["blur", "black", "white", "color"]
 
+# Filename tokens that only rerender/export artifacts carry (worker.py rerender
+# path: *_canvas.mp4, *_overlays.mp4, *_prepared.mp4 and the captioned outputs
+# derived from those stems), plus user-uploaded overlay images
+# (*_useroverlay_*.png/jpg from POST /jobs/{id}/overlay-images). Pipeline
+# cleanup and pipeline output collection must both skip anything carrying one
+# of these — a fresh pipeline run may never delete or adopt a user's previous
+# export, and may never delete a user's uploaded overlay image.
+_RERENDER_MARKERS = ("_canvas", "_overlays", "_prepared", "_useroverlay")
+
+
+def _is_rerender_artifact(name: str) -> bool:
+    return any(m in name for m in _RERENDER_MARKERS)
+
+
+def read_default_crop_box(output_dir: Path, video_id: str, clip_num: int):
+    """Sprint 4: the vertical cropper persists its AI framing as a fractional
+    window over the 16:9 master ({x,y,w,h}, 0–1) in a *_vertical.cropbox.json
+    sidecar. Adopt it onto the clip record as default_crop_box; None when the
+    sidecar is missing (pre-Sprint-4 outputs) or unreadable."""
+    sidecars = [f for f in output_dir.glob(f"{video_id}_clip{clip_num}_*_vertical.cropbox.json")
+                if not _is_rerender_artifact(f.name)]
+    if not sidecars:
+        return None
+    try:
+        box = json.loads(sidecars[0].read_text(encoding="utf-8"))
+        if (isinstance(box, dict)
+                and all(isinstance(box.get(k), (int, float)) for k in ("x", "y", "w", "h"))):
+            return {k: float(box[k]) for k in ("x", "y", "w", "h")}
+    except (OSError, ValueError) as e:
+        print(f"  [crop_box] ⚠ unreadable sidecar {sidecars[0].name}: {e}")
+    return None
+
 
 # ══════════════════════════════════════════════════════════════
 # Full pipeline task
 # ══════════════════════════════════════════════════════════════
 
 @celery_app.task(bind=True, name="process_video")
-def process_video(self, job_id: str, url: str, language: str = "te", known_video_id: str = None):
+def process_video(self, job_id: str, url: str, language: str = "te", known_video_id: str = None,
+                  is_upload: bool = False):
     """Full pipeline. Checkpoint-based: each stage's output on disk lets a
     re-run skip it. This is what makes stale-cache regeneration cheap — when
     POST /jobs finds a 'done' job whose output files were deleted, it re-runs
@@ -53,7 +90,25 @@ def process_video(self, job_id: str, url: str, language: str = "te", known_video
     known_video_id: when set and the source .mp4 is still on disk, the
     download+transcribe+select stages are skipped where their outputs survive.
     None (the normal first-run path) → download derives the id as before.
+
+    is_upload: True ONLY when enqueued by POST /jobs/upload with a path the
+    API itself just wrote under storage/uploads. The worker never infers
+    "local file" from disk existence — an attacker-supplied path that happens
+    to exist must not be treated as the caller's upload.
     """
+    # ── Per-video lock ────────────────────────────────────────────────────
+    # Storage artifacts are keyed by video_id and shared between runs, so two
+    # concurrent pipelines over the same video corrupt each other (cleanup
+    # unlinks files the other run is still writing). Held for the whole run;
+    # a second submission while in flight fails fast with a clear error.
+    lock_video_id = known_video_id or (
+        Path(url).stem if is_upload else extract_video_id(url)
+    )
+    if lock_video_id and not acquire_video_lock(lock_video_id, job_id):
+        update_job(job_id, status="failed", current_stage="Failed",
+                   error="This video is already being processed by another job. "
+                         "Wait for it to finish, then try again.")
+        return
     try:
         from services.video_downloader import download_youtube
         from services.transcriber import transcribe_audio, save_transcript
@@ -77,13 +132,19 @@ def process_video(self, job_id: str, url: str, language: str = "te", known_video
             video_path = reuse_source
             audio_path = str(UPLOAD_DIR / f"{video_id}_audio.wav")
             print(f"  [Resume] Reusing downloaded source for {video_id} — skipping download", flush=True)
-        elif Path(url).exists():
+        elif is_upload:
             # Local file from POST /jobs/upload — FastAPI and this worker share the
             # filesystem (both run from the repo root on one machine), so the saved
-            # path resolves here. YouTube URLs never exist as local paths.
+            # path resolves here. Trust the explicit flag, never bare existence,
+            # and require the path to actually live under storage/uploads so a
+            # forged task payload can't read arbitrary server files.
+            upload_path = Path(url).resolve()
+            if (not upload_path.is_file()
+                    or UPLOAD_DIR.resolve() not in upload_path.parents):
+                raise ValueError("Upload source path is missing or outside storage/uploads")
             from services.video_downloader import handle_upload
             update_job(job_id, current_stage="Preparing upload")
-            result = handle_upload(url, filename=Path(url).stem)
+            result = handle_upload(str(upload_path), filename=upload_path.stem)
             video_id   = result["video_id"]
             video_path = result["video_path"]
             audio_path = result["audio_path"]
@@ -124,16 +185,25 @@ def process_video(self, job_id: str, url: str, language: str = "te", known_video
         update_job(job_id, progress=60)
 
         update_job(job_id, status="cutting", progress=65, current_stage="Cutting clips")
+        # Scoped cleanup: only THIS video's pipeline artifacts (raw cuts,
+        # verticals, pipeline captions/thumbs — everything the stages below
+        # regenerate). The old bare `startswith(video_id)` glob also deleted
+        # rerender exports and, worse, other videos whose id shares a prefix.
+        # `{video_id}_clip` scopes to pipeline naming; rerender artifacts are
+        # excluded by marker. Safe against concurrent runs because we hold the
+        # per-video lock for the whole pipeline.
         if OUTPUT_DIR.exists() and video_id:
             for f in OUTPUT_DIR.iterdir():
-                if f.is_file() and f.name.startswith(video_id):
+                if (f.is_file()
+                        and f.name.startswith(f"{video_id}_clip")
+                        and not _is_rerender_artifact(f.name)):
                     f.unlink()
                     print(f"  [Cleanup] Removed old file: {f.name}")
         cut_all_clips(clips_path, video_path, str(OUTPUT_DIR))
         update_job(job_id, progress=75)
 
         update_job(job_id, status="cropping", progress=80, current_stage="Cropping to 9:16")
-        crop_all_clips(str(OUTPUT_DIR))
+        crop_all_clips(str(OUTPUT_DIR), video_id=video_id)
         update_job(job_id, progress=90)
 
         update_job(job_id, status="captioning", progress=92, current_stage="Burning captions")
@@ -148,13 +218,19 @@ def process_video(self, job_id: str, url: str, language: str = "te", known_video
 
         output_clips = []
         for i, clip in enumerate(clips_data.get("clips", []), 1):
-            # Raw cut clip (no crop, no captions) — source for re-renders
+            # Raw cut clip (no crop, no captions) — source for re-renders.
+            # Rerender exports now SURVIVE cleanup, so every glob here must
+            # exclude them or a previous export gets adopted as this run's output.
             raw_files      = [f for f in OUTPUT_DIR.glob(f"{video_id}_clip{i}_*.mp4")
-                              if "_vertical" not in f.name and "_captioned" not in f.name and "_captions" not in f.name]
-            captioned_file = list(OUTPUT_DIR.glob(f"{video_id}_clip{i}_*bold-yellow_captioned.mp4"))
+                              if "_vertical" not in f.name and "_captioned" not in f.name
+                              and "_captions" not in f.name and not _is_rerender_artifact(f.name)]
+            captioned_file = [f for f in OUTPUT_DIR.glob(f"{video_id}_clip{i}_*bold-yellow_captioned.mp4")
+                              if not _is_rerender_artifact(f.name)]
             if not captioned_file:
-                captioned_file = list(OUTPUT_DIR.glob(f"{video_id}_clip{i}_*captioned.mp4"))
-            vertical_file  = list(OUTPUT_DIR.glob(f"{video_id}_clip{i}_*_vertical.mp4"))
+                captioned_file = [f for f in OUTPUT_DIR.glob(f"{video_id}_clip{i}_*captioned.mp4")
+                                  if not _is_rerender_artifact(f.name)]
+            vertical_file  = [f for f in OUTPUT_DIR.glob(f"{video_id}_clip{i}_*_vertical.mp4")
+                              if not _is_rerender_artifact(f.name)]
 
             output_clips.append({
                 "clip_id":         clip.get("clip_id", f"{video_id}_c{i}"),
@@ -170,6 +246,7 @@ def process_video(self, job_id: str, url: str, language: str = "te", known_video
                 "raw_path":        str(raw_files[0])      if raw_files      else "",
                 "vertical_path":   str(vertical_file[0])  if vertical_file  else "",
                 "captioned_path":  str(captioned_file[0]) if captioned_file else "",
+                "default_crop_box": read_default_crop_box(OUTPUT_DIR, video_id, i),
             })
 
         set_job_clips(job_id, output_clips)
@@ -190,6 +267,29 @@ def process_video(self, job_id: str, url: str, language: str = "te", known_video
     except Exception as e:
         update_job(job_id, status="failed", error=str(e), current_stage="Failed")
         raise
+    finally:
+        if lock_video_id:
+            release_video_lock(lock_video_id, job_id)
+
+
+def select_rerender_source(clip: dict, use_autocrop: bool, crop_mode: str, crop_box):
+    """Sprint 4 source selection — THE byte-identical guarantee lives here.
+
+    A manual crop window (crop_mode='manual' + crop_box) renders from the
+    16:9 master (raw_path): crop_box is a fractional window over the master
+    and _prepare_source applies it upstream of _apply_canvas. Everything
+    else — crucially the untouched-crop 9:16 default, whose payload carries
+    crop_mode='auto' and no crop_box exactly as before this sprint — keeps
+    reading the SAME pre-baked vertical_path through the same chain, so its
+    output stays byte-identical. Falls back to vertical when a legacy clip
+    record has no raw_path (crop_box fractions then apply to the vertical;
+    the frontend previews over the same file, so both sides still agree).
+    """
+    if crop_mode == "manual" and crop_box:
+        return clip.get("raw_path", "") or clip.get("vertical_path", "")
+    if use_autocrop:
+        return clip.get("vertical_path", "")
+    return clip.get("raw_path", "")
 
 
 # ══════════════════════════════════════════════════════════════
@@ -203,7 +303,8 @@ def rerender_clip(self, rerender_job_id: str, source_job_id: str, clip_index: in
                   transcript_edits=None, crop_box=None, selected_subject=None,
                   crop_mode: str = "auto", elements=None, caption_font=None,
                   caption_x=None, caption_y=None,
-                  caption_font_size=None, caption_pill=None):
+                  caption_font_size=None, caption_pill=None,
+                  caption_script: str = "telugu"):
     """
     Export a single clip with:
     - Source: auto-cropped vertical OR original cut
@@ -225,6 +326,9 @@ def rerender_clip(self, rerender_job_id: str, source_job_id: str, clip_index: in
     - caption_pill (BUG-001 partial): {enabled, color '#rrggbb', opacity, padding, radius}.
       None or enabled=False → the preset's own back_color renders; a set pill overrides
       the ASS BorderStyle+BackColour combo for the current burn.
+    - caption_script: 'telugu' (default) or 'tanglish' — which script the caption text
+      renders in. Tanglish burns word_tanglish through the SAME ASS path (fonts,
+      k-values, \\an5\\pos, timing all unchanged); anything else falls back to telugu.
     """
     try:
         from services.caption_renderer import render_captions_for_clip, STYLES, DEFAULT_STYLE
@@ -246,10 +350,7 @@ def rerender_clip(self, rerender_job_id: str, source_job_id: str, clip_index: in
         clips_path      = str(UPLOAD_DIR / f"{video_id}_audio_clips.json")
 
         # ── Choose source clip ────────────────────────────────
-        if use_autocrop:
-            source_path = clip.get("vertical_path", "")
-        else:
-            source_path = clip.get("raw_path", "")
+        source_path = select_rerender_source(clip, use_autocrop, crop_mode, crop_box)
 
         if not source_path or not Path(source_path).exists():
             # Fallback — find any base clip
@@ -295,7 +396,9 @@ def rerender_clip(self, rerender_job_id: str, source_job_id: str, clip_index: in
             needs_trim = trim_start > 0 or (trim_end > 0 and trim_end < _dur)
 
         if needs_crop or needs_trim:
-            prepared_path = str(OUTPUT_DIR / f"{out_stem}_prepared.mp4")
+            # job_suffix like every other rerender artifact — without it, two
+            # concurrent re-exports of the same clip collide on this file.
+            prepared_path = str(OUTPUT_DIR / f"{out_stem}_{job_suffix}_prepared.mp4")
             _prepare_source(
                 source_path, prepared_path,
                 crop_box=crop_box if needs_crop else None,
@@ -322,6 +425,11 @@ def rerender_clip(self, rerender_job_id: str, source_job_id: str, clip_index: in
         # canvas_out unchanged if there's nothing supported to burn.
         update_job(rerender_job_id, progress=45, current_stage="Applying overlays")
         overlay_out = str(OUTPUT_DIR / f"{out_stem}_{safe_fmt}_{safe_bg}_{job_suffix}_overlays.mp4")
+        # User image overlays: opaque image_id → validated absolute path,
+        # pinned to THIS job's video_id (see resolve_image_overlays). Pure
+        # identity when no image elements are present.
+        from services.overlay_renderer import resolve_image_overlays
+        elements = resolve_image_overlays(elements, video_id, str(OUTPUT_DIR))
         pre_caption_path = render_elements(canvas_out, overlay_out, elements, target_w, target_h)
 
         update_job(rerender_job_id, progress=60, current_stage="Burning captions")
@@ -347,6 +455,7 @@ def rerender_clip(self, rerender_job_id: str, source_job_id: str, clip_index: in
             video_height=target_h,
             caption_font_size=caption_font_size,
             caption_pill=caption_pill,
+            caption_script=caption_script,
         )
 
         if not result:

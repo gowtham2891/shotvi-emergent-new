@@ -49,18 +49,29 @@ def get_font_path(name: str) -> str:
 # `Fontname`, and resolved to bundled files by libass via `fontsdir`
 # (CAPTION_FONTS_DIR). Static Regular instances (Noto's variable [wght] axis
 # was instanced at 400) to avoid libass variable-font weight ambiguity.
+#
+# LAYOUT INVARIANT (DIAGNOSIS_FONTS.md): every caption .ttf MUST be an
+# IMMEDIATE child of CAPTION_FONTS_DIR. libass's fontsdir scan is
+# NON-RECURSIVE — it fopen()s each directory entry as a font file, so a font
+# in a subdirectory is never loaded and libass silently substitutes a system
+# font (Nirmala UI on Windows, tofu elsewhere) for every export. Keep this
+# directory flat: .ttf files only (non-font files log an "Error opening
+# memory font"; subdirectories like licenses/ are skipped). Guarded by
+# tests/test_caption_font_resolution.py.
 CAPTION_FONTS = {
-    "Noto Sans Telugu": os.path.join(FONTS_DIR, "noto-sans-telugu", "NotoSansTelugu-Regular.ttf"),
-    "Ramabhadra":       os.path.join(FONTS_DIR, "ramabhadra", "Ramabhadra-Regular.ttf"),
-    "Mandali":          os.path.join(FONTS_DIR, "mandali", "Mandali-Regular.ttf"),
+    "Noto Sans Telugu": os.path.join(FONTS_DIR, "captions", "NotoSansTelugu-Regular.ttf"),
+    "Ramabhadra":       os.path.join(FONTS_DIR, "captions", "Ramabhadra-Regular.ttf"),
+    "Mandali":          os.path.join(FONTS_DIR, "captions", "Mandali-Regular.ttf"),
 }
 
 DEFAULT_CAPTION_FONT = "Noto Sans Telugu"
 
-# Directory handed to the ass filter as `fontsdir`. It also contains the
-# logo/headline fonts (manrope/outfit) — harmless: libass indexes the tree but
-# the .ass only references caption fonts by their family name.
-CAPTION_FONTS_DIR = FONTS_DIR
+# Directory handed to the ass filter as `fontsdir` — the flat directory whose
+# immediate children are exactly the caption .ttf files above (OFL licenses
+# live in captions/licenses/, out of libass's scan). The logo/headline fonts
+# (manrope/outfit) are NOT here: they are resolved by explicit file path via
+# get_font_path, never through fontsdir.
+CAPTION_FONTS_DIR = os.path.join(FONTS_DIR, "captions")
 
 
 def get_caption_font(name: str):

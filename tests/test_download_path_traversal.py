@@ -45,9 +45,16 @@ def client(tmp_path, monkeypatch):
         symlink_available = False
 
     from api import main as api_main
+    from api.auth import AuthUser, get_current_user
     monkeypatch.setattr(api_main, "OUTPUT_DIR", outputs)
 
+    # Auth: DEV_MODE identity — containment is what's under test here;
+    # ownership behaviour has its own suite (test_auth_ownership).
+    api_main.app.dependency_overrides[get_current_user] = (
+        lambda: AuthUser(id="dev-user", is_dev=True))
+
     yield TestClient(api_main.app), outputs, off_limits, escape_link, symlink_available
+    api_main.app.dependency_overrides.pop(get_current_user, None)
 
 
 def test_legit_clip_inside_outputs_downloads_200(client):

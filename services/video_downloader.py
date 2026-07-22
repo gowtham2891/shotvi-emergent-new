@@ -46,19 +46,38 @@ def download_youtube(url: str) -> dict:
         'no_warnings': False,
         'js_runtimes': {'node': {}},
         'remote_components': {'ejs': 'github'},
+        # Fetch resilience: pace requests so we look less like a scraper, and
+        # retry transient failures instead of dying on the first hiccup.
+        'sleep_interval': 1,
+        'max_sleep_interval': 3,
+        'retries': 3,
+        'fragment_retries': 3,
     }
 
     # Only add cookies if the file exists — avoids the Chrome lock error
     if cookies_file.exists():
         ydl_opts['cookiefile'] = str(cookies_file)
-    
-    # Download video
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(url, download=True)
-        video_id = info['id']
-        title = info.get('title', 'Untitled')
-        duration = info.get('duration', 0)
-        video_path = UPLOAD_DIR / f"{video_id}.mp4"
+
+    # Download video. Failures surface as a clean RuntimeError so the worker
+    # marks the job failed with a user-readable message instead of hanging or
+    # leaving a half-written source behind (yt-dlp writes .part files, so an
+    # aborted download never masquerades as a finished .mp4 checkpoint).
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=True)
+    except yt_dlp.utils.DownloadError as e:
+        msg = str(e)
+        if ("Sign in to confirm" in msg or "LOGIN_REQUIRED" in msg
+                or "not a bot" in msg or "consent" in msg.lower()):
+            raise RuntimeError(
+                "YouTube blocked the download (bot check / sign-in required). "
+                "Try again in a few minutes, or upload the video file directly."
+            ) from e
+        raise RuntimeError(f"YouTube download failed: {msg[-300:]}") from e
+    video_id = info['id']
+    title = info.get('title', 'Untitled')
+    duration = info.get('duration', 0)
+    video_path = UPLOAD_DIR / f"{video_id}.mp4"
     
     # Extract audio as 16kHz WAV for Whisper
     audio_path = UPLOAD_DIR / f"{video_id}_audio.wav"

@@ -57,7 +57,23 @@ def apply_transcript_edits(transcript: dict, edits: dict,
                 w = transcript['word_timestamps'][ref['index']]
             else:
                 w = transcript['segments'][ref['segIndex']]['words'][ref['wordIndex']]
-            if 'word'  in edit: w['word']  = edit['word']
+            if 'word' in edit:
+                w['word'] = edit['word']
+                # Tanglish display text for the edited word. Prefer the
+                # romanization the user typed in Tanglish view — it rides the
+                # wire verbatim as word_tanglish, exactly like a lineRealignment
+                # word — so a tanglish-script burn matches the preview rather
+                # than re-deriving a spelling the user never saw. Fall back to
+                # the deterministic derivation (same services.tanglish function
+                # the frontend's POST /tanglish uses) when the edit carries
+                # none. Telugu stays the stored source of truth; a telugu burn
+                # never reads word_tanglish, so its output is unchanged.
+                incoming_tanglish = edit.get('word_tanglish')
+                if isinstance(incoming_tanglish, str) and incoming_tanglish.strip():
+                    w['word_tanglish'] = incoming_tanglish
+                else:
+                    from services.tanglish import telugu_to_tanglish
+                    w['word_tanglish'] = telugu_to_tanglish(edit['word'])
             if 'start' in edit: w['start'] = edit['start']
             if 'end'   in edit: w['end']   = edit['end']
             applied += 1
@@ -77,6 +93,88 @@ def apply_transcript_edits(transcript: dict, edits: dict,
             _extend_word_end(transcript, lines[line_idx_a][-1]['ref'], line_b_abs_start)
 
     return transcript, applied
+
+
+def apply_line_realignments(lines: list, line_realignments: list,
+                            script: str = "telugu") -> int:
+    """
+    Overlay line-level re-alignments (Descript-style line edits with changed
+    word count) onto grouped caption lines, IN PLACE. Mirror of the frontend's
+    applyLineRealignments in lib/captionLines.js — the two must stay in
+    lockstep so preview karaoke == burned karaoke.
+
+    *lines*             — [{words: [{word, start, end}], line_start, line_end}]
+                          as produced by group_words_into_lines /
+                          group_words_with_splits (clip-relative times)
+    *line_realignments* — wire entries [{startIdx, endIdx, words: [{word,
+                          start, end, word_tanglish}], approximate}]; the
+                          index range addresses the ORIGINAL words the line
+                          covered, in the same raw-index space as lineSplits
+    *script*            — 'telugu' | 'tanglish'; picks which text renders
+                          (word vs word_tanglish, deriving on demand when an
+                          entry predates the tanglish field)
+
+    An entry applies ONLY when the current grouping still yields a line
+    spanning exactly [startIdx, endIdx] — if the grouping changed (different
+    style wordsPerLine, new splits), the entry is inert and the line renders
+    its original words. Line boundaries NEVER move: replacement word times
+    are clamped into the line's existing [line_start, line_end].
+
+    Returns the number of lines replaced.
+    """
+    if not line_realignments:
+        return 0
+
+    by_range = {}
+    for rec in line_realignments:
+        try:
+            by_range[(int(rec["startIdx"]), int(rec["endIdx"]))] = rec
+        except (KeyError, TypeError, ValueError):
+            continue
+
+    applied = 0
+    cursor = 0
+    for line in lines:
+        n = len(line["words"])
+        rec = by_range.get((cursor, cursor + n - 1))
+        cursor += n
+        if not rec or not rec.get("words"):
+            continue
+
+        ls, le = line["line_start"], line["line_end"]
+        new_words = []
+        for w in rec["words"]:
+            try:
+                text = str(w["word"]).strip()
+                s, e = float(w["start"]), float(w["end"])
+            except (KeyError, TypeError, ValueError):
+                new_words = None
+                break
+            if not text:
+                new_words = None
+                break
+            if script == "tanglish":
+                tl = w.get("word_tanglish")
+                if isinstance(tl, str) and tl.strip():
+                    text = tl.strip()
+                else:
+                    from services.tanglish import telugu_to_tanglish
+                    text = telugu_to_tanglish(text) or text
+            # Clamp into the FIXED line span (le may itself have been
+            # overlap-trimmed below the words' real end — the line vanishes
+            # at le either way, so squeezing trailing words is correct).
+            s = min(max(s, ls), le)
+            e = min(max(e, s), le)
+            new_words.append({"word": text, "start": round(s, 3), "end": round(e, 3)})
+
+        if not new_words:
+            print(f"  ✗ lineRealignment skipped — malformed words in "
+                  f"{rec.get('startIdx')}:{rec.get('endIdx')}", flush=True)
+            continue
+        line["words"] = new_words
+        applied += 1
+
+    return applied
 
 
 def group_words_with_splits(words: list, wpl: int, line_splits: set) -> list:

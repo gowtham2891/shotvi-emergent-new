@@ -10,7 +10,7 @@ import {
   PILL_DEFAULTS_BY_PRESET,
 } from "@/data/mockData";
 import { USE_MOCKS, outputFileUrl } from "@/api/client";
-import { createJobFromUrl, createJobFromFile, getJob } from "@/api/uploads";
+import { createJobFromUrl, createJobFromFile, getJob, listJobs } from "@/api/uploads";
 import { mapClipToUi, saveDraft, loadDraft, generateClipMetadata } from "@/api/clips";
 import {
   getTranscript,
@@ -19,7 +19,15 @@ import {
   isMultiSegmentClip,
   canRemapMultiSegment,
 } from "@/api/transcripts";
-import { buildRerenderRequest, startRerender, DEFAULT_STYLE_ID, isKnownStyle } from "@/api/renders";
+import {
+  buildRerenderRequest,
+  startRerender,
+  DEFAULT_STYLE_ID,
+  isKnownStyle,
+  isKnownCaptionFont,
+} from "@/api/renders";
+import { getCaptionTemplate, putCaptionTemplate } from "@/api/templates";
+import { uploadOverlayImage } from "@/api/overlays";
 import {
   listProjects as registryList,
   upsertProject as registryUpsert,
@@ -27,6 +35,23 @@ import {
   getProjectEntry,
 } from "@/lib/projectRegistry";
 import { assertEditDocumentNormalized } from "@/lib/editDocumentValidation";
+import {
+  createEmptyTranscriptEdits,
+  sanitizeTranscriptEdits,
+} from "@/lib/transcriptEdits";
+import {
+  clampCropBox,
+  boxesAlmostEqual,
+  inferMasterAspect,
+  initialWindowForAspect,
+  roundCropBox,
+} from "@/lib/cropWindow";
+import { fetchTanglish } from "@/api/tanglish";
+import { fetchTransliterations } from "@/api/transliterate";
+import { supabase, AUTH_ENABLED, mapSupabaseUser, DEV_USER } from "@/lib/supabaseClient";
+import { setUnauthorizedHandler } from "@/api/client";
+import { getBillingStatus, createSubscription, cancelSubscription } from "@/api/billing";
+import { loadRazorpay, openSubscriptionCheckout } from "@/lib/razorpayCheckout";
 
 // Utility: clamp
 const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
@@ -37,9 +62,50 @@ const nextElementId = (type) => `el_${type}_${++elementIdCounter}`;
 // Element types the editor can render/burn. Drafts saved before a type was
 // removed (e.g. the retired `sticker`) may still reference it — filter those
 // out on load so an old draft neither crashes nor renders a ghost element.
-const KNOWN_ELEMENT_TYPES = new Set(["caption", "headline", "progress", "logo"]);
+const KNOWN_ELEMENT_TYPES = new Set(["caption", "headline", "progress", "logo", "image"]);
 const sanitizeDraftElements = (elements) =>
   (elements || []).filter((el) => el && KNOWN_ELEMENT_TYPES.has(el.type));
+
+// ── Per-clip document defaults ─────────────────────────────────────
+// Elements and exportSettings are DOCUMENT state: they autosave into the
+// open clip's draft, so opening a clip must start both from a clean slate
+// (never the previous clip's overlays/pill/aspect) before that clip's own
+// draft — or the saved caption template — repopulates them. Deep-cloned so
+// no clip ever mutates the shared INITIAL_ELEMENTS constant.
+const initialElements = () => JSON.parse(JSON.stringify(INITIAL_ELEMENTS));
+
+const DEFAULT_EXPORT_SETTINGS = {
+  format: "9:16", // FORMAT_CONFIG keys in api/worker.py — the ASPECT, not the container
+  background: "blur", // blur | black | white | color
+  bgColor: "#000000",
+  useAutocrop: true,
+  burnInCaptions: true,
+  // Telugu ⇄ Tanglish caption toggle. Lives in exportSettings ON PURPOSE:
+  // it's part of the document, so it draft-persists (autosave deps cover
+  // exportSettings), sits inside undo history (documentSnapshot covers it),
+  // and serializes to export with zero new plumbing. Display-only switch
+  // over stored data — flipping never touches transcript/edit state.
+  captionScript: "telugu", // 'telugu' | 'tanglish'
+  // Clip boundary trim, seconds within the clip's own video. Backend
+  // contract (api/models.py trim_start/trim_end): 0 / -1 sentinels mean
+  // "untrimmed", and buildRerenderRequest always sends both fields, so the
+  // defaults keep trim-untouched export payloads byte-identical.
+  trimStart: 0,
+  trimEnd: -1,
+  // Sprint 4 — per-aspect crop windows over the 16:9 master, keyed by
+  // aspect ("9:16" | "1:1" | "16:9") with {x,y,w,h} 0–1 fraction values.
+  // ONLY aspects the user actually dragged get an entry; an absent key means
+  // "use the derived default" (initialWindowForAspect — the AI face crop for
+  // 9:16). Empty = fully untouched, which keeps the 9:16 export payload —
+  // and therefore its output — byte-identical to before this sprint.
+  cropWindows: {},
+};
+const defaultExportSettings = () => ({ ...DEFAULT_EXPORT_SETTINGS, cropWindows: {} });
+
+// Stale-run token for openClip: rapid clip switching interleaves two async
+// runs, and the slower one's set() calls must not land on the newer clip's
+// editor. Module-level on purpose — not reactive state, never rendered.
+let _openSeq = 0;
 
 // JobStatus (backend enum) → dashboard project status keys (STATUS_META)
 const JOB_TO_PROJECT_STATUS = {
@@ -90,18 +156,263 @@ const surfaceError = (err, fallback) => {
   return msg;
 };
 
+// ── Undo/redo history internals ────────────────────────────────────
+// Snapshot = the document's three independent slices — exactly what
+// getEditDocument serializes and applyDraft restores. Deep-copied via JSON
+// (all three are JSON-safe by construction: they round-trip through Redis
+// drafts already); a shared nested reference here would corrupt history
+// silently the next time the live slice mutates.
+const HISTORY_LIMIT = 50; // frames — bounds memory
+const documentSnapshot = (s) =>
+  JSON.parse(
+    JSON.stringify({
+      elements: s.elements,
+      exportSettings: s.exportSettings,
+      transcriptEdits: s.transcriptEdits,
+    })
+  );
+
+// Sliding-window coalescing: continuous gestures (drag ticks, slider
+// drags, held-arrow nudges) hit pushHistory dozens of times per second
+// with the same key — only the FIRST call pushes (capturing the pre-
+// gesture state); the rest just refresh the window, so a gesture of any
+// length is ONE undo frame. endHistoryCoalescing() (pointerup / arrow
+// keyup) closes the gesture so the next one pushes fresh. Module-level on
+// purpose: not reactive state, never rendered.
+const COALESCE_MS = 800;
+let _coalesce = { key: null, at: 0 };
+
+// ── Draft version history internals ────────────────────────────────
+// A version is captured only from a COMMITTED save (saveDraftNow success),
+// and an empty/default document is never captured — so a wiped autosave can
+// never become a restorable "version". Bounded per clip to cap memory.
+// Versions are addressed by a monotonic id, not their timestamp — two saves
+// can land in the same millisecond.
+const DRAFT_VERSION_LIMIT = 15;
+let _versionSeq = 0;
+
+const deepEqual = (a, b) => {
+  if (a === b) return true;
+  if (typeof a !== typeof b || a === null || b === null) return false;
+  if (typeof a !== "object") return false;
+  if (Array.isArray(a) !== Array.isArray(b)) return false;
+  const ka = Object.keys(a);
+  const kb = Object.keys(b);
+  if (ka.length !== kb.length) return false;
+  return ka.every((k) => deepEqual(a[k], b[k]));
+};
+
+// "Default" = what openClip resets to before a draft/template lands: no
+// transcript edits and both other slices at their pristine per-clip values.
+const isDefaultEditDocument = (doc) => {
+  const te = doc?.transcriptEdits || {};
+  const hasEdits =
+    Object.keys(te.wordEdits || {}).length > 0 ||
+    (te.lineSplits || []).length > 0 ||
+    (te.mergedGroups || []).length > 0 ||
+    Object.keys(te.lineRealignments || {}).length > 0;
+  if (hasEdits) return false;
+  return (
+    deepEqual(doc?.elements, initialElements()) &&
+    deepEqual(doc?.exportSettings, defaultExportSettings())
+  );
+};
+
 export const useAppStore = create((set, get) => ({
-  // ============ AUTH (mocked sign-in stays as-is) ============
-  user: null,
-  signIn: (email) =>
-    set({
-      user: {
-        email: email || "creator@shotvi.app",
-        name: (email || "Rahul K").split("@")[0],
-        plan: "Creator",
-      },
-    }),
-  signOut: () => set({ user: null }),
+  // ============ AUTH (Supabase) ============
+  // user: the identity shape the UI renders; session: the raw Supabase
+  // session (token lifetime is supabase-js's job, not ours). Dev mode — no
+  // REACT_APP_SUPABASE_* env — permanently signs in a fake dev user and all
+  // auth actions are no-ops, pairing with the backend's DEV_MODE flag.
+  user: AUTH_ENABLED ? null : DEV_USER,
+  session: null,
+  authEnabled: AUTH_ENABLED,
+  authLoading: AUTH_ENABLED, // true until the persisted session is restored
+  passwordRecovery: false,   // true after following a reset-password email link
+
+  // Called once at app mount. Restores the persisted session, subscribes to
+  // auth changes, and registers the API client's 401 handler (a dead session
+  // mid-flight → clear auth state → route guard shows the auth screen).
+  // Returns an unsubscribe cleanup for the effect.
+  initAuth: () => {
+    if (!AUTH_ENABLED) return () => {};
+    // Only invoked for a GENUINELY dead session — api/client.js classifies
+    // 401s first: a request that raced a just-created session (post-login)
+    // is retried once with the fresh token and never reaches this handler.
+    // We only get here when no usable session exists locally, or a retry
+    // carrying a token the auth client considers live was still rejected
+    // (revoked server-side). Global sign-out is intentional for those cases.
+    setUnauthorizedHandler(() => {
+      supabase.auth.signOut().catch(() => {});
+      set({ user: null, session: null });
+      toast.error("Session expired — please sign in again");
+    });
+    supabase.auth.getSession().then(({ data }) => {
+      set({
+        session: data?.session || null,
+        user: mapSupabaseUser(data?.session?.user),
+        authLoading: false,
+      });
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      set({
+        session: session || null,
+        user: mapSupabaseUser(session?.user),
+        authLoading: false,
+        ...(event === "PASSWORD_RECOVERY" ? { passwordRecovery: true } : {}),
+      });
+    });
+    return () => sub?.subscription?.unsubscribe();
+  },
+
+  signInWithPassword: async (email, password) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw new Error(error.message);
+  },
+
+  signUpWithPassword: async (email, password, name) => {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name: name || "" } },
+    });
+    if (error) throw new Error(error.message);
+    // With email confirmation on (Supabase default) there is no session yet.
+    return { needsConfirmation: !data?.session };
+  },
+
+  signInWithGoogle: async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/dashboard` },
+    });
+    if (error) throw new Error(error.message);
+  },
+
+  resetPassword: async (email) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth`,
+    });
+    if (error) throw new Error(error.message);
+  },
+
+  // Completes the reset-password email flow (PASSWORD_RECOVERY session).
+  updatePassword: async (password) => {
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) throw new Error(error.message);
+    set({ passwordRecovery: false });
+  },
+
+  signOut: async () => {
+    if (AUTH_ENABLED) await supabase.auth.signOut().catch(() => {});
+    set({ user: AUTH_ENABLED ? null : DEV_USER, session: null, billingStatus: null });
+  },
+
+  // ============ BILLING (Razorpay Studio Plan) ============
+  // Plan status read from GET /billing/status. This slice records who is paid
+  // and drives the sidebar upgrade card — it GATES NOTHING (no paid features
+  // exist yet); a future feature reads billingStatus.plan for a one-line gate.
+  // configured=false (Razorpay env absent on the server) → the card shows a
+  // "not set up" state instead of an upgrade button, so the app never crashes
+  // or dead-ends when billing isn't configured.
+  billingStatus: null,          // {plan, subscription_status, subscription_id, configured, plan_info} | null
+  billingLoading: false,
+  billingActionPending: false,  // checkout or cancel in flight → buttons disable
+
+  loadBillingStatus: async () => {
+    if (USE_MOCKS) {
+      set({
+        billingStatus: {
+          plan: "free", subscription_status: "", subscription_id: "",
+          configured: false, plan_info: null,
+        },
+      });
+      return;
+    }
+    set({ billingLoading: true });
+    try {
+      const status = await getBillingStatus();
+      set({ billingStatus: status, billingLoading: false });
+    } catch (err) {
+      // Non-fatal and ambient (not a user action) — don't toast; the card just
+      // won't show plan state.
+      set({ billingLoading: false });
+    }
+  },
+
+  isPaidPlan: () => get().billingStatus?.plan === "studio",
+
+  // Start the Razorpay checkout: create a subscription, load + open the modal,
+  // and on successful payment refetch status (the webhook flips it server-
+  // side). billingActionPending stays true across the modal's lifetime;
+  // success, dismiss, or failure all clear it.
+  startUpgrade: async () => {
+    const s = get();
+    if (s.billingActionPending) return;
+    if (!s.billingStatus?.configured) {
+      toast.error("Billing isn't set up on this server yet.");
+      return;
+    }
+    set({ billingActionPending: true });
+    let out;
+    try {
+      out = await createSubscription();
+      await loadRazorpay();
+    } catch (err) {
+      set({ billingActionPending: false });
+      surfaceError(err, "Could not start checkout");
+      return;
+    }
+    try {
+      openSubscriptionCheckout({
+        keyId: out.key_id,
+        subscriptionId: out.subscription_id,
+        description: out.plan?.name || "Studio Plan",
+        email: s.user?.email || "",
+        onSuccess: async () => {
+          toast.success("Payment received — activating your Studio Plan…");
+          await get().refreshBillingUntilPaid();
+          set({ billingActionPending: false });
+        },
+        onDismiss: () => set({ billingActionPending: false }),
+      });
+    } catch (err) {
+      set({ billingActionPending: false });
+      surfaceError(err, "Could not open checkout");
+    }
+  },
+
+  // Poll status after checkout so the UI reflects the new plan without a full
+  // reload. The activation webhook is usually near-instant but can lag a beat.
+  refreshBillingUntilPaid: async (attempts = 6, intervalMs = 2000) => {
+    for (let i = 0; i < attempts; i++) {
+      try {
+        const status = await getBillingStatus();
+        set({ billingStatus: status });
+        if (status.plan === "studio") return;
+      } catch {
+        // transient — keep trying
+      }
+      await new Promise((r) => setTimeout(r, intervalMs));
+    }
+  },
+
+  // Cancel the current subscription. The webhook confirms the flip to free; we
+  // refetch to show the interim state. The confirm prompt lives in the caller.
+  cancelPlan: async () => {
+    const s = get();
+    if (s.billingActionPending) return;
+    set({ billingActionPending: true });
+    try {
+      await cancelSubscription();
+      toast.success("Your Studio Plan will be cancelled.");
+      await get().loadBillingStatus();
+    } catch (err) {
+      surfaceError(err, "Could not cancel your subscription");
+    } finally {
+      set({ billingActionPending: false });
+    }
+  },
 
   // ============ PROJECTS (localStorage registry + GET /jobs/{id}) ============
   projects: USE_MOCKS ? MOCK_PROJECTS : [],
@@ -111,40 +422,52 @@ export const useAppStore = create((set, get) => ({
   getProject: (id) => get().projects.find((p) => p.id === id),
   addProject: (project) => set((s) => ({ projects: [project, ...s.projects] })),
 
-  // Hydrate the dashboard: each registry entry → GET /jobs/{id}.
-  // 404 = expired (24h Redis TTL) — shown, not silently dropped.
+  // Hydrate the dashboard from GET /jobs — the backend returns ONLY the
+  // caller's jobs (ownership is enforced server-side; this list is just
+  // displayed). The localStorage registry supplies titles and keeps showing
+  // jobs that fell out of Redis (24h TTL) as "expired" instead of silently
+  // vanishing. Registry entries are stamped with the creating user's id so a
+  // shared browser never shows one account's titles to another; un-stamped
+  // legacy entries only surface in dev mode (clean-slate decision).
   loadProjects: async () => {
     if (USE_MOCKS) {
       set({ projects: MOCK_PROJECTS, projectsLoading: false });
       return;
     }
     set({ projectsLoading: true });
-    const entries = registryList();
-    const projects = await Promise.all(
-      entries.map(async (entry) => {
-        try {
-          const job = await getJob(entry.jobId);
-          if (job.video_id && job.video_id !== entry.videoId) {
-            registryUpsert({ jobId: entry.jobId, videoId: job.video_id });
-          }
-          return jobToProject(job, entry);
-        } catch (err) {
-          return {
-            id: entry.jobId,
-            title: entry.title || entry.jobId.slice(0, 8),
-            thumbnail: null,
-            duration: "",
-            createdAt: timeAgo(entry.createdAt),
-            status: err.status === 404 ? "expired" : "failed",
-            clipsCount: 0,
-            language: entry.language || "te",
-            videoId: entry.videoId || null,
-            error: err.status === 404 ? "Job expired — jobs are kept for 24 hours" : err.message,
-          };
+    try {
+      const jobs = await listJobs();
+      const live = jobs.map((job) => {
+        const entry = getProjectEntry(job.job_id);
+        if (entry && job.video_id && job.video_id !== entry.videoId) {
+          registryUpsert({ jobId: job.job_id, videoId: job.video_id });
         }
-      })
-    );
-    set({ projects, projectsLoading: false });
+        return jobToProject(job, entry);
+      });
+
+      const liveIds = new Set(jobs.map((j) => j.job_id));
+      const userId = get().user?.id || null;
+      const expired = registryList()
+        .filter((e) => !liveIds.has(e.jobId))
+        .filter((e) => (e.userId ? e.userId === userId : userId === "dev-user"))
+        .map((entry) => ({
+          id: entry.jobId,
+          title: entry.title || entry.jobId.slice(0, 8),
+          thumbnail: null,
+          duration: "",
+          createdAt: timeAgo(entry.createdAt),
+          status: "expired",
+          clipsCount: 0,
+          language: entry.language || "te",
+          videoId: entry.videoId || null,
+          error: "Job expired — jobs are kept for 24 hours",
+        }));
+
+      set({ projects: [...live, ...expired], projectsLoading: false });
+    } catch (err) {
+      surfaceError(err, "Could not load your projects");
+      set({ projectsLoading: false });
+    }
   },
 
   removeProjectEntry: (jobId) => {
@@ -170,6 +493,7 @@ export const useAppStore = create((set, get) => ({
         source: "youtube",
         url,
         videoId: job.video_id || null,
+        userId: get().user?.id || null,
       });
       set({ activeJobId: job.job_id, activeJob: job });
       return job;
@@ -195,6 +519,7 @@ export const useAppStore = create((set, get) => ({
         language,
         source: "upload",
         videoId: job.video_id || null,
+        userId: get().user?.id || null,
       });
       set({ activeJobId: job.job_id, activeJob: job, uploadPercent: 100 });
       return job;
@@ -304,6 +629,32 @@ export const useAppStore = create((set, get) => ({
         // expired/unreachable entry — keep searching
       }
     }
+    // Registry miss ≠ clip gone: the localStorage registry only knows jobs
+    // CREATED in this browser. A cold deep link from another device/browser
+    // (or after clearing storage) lands here with a valid clip whose job the
+    // backend can list. Fall back to the caller's own job list — the same
+    // backend-ownership-enforced GET /jobs the dashboard renders — before
+    // declaring the clip not found.
+    try {
+      const jobs = await listJobs();
+      for (const job of jobs) {
+        if (!job.clips?.length) continue;
+        const clips = job.clips.map((c, i) => mapClipToUi(c, i, job.job_id));
+        const hit = clips.find((c) => c.id === clipId);
+        if (hit) {
+          get().cacheJobClips(job);
+          // Adopt into the local registry (same pattern as pollJob) so the
+          // transcript load below finds the videoId and the NEXT cold load
+          // resolves through the fast registry path.
+          if (job.video_id) {
+            registryUpsert({ jobId: job.job_id, videoId: job.video_id });
+          }
+          return { clip: hit, jobId: job.job_id };
+        }
+      }
+    } catch {
+      // backend unreachable — fall through to not-found
+    }
     return null;
   },
 
@@ -311,12 +662,27 @@ export const useAppStore = create((set, get) => ({
   // transcript (backend word boundaries are authoritative — rendered
   // verbatim), and restore any saved draft.
   openClip: async (clipId) => {
+    // History is per-clip and session-only: opening a clip always starts
+    // with clean undo/redo stacks (no cross-clip bleed).
+    get().resetHistory();
+    // Stale-run guard: every set() after an await below must prove this run
+    // still owns the editor, or a slow clip-A open landing after a fast
+    // clip-B open would apply A's transcript/duration/draft onto B.
+    const seq = ++_openSeq;
+    const stale = () => _openSeq !== seq;
     if (USE_MOCKS) {
       set({
         currentClipId: clipId,
         transcript: WORD_TRANSCRIPT,
         duration: CLIP_DURATION,
         transcriptStatus: "ready",
+        transcriptEdits: createEmptyTranscriptEdits(),
+        elements: initialElements(),
+        selectedElementId: "el_caption_1",
+        exportSettings: defaultExportSettings(),
+        masterDims: null,
+        reframeMode: false,
+        draftLoadStatus: "ready",
       });
       return;
     }
@@ -328,12 +694,32 @@ export const useAppStore = create((set, get) => ({
       transcriptError: null,
       transcriptWarning: null,
       exportWarnings: [],
+      // The WHOLE document is per-clip: edits, canvas elements, and export
+      // settings all start clean, then the draft restore below repopulates
+      // them for THIS clip (never leak the previous clip's state — elements
+      // and exportSettings would otherwise autosave into the wrong draft).
+      transcriptEdits: createEmptyTranscriptEdits(),
+      elements: initialElements(),
+      selectedElementId: "el_caption_1",
+      exportSettings: defaultExportSettings(),
+      // Per-clip session view state: the master's measured dimensions and
+      // the reframe overlay never survive a clip switch.
+      masterDims: null,
+      reframeMode: false,
+      // Draft round-trip now in flight: saveDraftNow refuses to persist and
+      // the Editor keeps autosave disarmed until this settles, so the empty
+      // document above can never overwrite the persisted draft.
+      draftLoadStatus: "loading",
+      draftStatus: "idle",
     });
     const found = await get().resolveClip(clipId);
+    if (stale()) return;
     if (!found) {
       set({
         transcriptStatus: "error",
         transcriptError: "Clip not found — the job may have expired (24h retention).",
+        // Not a confirmed no-draft — keep autosave off for this dead end.
+        draftLoadStatus: "error",
       });
       return;
     }
@@ -349,6 +735,7 @@ export const useAppStore = create((set, get) => ({
       // Sidecar is legacy-defensive: nothing currently writes it; multi-segment
       // clips are plain concat, so sentence-time stacking matches the video.
       const sidecar = await getSegmentSidecar(clip.verticalPath);
+      if (stale()) return;
       const words = buildClipTranscript(transcript, clip, sidecar);
       const duration = words.length ? Math.max(clip.duration || 0, words[words.length - 1].end) : clip.duration;
 
@@ -366,6 +753,7 @@ export const useAppStore = create((set, get) => ({
       }
       set({ transcript: words, transcriptStatus: "ready", duration, transcriptWarning });
     } catch (err) {
+      if (stale()) return;
       set({
         transcriptStatus: "error",
         transcriptError: err.message,
@@ -373,20 +761,120 @@ export const useAppStore = create((set, get) => ({
       surfaceError(err, "Could not load the transcript");
     }
 
-    // Restore draft (non-fatal if it fails)
-    try {
-      const draft = await loadDraft(jobId, clipId);
-      if (draft?.elements?.length) {
-        // Drop elements of retired types (e.g. old `sticker` drafts) so they
-        // never crash the editor or render as invisible ghosts.
-        set({ elements: sanitizeDraftElements(draft.elements) });
+    // Restore draft; the saved caption template is fetched alongside so a
+    // confirmed no-draft clip can start from the user's style.
+    const [tplResult, draftResult] = await Promise.allSettled([
+      get().ensureCaptionTemplate(),
+      loadDraft(jobId, clipId),
+    ]);
+    if (stale()) return;
+    if (draftResult.status === "fulfilled") {
+      const draft = draftResult.value;
+      if (draft) {
+        // A clip's OWN draft always wins over the template.
+        get().applyDraft(draft);
+        // A restored draft may carry Tanglish-view edits whose Telugu never
+        // resolved (service was down at commit) — retry now, fire-and-forget.
+        get().resolvePendingTelugu();
+      } else if (tplResult.status === "fulfilled" && tplResult.value) {
+        // Confirmed no-draft: a clean clip starts from the saved style.
+        get().applyCaptionTemplateToCleanClip(tplResult.value);
       }
-      if (draft?.exportSettings) {
-        set((s) => ({ exportSettings: { ...s.exportSettings, ...draft.exportSettings } }));
-      }
-    } catch {
-      // draft restore is best-effort
+      set({ draftLoadStatus: "ready" });
+    } else {
+      // A FAILED load is not a confirmed no-draft: autosave stays disarmed
+      // (Editor gates on 'ready') so it can never overwrite a draft we
+      // couldn't read. Manual save still works — that's an explicit action.
+      set({ draftLoadStatus: "error" });
     }
+  },
+
+  // THE single document-restore path. Drafts (sanitized, via applyDraft)
+  // and undo/redo snapshots both land here, so history restore can never
+  // diverge from what a draft reload produces. Null slice = leave as-is.
+  applyDocumentState: ({ elements, exportSettings, transcriptEdits }) =>
+    set((s) => ({
+      ...(elements ? { elements } : {}),
+      ...(exportSettings
+        ? { exportSettings: { ...s.exportSettings, ...exportSettings } }
+        : {}),
+      ...(transcriptEdits ? { transcriptEdits } : {}),
+    })),
+
+  // Apply a persisted draft to editor state. Extracted from openClip so the
+  // draft → state mapping is unit-testable without the network round-trip.
+  // Untrusted input: each slice is sanitized before the shared restore path
+  // (drop retired element types; normalize old transcriptEdits shapes).
+  applyDraft: (draft) => {
+    if (!draft) return;
+    get().applyDocumentState({
+      elements: draft.elements?.length ? sanitizeDraftElements(draft.elements) : null,
+      exportSettings: draft.exportSettings || null,
+      transcriptEdits: draft.transcriptEdits
+        ? sanitizeTranscriptEdits(draft.transcriptEdits)
+        : null,
+    });
+  },
+
+  // ============ UNDO / REDO ============
+  // Full-document snapshots (past[]/future[]) of the same three slices
+  // getEditDocument covers. Session-only: never serialized into drafts
+  // (getEditDocument doesn't read it), reset per clip in openClip.
+  history: { past: [], future: [] },
+
+  // Push the CURRENT (pre-mutation) document as an undo frame. Call at the
+  // top of every committed document mutation, after its validity guards —
+  // a no-op action must not leave a phantom frame. Any new committed
+  // action clears future[] (standard redo invalidation). `coalesceKey`
+  // merges a continuous same-target burst into one frame (see _coalesce).
+  pushHistory: (coalesceKey = null) => {
+    const now = Date.now();
+    if (coalesceKey && _coalesce.key === coalesceKey && now - _coalesce.at < COALESCE_MS) {
+      _coalesce.at = now;
+      return;
+    }
+    _coalesce = { key: coalesceKey, at: now };
+    set((s) => ({
+      history: {
+        past: [...s.history.past, documentSnapshot(s)].slice(-HISTORY_LIMIT),
+        future: [],
+      },
+    }));
+  },
+
+  // Gesture boundary (pointerup, arrow keyup): the next same-key mutation
+  // starts a NEW frame instead of merging into the finished gesture.
+  endHistoryCoalescing: () => {
+    _coalesce = { key: null, at: 0 };
+  },
+
+  undo: () => {
+    const s = get();
+    const { past, future } = s.history;
+    if (!past.length) return;
+    _coalesce = { key: null, at: 0 };
+    const current = documentSnapshot(s);
+    set({
+      history: { past: past.slice(0, -1), future: [...future, current].slice(-HISTORY_LIMIT) },
+    });
+    get().applyDocumentState(past[past.length - 1]);
+  },
+
+  redo: () => {
+    const s = get();
+    const { past, future } = s.history;
+    if (!future.length) return;
+    _coalesce = { key: null, at: 0 };
+    const current = documentSnapshot(s);
+    set({
+      history: { past: [...past, current].slice(-HISTORY_LIMIT), future: future.slice(0, -1) },
+    });
+    get().applyDocumentState(future[future.length - 1]);
+  },
+
+  resetHistory: () => {
+    _coalesce = { key: null, at: 0 };
+    set({ history: { past: [], future: [] } });
   },
 
   retryTranscript: () => {
@@ -404,28 +892,468 @@ export const useAppStore = create((set, get) => ({
     return get().transcript.findIndex((w) => t >= w.start && t < w.end);
   },
 
+  // ============ TRANSCRIPT EDITS ============
+  // Full storage shape now, even though no UI populates it yet: wordEdits is
+  // keyed by word id (ids derive from the word's global transcript ref — see
+  // lib/transcriptEdits.js), mergedGroups/lineSplits are the backend's int
+  // lists. The split/undo/Tanglish/word-edit passes mutate this slice; this
+  // pass owns only storage, persistence, and the export path. NOTE: this is
+  // the STORE shape — serializeTranscriptEdits converts to the backend wire
+  // shape at the export boundary; never send it raw.
+  transcriptEdits: createEmptyTranscriptEdits(),
+
+  // THE word-text resolver. Every read of a word's display text (preview
+  // canvas, transcript panel, metadata) goes through here — one source of
+  // truth, so preview and export can never disagree about an edited word.
+  // Components must also subscribe to transcriptEdits for reactivity.
+  effectiveWord: (id) => {
+    const edit = get().transcriptEdits.wordEdits[id];
+    if (typeof edit?.text === "string") return edit.text;
+    return get().transcript.find((w) => w.id === id)?.text ?? "";
+  },
+
+  // THE display-script resolver (Telugu ⇄ Tanglish toggle). What the caption
+  // canvas and the transcript panel SHOW: in tanglish view, an edited word's
+  // re-derived tanglish wins (wordEdits[id].text_tanglish, populated async on
+  // commit via POST /tanglish), then the word's stored text_tanglish (stale-
+  // fallback when the endpoint was unreachable at commit), then the Telugu
+  // text (degrade, never blank). Any captionScript other than 'tanglish'
+  // (including junk from an old draft) renders Telugu via effectiveWord.
+  // Editing always operates on the TELUGU source — this resolver is display-
+  // only; timestamps and edit addressing are script-independent.
+  displayWord: (id) => {
+    const s = get();
+    if (s.exportSettings.captionScript !== "tanglish") return s.effectiveWord(id);
+    const edit = s.transcriptEdits.wordEdits[id];
+    if (typeof edit?.text_tanglish === "string" && edit.text_tanglish) {
+      return edit.text_tanglish;
+    }
+    const word = s.transcript.find((w) => w.id === id);
+    return word?.text_tanglish || s.effectiveWord(id);
+  },
+
+  // Line splits. A lineSplits entry stores the RAW INDEX of the word that
+  // ENDS a caption line — the forced break lands AFTER transcript[rawIndex],
+  // so transcript[rawIndex + 1] starts the next line (the exact contract of
+  // group_words_with_splits in services/apply_transcript_edits.py). The raw
+  // index space is the clip's empty-text-filtered word list, which IS the
+  // store's transcript array — getWordsForRange mirrors the backend's
+  // get_words_for_clip one-to-one (same window operators, same empty-text
+  // drop) — so array position is the wire address; no ref mapping needed.
+  //
+  // Driven by the editable transcript (EditableTranscript.jsx): Enter at a
+  // caret position ADDS a split (idempotent — Enter at an existing break
+  // must not remove it), Backspace at a line start REMOVES one, and the
+  // line-end cut badge removes on click. The old playhead-based
+  // splitAtPlayhead/Split-button path is gone — splits are caret-addressed
+  // now, so they no longer depend on where playback happens to be.
+  addLineSplit: (rawIndex) => {
+    const st = get();
+    if (
+      !Number.isInteger(rawIndex) ||
+      rawIndex < 0 ||
+      rawIndex >= st.transcript.length - 1 ||
+      st.transcriptEdits.lineSplits.includes(rawIndex)
+    ) {
+      return; // invalid/duplicate: no change, so no history frame either
+    }
+    st.pushHistory();
+    set((s) => ({
+      transcriptEdits: {
+        ...s.transcriptEdits,
+        lineSplits: [...s.transcriptEdits.lineSplits, rawIndex].sort((a, b) => a - b),
+      },
+    }));
+  },
+
+  removeLineSplit: (rawIndex) => {
+    const st = get();
+    if (!st.transcriptEdits.lineSplits.includes(rawIndex)) return;
+    st.pushHistory();
+    set((s) => ({
+      transcriptEdits: {
+        ...s.transcriptEdits,
+        lineSplits: s.transcriptEdits.lineSplits.filter((i) => i !== rawIndex),
+      },
+    }));
+  },
+
+  // Commit a word-text fix from the editable transcript. Text-only by
+  // contract: timestamps are NEVER touched (audio/video is never cut).
+  // Committing text identical to the original (or blank) clears the edit,
+  // so wordEdits only ever holds real deltas. text_tanglish stays null —
+  // SEAM: telugu_to_tanglish() is not wired in this repo yet; the
+  // Tanglish-toggle task owns deriving it on commit (see lib/transcriptEdits.js).
+  setWordEdit: (id, text) => {
+    const st = get();
+    const original = st.transcript.find((w) => w.id === id);
+    if (!original) return;
+    const clean = typeof text === "string" ? text.trim() : "";
+    const existing = st.transcriptEdits.wordEdits[id];
+    const clearing = !clean || clean === original.text;
+    // No-op commits (unknown word, clearing a non-edit, re-committing the
+    // same fix) change nothing and push nothing. The commit itself is the
+    // atomic history unit — one frame per commit, never per keystroke.
+    if (clearing && !existing) return;
+    if (!clearing && existing?.text === clean) return;
+    st.pushHistory();
+    set((s) => {
+      const next = { ...s.transcriptEdits.wordEdits };
+      if (clearing) delete next[id];
+      else next[id] = { text: clean, text_tanglish: null };
+      return { transcriptEdits: { ...s.transcriptEdits, wordEdits: next } };
+    });
+    // Edit seam (Tanglish toggle): re-derive the committed word's Tanglish
+    // async so the tanglish view never shows stale romanization. Fire-and-
+    // forget, non-blocking — fetchTanglish never throws; on null (endpoint
+    // down) text_tanglish stays null and displayWord falls back to the
+    // word's stored text_tanglish. NOT a history frame: derived data, and
+    // the guard below drops the response if the edit changed/cleared while
+    // the request was in flight.
+    if (!clearing) {
+      fetchTanglish([clean]).then((out) => {
+        if (!out) return;
+        set((s) => {
+          const cur = s.transcriptEdits.wordEdits[id];
+          if (!cur || cur.text !== clean) return {};
+          return {
+            transcriptEdits: {
+              ...s.transcriptEdits,
+              wordEdits: {
+                ...s.transcriptEdits.wordEdits,
+                [id]: { ...cur, text_tanglish: out[0] },
+              },
+            },
+          };
+        });
+      });
+    }
+  },
+
+  // Batch word-text commits from a LINE edit or a Tanglish-view word commit.
+  // ONE history frame for the whole batch — a commit is a single user
+  // action, so Ctrl+Z undoes all of it at once.
+  //
+  // Entry shapes:
+  //   {id, text}                        — Telugu-view path, byte-identical
+  //       semantics to setWordEdit (trim, clear-on-original, async tanglish
+  //       re-derivation via ONE batched /tanglish call).
+  //   {id, text, text_tanglish}         — Tanglish-view path: Telugu resolved
+  //       at commit (picked suggestion / transliterate top-1 / typed script),
+  //       text_tanglish is the user's TYPED romanization verbatim — their
+  //       spelling wins over re-derivation, so NO /tanglish call fires.
+  //   {id, text: null, text_tanglish, pending: true} — Tanglish typed but
+  //       /transliterate unreachable: the edit commits with the typed
+  //       romanization and NO Telugu yet (effectiveWord falls back to the
+  //       original source); resolvePendingTelugu upgrades it async/later.
+  setWordEditsBatch: (edits) => {
+    const st = get();
+    const real = [];
+    for (const { id, text, text_tanglish, pending } of edits || []) {
+      const original = st.transcript.find((w) => w.id === id);
+      if (!original) continue;
+      const existing = st.transcriptEdits.wordEdits[id];
+      if (pending) {
+        const cleanTa = typeof text_tanglish === "string" ? text_tanglish.trim() : "";
+        if (!cleanTa) continue;
+        if (existing?.pendingTelugu && existing.text_tanglish === cleanTa) continue;
+        real.push({ id, entry: { text: null, text_tanglish: cleanTa, pendingTelugu: true } });
+        continue;
+      }
+      const clean = typeof text === "string" ? text.trim() : "";
+      const cleanTa = typeof text_tanglish === "string" ? text_tanglish.trim() : "";
+      if (cleanTa) {
+        // Tanglish-view entry: a true no-op only when BOTH scripts match the
+        // pristine word — same Telugu with a different typed spelling is a
+        // real (display) delta and must persist.
+        const clearing =
+          !clean || (clean === original.text && cleanTa === (original.text_tanglish || ""));
+        if (clearing && !existing) continue;
+        if (!clearing && existing?.text === clean && existing?.text_tanglish === cleanTa) continue;
+        real.push({ id, entry: clearing ? null : { text: clean, text_tanglish: cleanTa } });
+        continue;
+      }
+      const clearing = !clean || clean === original.text;
+      if (clearing && !existing) continue;
+      if (!clearing && existing?.text === clean) continue;
+      real.push({
+        id,
+        clean,
+        entry: clearing ? null : { text: clean, text_tanglish: null },
+        derive: !clearing,
+      });
+    }
+    if (!real.length) return;
+    st.pushHistory();
+    set((s) => {
+      const next = { ...s.transcriptEdits.wordEdits };
+      for (const r of real) {
+        if (r.entry === null) delete next[r.id];
+        else next[r.id] = r.entry;
+      }
+      return { transcriptEdits: { ...s.transcriptEdits, wordEdits: next } };
+    });
+    // Async tanglish derivation for Telugu-typed entries only (a typed
+    // Tanglish spelling is verbatim and never re-derived) — same guard as
+    // setWordEdit: a response only lands on a word whose edit is still the
+    // one we derived for.
+    const toDerive = real.filter((r) => r.derive);
+    if (toDerive.length) {
+      fetchTanglish(toDerive.map((r) => r.clean)).then((out) => {
+        if (!out || out.length !== toDerive.length) return;
+        set((s) => {
+          const next = { ...s.transcriptEdits.wordEdits };
+          let changed = false;
+          toDerive.forEach((r, i) => {
+            const cur = next[r.id];
+            if (cur && cur.text === r.clean && out[i]) {
+              next[r.id] = { ...cur, text_tanglish: out[i] };
+              changed = true;
+            }
+          });
+          return changed
+            ? { transcriptEdits: { ...s.transcriptEdits, wordEdits: next } }
+            : {};
+        });
+      });
+    }
+  },
+
+  // Resolve words committed in Tanglish view while /transliterate was
+  // unreachable (wordEdits entries flagged pendingTelugu): re-ask the
+  // service for each pending token's top-1 Telugu and upgrade the entry.
+  // NOT a history frame — the user's commit (the typed tanglish) is already
+  // in history; this only fills in derived data, same rule as the async
+  // /tanglish backfills. Guarded per word: a response lands only if the
+  // pending edit is still the one we resolved for. Fire-and-forget from
+  // every Tanglish commit and from draft restore ("retry async or on next
+  // commit"); failures simply stay pending for the next retry.
+  resolvePendingTelugu: async () => {
+    const pend = Object.entries(get().transcriptEdits.wordEdits).filter(
+      ([, e]) => e?.pendingTelugu && e.text_tanglish
+    );
+    await Promise.all(
+      pend.map(async ([id, e]) => {
+        const list = await fetchTransliterations(e.text_tanglish);
+        const top = typeof list?.[0] === "string" && list[0].trim() ? list[0].trim() : null;
+        if (!top) return;
+        set((s) => {
+          const cur = s.transcriptEdits.wordEdits[id];
+          if (!cur?.pendingTelugu || cur.text_tanglish !== e.text_tanglish) return {};
+          return {
+            transcriptEdits: {
+              ...s.transcriptEdits,
+              wordEdits: {
+                ...s.transcriptEdits.wordEdits,
+                [id]: { text: top, text_tanglish: cur.text_tanglish },
+              },
+            },
+          };
+        });
+      })
+    );
+  },
+
+  // Commit a line re-alignment (line edit with CHANGED word count): the
+  // record replaces that line's words — text AND per-word timing within the
+  // line's fixed span — in every caption surface. ONE history frame; the
+  // whole line edit is a single undoable action.
+  setLineRealignment: (key, record) => {
+    if (!record || !Array.isArray(record.words) || !record.words.length) return;
+    get().pushHistory();
+    set((s) => ({
+      transcriptEdits: {
+        ...s.transcriptEdits,
+        lineRealignments: { ...s.transcriptEdits.lineRealignments, [key]: record },
+      },
+    }));
+  },
+
+  // Revert a realigned line to its pristine transcript words (the user typed
+  // the original text back). Also clears any wordEdits riding on the line's
+  // original word ids so "revert" really means untouched. ONE history frame.
+  clearLineRealignment: (key, wordIdsToClear = []) => {
+    const st = get();
+    if (!st.transcriptEdits.lineRealignments[key]) return;
+    st.pushHistory();
+    set((s) => {
+      const nextRealign = { ...s.transcriptEdits.lineRealignments };
+      delete nextRealign[key];
+      const nextEdits = { ...s.transcriptEdits.wordEdits };
+      for (const id of wordIdsToClear) delete nextEdits[id];
+      return {
+        transcriptEdits: {
+          ...s.transcriptEdits,
+          lineRealignments: nextRealign,
+          wordEdits: nextEdits,
+        },
+      };
+    });
+  },
+
+  // Backfill word_tanglish onto a committed realignment (client-side even-
+  // distribution fallback commits with nulls, then derives async). NOT a
+  // history frame — derived data, same rule as setWordEdit's async fill; the
+  // guard drops the response if the record changed while in flight. Fills
+  // ONLY missing slots: a word_tanglish already present is the user's TYPED
+  // romanization (Tanglish-view commit) and their spelling always wins over
+  // re-derivation.
+  setLineRealignmentTanglish: (key, tanglishList) =>
+    set((s) => {
+      const rec = s.transcriptEdits.lineRealignments[key];
+      if (!rec || !Array.isArray(tanglishList) || rec.words.length !== tanglishList.length) {
+        return {};
+      }
+      return {
+        transcriptEdits: {
+          ...s.transcriptEdits,
+          lineRealignments: {
+            ...s.transcriptEdits.lineRealignments,
+            [key]: {
+              ...rec,
+              words: rec.words.map((w, i) => ({
+                ...w,
+                word_tanglish: w.word_tanglish || tanglishList[i] || null,
+              })),
+            },
+          },
+        },
+      };
+    }),
+
   // ============ PLAYBACK ============
   isPlaying: false,
   togglePlay: () => set((s) => ({ isPlaying: !s.isPlaying })),
   setPlaying: (v) => set({ isPlaying: v }),
   currentTime: 0,
   duration: USE_MOCKS ? CLIP_DURATION : 0,
-  seek: (t) => set({ currentTime: clamp(t, 0, get().duration) }),
+  // Seeks clamp into the trimmed window so the playhead always reflects what
+  // the export will contain. Untrimmed clips behave exactly as before
+  // (bounds collapse to [0, duration]).
+  seek: (t) => {
+    const { start, end } = get().getTrimBounds();
+    set({ currentTime: clamp(t, start, end) });
+  },
   setDuration: (d) => set({ duration: d }),
+
+  // ============ CLIP TRIM (timeline handles) ============
+  // trimStart/trimEnd live in exportSettings (draft-persisted, undoable,
+  // exported — see DEFAULT_EXPORT_SETTINGS). These helpers own the sentinel
+  // math so no component touches -1 directly.
+
+  // Effective playable window in clip-seconds: trimEnd -1 → clip duration.
+  getTrimBounds: () => {
+    const s = get();
+    const dur = s.duration || 0;
+    const start = clamp(s.exportSettings.trimStart || 0, 0, dur);
+    const rawEnd = s.exportSettings.trimEnd;
+    const end = rawEnd > 0 ? clamp(rawEnd, start, dur) : dur;
+    return { start, end };
+  },
+
+  isTrimmed: () => {
+    const s = get().exportSettings;
+    return (s.trimStart || 0) > 0 || s.trimEnd > 0;
+  },
+
+  // Set both bounds, clamped to the clip's own video ([0, duration] — the
+  // backend trims the already-cut clip file, so extension isn't possible)
+  // with a minimum kept length. Values at the clip edges store as the 0/-1
+  // sentinels, keeping an untrimmed document byte-identical to before.
+  // Coalesced per gesture: a handle drag is ONE undo frame
+  // (endHistoryCoalescing on pointerup closes it).
+  setTrimRange: (start, end) => {
+    const st = get();
+    const dur = st.duration;
+    if (!dur) return;
+    const MIN_KEEP = 0.5; // seconds — a zero-length export is never valid
+    const ts = clamp(start ?? 0, 0, Math.max(0, dur - MIN_KEEP));
+    const te = clamp(end == null || end < 0 ? dur : end, ts + MIN_KEEP, dur);
+    const tsStored = ts <= 0.01 ? 0 : Math.round(ts * 100) / 100;
+    const teStored = te >= dur - 0.01 ? -1 : Math.round(te * 100) / 100;
+    if (
+      st.exportSettings.trimStart === tsStored &&
+      st.exportSettings.trimEnd === teStored
+    ) {
+      return;
+    }
+    st.pushHistory("trim-range");
+    set((s) => ({
+      exportSettings: { ...s.exportSettings, trimStart: tsStored, trimEnd: teStored },
+      // Keep the playhead inside the new window immediately.
+      currentTime: clamp(s.currentTime, tsStored, teStored > 0 ? teStored : dur),
+    }));
+  },
+
+  resetTrim: () => {
+    const s = get();
+    if (!s.isTrimmed()) return;
+    s.pushHistory();
+    set((st) => ({ exportSettings: { ...st.exportSettings, trimStart: 0, trimEnd: -1 } }));
+  },
 
   // ============ DRAFTS (PATCH/GET /jobs/{job}/clips/{clip}/draft) ============
   draftStatus: "idle", // idle|saving|saved|error
+  // Lifecycle of the CURRENT clip's draft restore (openClip round-trip):
+  // idle|loading|ready|error. 'ready' = draft applied OR confirmed no-draft;
+  // 'error' = the load failed, so whether a draft exists is UNKNOWN. Autosave
+  // (Editor.jsx) arms only on 'ready'; saveDraftNow refuses while 'loading'.
+  // Together these guarantee an autosave can never PATCH the freshly-reset
+  // empty document over a persisted draft during a slow clip open.
+  draftLoadStatus: "idle",
   saveDraftNow: async () => {
     const s = get();
     if (USE_MOCKS || !s.currentClip) return;
+    if (s.draftLoadStatus === "loading") return; // draft restore in flight — never clobber it
+    const clipId = s.currentClipId;
+    // Built synchronously with the ids above, so a clip switch mid-PATCH
+    // can't mix clip A's document into clip B's draft key.
+    const doc = s.getEditDocument();
     set({ draftStatus: "saving" });
     try {
-      await saveDraft(s.currentJobId, s.currentClipId, s.getEditDocument());
+      await saveDraft(s.currentJobId, clipId, doc);
       set({ draftStatus: "saved" });
+      // Version history captures COMMITTED saves only — see captureDraftVersion.
+      get().captureDraftVersion(clipId, doc);
     } catch (err) {
       set({ draftStatus: "error" });
       surfaceError(err, "Could not save draft");
     }
+  },
+
+  // ============ DRAFT VERSION HISTORY (session-only, per clip) ============
+  // Bounded newest-first snapshots of the clip's committed draft, so the
+  // user can restore "from N minutes ago". Captured ONLY from a successful
+  // saveDraftNow (never from the raw autosave trigger) and never for an
+  // empty/default document — a bad wipe can't become a restorable version.
+  draftVersions: {}, // clipId → [{ts, doc}]
+
+  captureDraftVersion: (clipId, doc) => {
+    if (!clipId || !doc) return;
+    if (isDefaultEditDocument(doc)) return;
+    const snap = { id: ++_versionSeq, ts: Date.now(), doc: JSON.parse(JSON.stringify(doc)) };
+    set((s) => {
+      const list = s.draftVersions[clipId] || [];
+      // Dedupe echo saves (same content saved again) against the newest.
+      if (list[0] && deepEqual(list[0].doc, snap.doc)) return {};
+      return {
+        draftVersions: {
+          ...s.draftVersions,
+          [clipId]: [snap, ...list].slice(0, DRAFT_VERSION_LIMIT),
+        },
+      };
+    });
+  },
+
+  // Restore a snapshot through the NORMAL draft-apply path (sanitize +
+  // applyDocumentState) — and push history first, so the restore itself is
+  // one undoable action.
+  restoreDraftVersion: (versionId) => {
+    const s = get();
+    const version = (s.draftVersions[s.currentClipId] || []).find((v) => v.id === versionId);
+    if (!version) return;
+    s.pushHistory();
+    get().applyDraft(JSON.parse(JSON.stringify(version.doc)));
   },
 
   // ============ EDIT DOCUMENT ============
@@ -440,7 +1368,12 @@ export const useAppStore = create((set, get) => ({
       version: 1,
       clipId: s.currentClipId,
       elements: s.elements.map((el) => ({ ...el, props: { ...el.props } })),
-      exportSettings: { ...s.exportSettings },
+      // cropWindows is nested state — deep-copy it so a draft payload can't
+      // alias (and later mutate through) the live store slice.
+      exportSettings: {
+        ...s.exportSettings,
+        cropWindows: JSON.parse(JSON.stringify(s.exportSettings.cropWindows || {})),
+      },
       style: caption?.props?.presetId || DEFAULT_STYLE_ID,
       // Caption font (one of the three bundled Telugu fonts). Null when there is
       // no caption element so the backend falls back to its default; otherwise a
@@ -456,19 +1389,106 @@ export const useAppStore = create((set, get) => ({
       // pass-through of the Inspector state.
       captionFontSize: caption?.props?.fontSize ?? null,
       captionPill: caption?.props?.pill ?? null,
+      // Store shape (wordEdits keyed by word id) — persisted verbatim in
+      // drafts; converted to the backend wire shape only at the export
+      // boundary (serializeTranscriptEdits inside buildRerenderRequest).
+      // Deep-copied so draft payloads can't alias live store state.
+      transcriptEdits: {
+        wordEdits: Object.fromEntries(
+          Object.entries(s.transcriptEdits.wordEdits).map(([id, e]) => [id, { ...e }])
+        ),
+        mergedGroups: [...s.transcriptEdits.mergedGroups],
+        lineSplits: [...s.transcriptEdits.lineSplits],
+        lineRealignments: Object.fromEntries(
+          // `|| {}`: a slice set directly from a pre-realignment shape (old
+          // test fixtures, hot-reload) must not crash the document build.
+          Object.entries(s.transcriptEdits.lineRealignments || {}).map(([k, r]) => [
+            k,
+            { ...r, words: r.words.map((w) => ({ ...w })) },
+          ])
+        ),
+      },
     };
   },
 
   // ============ EXPORT ============
-  exportSettings: {
-    format: "9:16", // FORMAT_CONFIG keys in api/worker.py
-    background: "blur", // blur | black | white | color
-    bgColor: "#000000",
-    useAutocrop: true,
-    burnInCaptions: true,
+  // Shape + rationale live on DEFAULT_EXPORT_SETTINGS (top of file); openClip
+  // resets to the same defaults per clip.
+  exportSettings: defaultExportSettings(),
+  setExportSetting: (key, val) => {
+    if (get().exportSettings[key] === val) return;
+    // Coalesced per key: a color-picker drag is one frame, not hundreds.
+    get().pushHistory(`export-${key}`);
+    set((s) => ({ exportSettings: { ...s.exportSettings, [key]: val } }));
   },
-  setExportSetting: (key, val) =>
-    set((s) => ({ exportSettings: { ...s.exportSettings, [key]: val } })),
+
+  // ============ CROP WINDOW (Sprint 4 — drag-to-reframe) ============
+  // The editor previews the 16:9 master through a per-aspect fractional
+  // window (lib/cropWindow.js owns the math). Windows live in
+  // exportSettings.cropWindows → draft-persisted, undoable, exported.
+  // masterDims/reframeMode are session-only view state (never serialized).
+  masterDims: null, // {w,h} of the loaded master video (loadedmetadata)
+  setMasterDims: (dims) => {
+    const cur = get().masterDims;
+    if (cur && dims && cur.w === dims.w && cur.h === dims.h) return;
+    set({ masterDims: dims });
+  },
+  reframeMode: false,
+  setReframeMode: (v) => set({ reframeMode: !!v }),
+
+  // Effective window for an aspect: the user's stored window, else the
+  // derived default (the AI face crop for 9:16 — what _vertical.mp4 bakes).
+  getEffectiveCropWindow: (aspectArg) => {
+    const s = get();
+    const aspect = aspectArg || s.exportSettings.format;
+    const stored = (s.exportSettings.cropWindows || {})[aspect];
+    if (stored) return stored;
+    const box = s.currentClip?.defaultCropBox || null;
+    return initialWindowForAspect(aspect, inferMasterAspect(box, s.masterDims), box);
+  },
+
+  // "Touched" = a stored window that differs from the derived default.
+  // Dragging back onto the exact default counts as untouched again, so the
+  // byte-identical 9:16 path re-engages.
+  isCropTouched: (aspectArg) => {
+    const s = get();
+    const aspect = aspectArg || s.exportSettings.format;
+    const stored = (s.exportSettings.cropWindows || {})[aspect];
+    if (!stored) return false;
+    const box = s.currentClip?.defaultCropBox || null;
+    const initial = initialWindowForAspect(aspect, inferMasterAspect(box, s.masterDims), box);
+    return !boxesAlmostEqual(stored, initial, 1e-3);
+  },
+
+  // Coalesced like every other drag gesture: one reframe drag = one undo
+  // frame (CropReframeOverlay calls endHistoryCoalescing on pointerup).
+  setCropWindow: (aspect, box) => {
+    const st = get();
+    const clamped = clampCropBox(box);
+    const prev = (st.exportSettings.cropWindows || {})[aspect];
+    if (prev && boxesAlmostEqual(prev, clamped, 1e-9)) return;
+    st.pushHistory("crop-window");
+    set((s) => ({
+      exportSettings: {
+        ...s.exportSettings,
+        cropWindows: { ...(s.exportSettings.cropWindows || {}), [aspect]: clamped },
+      },
+    }));
+  },
+
+  // Reset framing → drop the stored window so the derived default applies
+  // again (and the 9:16 export goes back to the byte-identical path).
+  resetCropWindow: (aspectArg) => {
+    const st = get();
+    const aspect = aspectArg || st.exportSettings.format;
+    if (!(st.exportSettings.cropWindows || {})[aspect]) return;
+    st.pushHistory();
+    set((s) => {
+      const rest = { ...(s.exportSettings.cropWindows || {}) };
+      delete rest[aspect];
+      return { exportSettings: { ...s.exportSettings, cropWindows: rest } };
+    });
+  },
 
   exportJobId: null,
   exportStatus: "idle", // idle|submitting|rendering|done|failed
@@ -502,19 +1522,40 @@ export const useAppStore = create((set, get) => ({
       toast.error(err.message);
       return null;
     }
+    // Sprint 4 crop-window branch — THE byte-identical rule:
+    //   untouched window + 9:16  → crop_mode 'auto', NO crop_box. The wire
+    //   payload is exactly the pre-sprint payload, the worker reads the same
+    //   pre-baked vertical_path through the same chain → identical bytes.
+    //   touched window OR non-9:16 → crop_mode 'manual' + the effective
+    //   window; the worker crops the 16:9 master via _prepare_source.
+    const aspect = s.exportSettings.format;
+    const cropActive = aspect !== "9:16" || s.isCropTouched(aspect);
     const req = buildRerenderRequest({
       style: doc.style,
       format: s.exportSettings.format,
       background: s.exportSettings.background,
       bgColor: s.exportSettings.bgColor,
       useAutocrop: s.exportSettings.useAutocrop,
+      cropMode: cropActive ? "manual" : "auto",
+      cropBox: cropActive ? roundCropBox(s.getEffectiveCropWindow(aspect)) : null,
+      // Clip boundary trim (timeline handles). Defaults 0/-1 mean untrimmed
+      // and produce the exact pre-trim-feature payload.
+      trimStart: s.exportSettings.trimStart ?? 0,
+      trimEnd: s.exportSettings.trimEnd ?? -1,
       captionFont: doc.captionFont,
       captionX: doc.captionX,
       captionY: doc.captionY,
       // BUG-001 partial fix — thread the caption Size + Background Pill.
       captionFontSize: doc.captionFontSize,
       captionPill: doc.captionPill,
+      // Telugu ⇄ Tanglish toggle — burned export renders the same script the
+      // preview shows (omitted from the wire when 'telugu', the default).
+      captionScript: s.exportSettings.captionScript,
       elements: doc.elements,
+      // BUG-003 fix — transcript edits reach the export payload. Store shape
+      // in, wire shape out: buildRerenderRequest serializes (and omits the
+      // field entirely when there are no edits).
+      transcriptEdits: doc.transcriptEdits,
     });
     try {
       const rerenderJobId = await startRerender(target.jobId, target.index, req);
@@ -612,7 +1653,8 @@ export const useAppStore = create((set, get) => ({
     const s = get();
     const target = clip || s.currentClip;
     if (!target || USE_MOCKS) return;
-    const text = s.transcript.map((w) => w.text).join(" ");
+    // Word text always reads through the resolver, so metadata reflects edits.
+    const text = s.transcript.map((w) => s.effectiveWord(w.id)).join(" ");
     if (!text) return;
     set({ metadataStatus: "loading" });
     try {
@@ -625,7 +1667,7 @@ export const useAppStore = create((set, get) => ({
   },
 
   // ============ CANVAS ELEMENTS ============
-  elements: INITIAL_ELEMENTS,
+  elements: initialElements(),
   selectedElementId: "el_caption_1",
 
   setSelected: (id) => set({ selectedElementId: id }),
@@ -639,7 +1681,15 @@ export const useAppStore = create((set, get) => ({
   // Applied at the store boundary (not just the TransformBox UI) so keyboard
   // nudges, mock data, and any future callers all funnel through here.
 
-  updateElement: (id, patch) =>
+  // History note: updateElement/updateElementProps are also the per-tick
+  // primitives of continuous gestures (canvas drags, Inspector sliders,
+  // held-arrow nudges), so they push with a per-target coalesce key — the
+  // whole gesture lands as ONE undo frame capturing the pre-gesture state.
+  // Pointerup/keyup call endHistoryCoalescing so separate gestures never
+  // merge. Discrete actions (add/remove/visibility/reorder) push plainly.
+
+  updateElement: (id, patch) => {
+    get().pushHistory(`element-${id}`);
     set((s) => ({
       elements: s.elements.map((el) => {
         if (el.id !== id) return el;
@@ -647,16 +1697,20 @@ export const useAppStore = create((set, get) => ({
         if (ROTATION_LOCKED_TYPES.has(next.type)) next.rotation = 0;
         return next;
       }),
-    })),
+    }));
+  },
 
-  updateElementProps: (id, propsPatch) =>
+  updateElementProps: (id, propsPatch) => {
+    get().pushHistory(`props-${id}:${Object.keys(propsPatch).sort().join(",")}`);
     set((s) => ({
       elements: s.elements.map((el) =>
         el.id === id ? { ...el, props: { ...el.props, ...propsPatch } } : el
       ),
-    })),
+    }));
+  },
 
   addElement: (type, overrides = {}) => {
+    get().pushHistory();
     const defaults = defaultElementForType(type);
     const el = { ...defaults, ...overrides, id: nextElementId(type) };
     set((s) => ({
@@ -666,36 +1720,74 @@ export const useAppStore = create((set, get) => ({
     return el.id;
   },
 
-  removeElement: (id) =>
+  // Upload a user image and drop it on the canvas as an overlay element.
+  // The element carries ONLY the opaque image_id (never a path/URL) — the
+  // preview derives its /outputs URL from it and the burn resolves it
+  // server-side, pinned to this job's video. Multiple image elements are
+  // fine (each addElement mints a fresh id). One history frame via
+  // addElement — the upload itself is not an undoable document change.
+  addImageOverlay: async (file) => {
+    const s = get();
+    if (USE_MOCKS) {
+      toast.error("Image overlays need a real backend (mock mode is on)");
+      return null;
+    }
+    if (!s.currentJobId || !file) {
+      toast.error("Open a clip before adding an image");
+      return null;
+    }
+    try {
+      const out = await uploadOverlayImage(s.currentJobId, file);
+      return get().addElement("image", {
+        props: { image_id: out.image_id, height: 0.18, opacity: 1 },
+      });
+    } catch (err) {
+      surfaceError(err, "Could not upload the image");
+      return null;
+    }
+  },
+
+  removeElement: (id) => {
+    if (!get().elements.some((el) => el.id === id)) return;
+    get().pushHistory();
     set((s) => ({
       elements: s.elements.filter((el) => el.id !== id),
       selectedElementId:
         s.selectedElementId === id ? null : s.selectedElementId,
-    })),
+    }));
+  },
 
-  toggleElementVisibility: (id) =>
+  toggleElementVisibility: (id) => {
+    if (!get().elements.some((el) => el.id === id)) return;
+    get().pushHistory();
     set((s) => ({
       elements: s.elements.map((el) =>
         el.id === id ? { ...el, visible: !el.visible } : el
       ),
-    })),
+    }));
+  },
 
-  bringForward: (id) =>
+  bringForward: (id) => {
+    const els = get().elements;
+    const idx = els.findIndex((el) => el.id === id);
+    if (idx === -1 || idx === els.length - 1) return;
+    get().pushHistory();
     set((s) => {
-      const idx = s.elements.findIndex((el) => el.id === id);
-      if (idx === -1 || idx === s.elements.length - 1) return s;
       const next = [...s.elements];
       [next[idx], next[idx + 1]] = [next[idx + 1], next[idx]];
       return { elements: next };
-    }),
-  sendBackward: (id) =>
+    });
+  },
+  sendBackward: (id) => {
+    const idx = get().elements.findIndex((el) => el.id === id);
+    if (idx <= 0) return;
+    get().pushHistory();
     set((s) => {
-      const idx = s.elements.findIndex((el) => el.id === id);
-      if (idx <= 0) return s;
       const next = [...s.elements];
       [next[idx], next[idx - 1]] = [next[idx - 1], next[idx]];
       return { elements: next };
-    }),
+    });
+  },
 
   // Element convenience getters
   getElement: (id) => get().elements.find((el) => el.id === id),
@@ -771,12 +1863,136 @@ export const useAppStore = create((set, get) => ({
   canvasPan: { x: 0, y: 0 },
   setCanvasPan: (p) => set({ canvasPan: p }),
 
-  // ============ MUSIC ============
-  selectedTrackId: null,
-  setSelectedTrack: (id) => set({ selectedTrackId: id }),
-  musicVolume: 40,
-  setMusicVolume: (v) => set({ musicVolume: v }),
+  // ============ SAVED CAPTION TEMPLATE ("My Style") ============
+  // ONE named style {name, presetId, font, fontSize, pill, x, y} per user,
+  // persisted server-side on the user:{id} Redis hash (same layer billing
+  // uses — GET/PUT /users/me/caption-template). Auto-applied ONLY to a clip
+  // with a CONFIRMED empty draft (openClip's no-draft branch): a clip's own
+  // restored draft always wins. Fetched once per session, cached here.
+  captionTemplate: null,
+  captionTemplateLoaded: false,
+  captionTemplateSaving: false,
+
+  ensureCaptionTemplate: async () => {
+    const s = get();
+    if (USE_MOCKS || s.captionTemplateLoaded) return s.captionTemplate;
+    try {
+      const template = await getCaptionTemplate();
+      set({ captionTemplate: template || null, captionTemplateLoaded: true });
+      return template || null;
+    } catch {
+      // Not latched — retried on the next clip open. A template we couldn't
+      // fetch just means the clip opens with plain defaults.
+      return null;
+    }
+  },
+
+  // Snapshot the current caption element as the user's saved style.
+  saveMyStyle: async (name) => {
+    const s = get();
+    const caption = s.getCaptionElement();
+    if (!caption || s.captionTemplateSaving) return;
+    const template = {
+      name: (typeof name === "string" && name.trim() ? name.trim() : "My style").slice(0, 60),
+      presetId: caption.props.presetId,
+      font: caption.props.font,
+      fontSize: caption.props.fontSize,
+      pill: { ...caption.props.pill },
+      x: caption.x,
+      y: caption.y,
+    };
+    const prev = { template: s.captionTemplate, loaded: s.captionTemplateLoaded };
+    set({ captionTemplate: template, captionTemplateLoaded: true, captionTemplateSaving: true });
+    if (USE_MOCKS) {
+      set({ captionTemplateSaving: false });
+      return;
+    }
+    try {
+      await putCaptionTemplate(template);
+      toast.success(`Saved "${template.name}" — new clips will start with this style`);
+    } catch (err) {
+      set({ captionTemplate: prev.template, captionTemplateLoaded: prev.loaded });
+      surfaceError(err, "Could not save your style");
+    } finally {
+      set({ captionTemplateSaving: false });
+    }
+  },
+
+  clearMyStyle: async () => {
+    const s = get();
+    if (s.captionTemplateSaving) return;
+    const prev = { template: s.captionTemplate, loaded: s.captionTemplateLoaded };
+    set({ captionTemplate: null, captionTemplateLoaded: true, captionTemplateSaving: true });
+    if (USE_MOCKS) {
+      set({ captionTemplateSaving: false });
+      return;
+    }
+    try {
+      await putCaptionTemplate(null);
+    } catch (err) {
+      set({ captionTemplate: prev.template, captionTemplateLoaded: prev.loaded });
+      surfaceError(err, "Could not remove your saved style");
+    } finally {
+      set({ captionTemplateSaving: false });
+    }
+  },
+
+  // Fill a CLEAN clip's caption element from the template. NOT a history
+  // frame and not an "edit": it is the clip's starting state, exactly like
+  // a restored draft. Field-validated so a stale template (retired preset,
+  // junk coords) degrades to defaults instead of corrupting the document.
+  applyCaptionTemplateToCleanClip: (template) => {
+    if (!template || typeof template !== "object") return;
+    const unit = (v) => typeof v === "number" && Number.isFinite(v) && v >= 0 && v <= 1;
+    set((s) => ({
+      elements: s.elements.map((el) => {
+        if (el.type !== "caption") return el;
+        const next = { ...el, props: { ...el.props } };
+        if (isKnownStyle(template.presetId)) next.props.presetId = template.presetId;
+        if (isKnownCaptionFont(template.font)) next.props.font = template.font;
+        if (unit(template.fontSize) && template.fontSize > 0) {
+          next.props.fontSize = template.fontSize;
+        }
+        if (template.pill && typeof template.pill === "object") {
+          next.props.pill = { ...next.props.pill, ...template.pill };
+        }
+        if (unit(template.x)) next.x = template.x;
+        if (unit(template.y)) next.y = template.y;
+        return next;
+      }),
+    }));
+  },
+
+  // Manual re-apply to the current clip (Inspector button) — a real user
+  // action, so it IS one undoable history frame.
+  applyMyStyleToCurrentClip: () => {
+    const s = get();
+    if (!s.captionTemplate) return;
+    s.pushHistory();
+    get().applyCaptionTemplateToCleanClip(s.captionTemplate);
+  },
 }));
+
+// React-side entry point to the word-text resolver: components render word
+// text via this hook so every read goes through the store's effectiveWord
+// (edits win over the original — the single source of truth; no scattered
+// wordEdits lookups) AND re-render when an edit lands (the wordEdits
+// subscription below is solely for that reactivity).
+export const useEffectiveWord = () => {
+  useAppStore((s) => s.transcriptEdits.wordEdits);
+  return useAppStore((s) => s.effectiveWord);
+};
+
+// Script-aware sibling of useEffectiveWord for DISPLAY surfaces (caption
+// canvas, transcript panel rows): resolves through displayWord so the
+// Telugu ⇄ Tanglish toggle flips them instantly. Subscribes to wordEdits
+// (edits + async tanglish derivations) AND captionScript for reactivity.
+// Editing inputs keep using useEffectiveWord — edits are Telugu-source.
+export const useDisplayWord = () => {
+  useAppStore((s) => s.transcriptEdits.wordEdits);
+  useAppStore((s) => s.exportSettings.captionScript);
+  return useAppStore((s) => s.displayWord);
+};
 
 // -----------------------------------------------------------------
 // Element type factory — defaults per type
@@ -856,6 +2072,20 @@ function defaultElementForType(type) {
           avatar: "R",
           font: "Manrope",
           fontSize: 0.02,
+        },
+      };
+    case "image":
+      // User-uploaded overlay image. image_id is the opaque server handle
+      // (set by addImageOverlay after upload); height is a fraction of
+      // canvas height (width follows the image's natural ratio — the same
+      // contract _prepare_image_layer burns with); opacity maps 1:1.
+      return {
+        ...base,
+        type: "image",
+        props: {
+          image_id: null,
+          height: 0.18,
+          opacity: 1,
         },
       };
     default:

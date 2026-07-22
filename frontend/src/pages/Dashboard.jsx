@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Plus, MoreVertical, Play, Clock, Sparkles, TrendingUp, Trash2, FileVideo } from "lucide-react";
 import { AppShell } from "@/components/shotvi/AppShell";
 import { StatusBadge } from "@/components/shotvi/StatusBadge";
+import { FirstRunHero } from "@/components/shotvi/FirstRunHero";
 import { useAppStore } from "@/store/useAppStore";
 import { DASHBOARD } from "@/constants/testIds";
 import { LANGUAGES } from "@/data/mockData";
@@ -132,135 +133,150 @@ export default function Dashboard() {
   const readyClips = projects.reduce((a, p) => a + p.clipsCount, 0);
   const processing = projects.filter((p) => p.status !== "ready").length;
 
+  // First-run detection: zero jobs for this user. Only decided once the
+  // initial load settles — while projectsLoading is true we don't yet know,
+  // so returning users never see a flash of the hero before their projects
+  // arrive, and first-time users just see the existing loading state briefly
+  // instead of the hero flashing in twice.
+  const isFirstRun = !projectsLoading && projects.length === 0;
+
   return (
     <AppShell
       title="Projects"
-      subtitle="Manage your uploads, clips and exports"
+      subtitle={isFirstRun ? "Let's make your first clip" : "Manage your uploads, clips and exports"}
       actions={
-        <button
-          data-testid={DASHBOARD.newProject}
-          onClick={() => navigate("/upload")}
-          className="inline-flex items-center gap-1.5 bg-[#7c3aed] hover:bg-[#6d28d9] text-white text-sm font-semibold px-4 py-2 rounded-md transition-colors shadow-[0_8px_24px_-8px_rgba(124,58,237,0.7)]"
-        >
-          <Plus size={15} /> New Project
-        </button>
+        !isFirstRun && (
+          <button
+            data-testid={DASHBOARD.newProject}
+            onClick={() => navigate("/upload")}
+            className="inline-flex items-center gap-1.5 bg-[#7c3aed] hover:bg-[#6d28d9] text-white text-sm font-semibold px-4 py-2 rounded-md transition-colors shadow-[0_8px_24px_-8px_rgba(124,58,237,0.7)]"
+          >
+            <Plus size={15} /> New Project
+          </button>
+        )
       }
     >
       <div
         data-testid={DASHBOARD.root}
         className="p-8 max-w-[1400px] mx-auto"
       >
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          {[
-            {
-              l: "Total projects",
-              v: projects.length,
-              i: Sparkles,
-              c: "#7c3aed",
-            },
-            {
-              l: "Clips generated",
-              v: readyClips,
-              i: TrendingUp,
-              c: "#10b981",
-            },
-            {
-              l: "Processing",
-              v: processing,
-              i: Clock,
-              c: "#f59e0b",
-            },
-            {
-              l: "This month usage",
-              v: "42%",
-              i: Play,
-              c: "#c026d3",
-            },
-          ].map((s) => {
-            const Icon = s.i;
-            return (
-              <div
-                key={s.l}
-                className="rounded-xl border border-[#2a2a35] bg-[#0b0b10] p-5"
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <p className="text-[11px] uppercase tracking-widest text-[#71717a]">
-                    {s.l}
-                  </p>
+        {isFirstRun ? (
+          <FirstRunHero />
+        ) : (
+          <>
+            {/* Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+              {[
+                {
+                  l: "Total projects",
+                  v: projects.length,
+                  i: Sparkles,
+                  c: "#7c3aed",
+                },
+                {
+                  l: "Clips generated",
+                  v: readyClips,
+                  i: TrendingUp,
+                  c: "#10b981",
+                },
+                {
+                  l: "Processing",
+                  v: processing,
+                  i: Clock,
+                  c: "#f59e0b",
+                },
+                {
+                  l: "This month usage",
+                  v: "42%",
+                  i: Play,
+                  c: "#c026d3",
+                },
+              ].map((s) => {
+                const Icon = s.i;
+                return (
                   <div
-                    className="w-8 h-8 rounded-md flex items-center justify-center"
-                    style={{
-                      backgroundColor: `${s.c}20`,
-                      color: s.c,
-                    }}
+                    key={s.l}
+                    className="rounded-xl border border-[#2a2a35] bg-[#0b0b10] p-5"
                   >
-                    <Icon size={15} />
+                    <div className="flex items-center justify-between mb-4">
+                      <p className="text-[11px] uppercase tracking-widest text-[#71717a]">
+                        {s.l}
+                      </p>
+                      <div
+                        className="w-8 h-8 rounded-md flex items-center justify-center"
+                        style={{
+                          backgroundColor: `${s.c}20`,
+                          color: s.c,
+                        }}
+                      >
+                        <Icon size={15} />
+                      </div>
+                    </div>
+                    <p className="font-display text-3xl font-bold text-white">
+                      {s.v}
+                    </p>
                   </div>
-                </div>
-                <p className="font-display text-3xl font-bold text-white">
-                  {s.v}
+                );
+              })}
+            </div>
+
+            {/* Section header */}
+            <div className="flex items-end justify-between mb-5">
+              <div>
+                <h2 className="font-display text-xl font-semibold tracking-tight">
+                  Recent projects
+                </h2>
+                <p className="text-xs text-[#71717a] mt-1">
+                  {projects.length} total · Sorted by most recent
                 </p>
               </div>
-            );
-          })}
-        </div>
+              <div className="flex gap-2 text-xs">
+                {["All", "Ready", "Processing", "Failed"].map((f, i) => (
+                  <button
+                    key={f}
+                    className={`px-3 py-1.5 rounded-md border transition-colors ${
+                      i === 0
+                        ? "bg-[#7c3aed]/15 border-[#7c3aed]/40 text-white"
+                        : "bg-[#0b0b10] border-[#2a2a35] text-[#a1a1aa] hover:text-white"
+                    }`}
+                  >
+                    {f}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-        {/* Section header */}
-        <div className="flex items-end justify-between mb-5">
-          <div>
-            <h2 className="font-display text-xl font-semibold tracking-tight">
-              Recent projects
-            </h2>
-            <p className="text-xs text-[#71717a] mt-1">
-              {projects.length} total · Sorted by most recent
-            </p>
-          </div>
-          <div className="flex gap-2 text-xs">
-            {["All", "Ready", "Processing", "Failed"].map((f, i) => (
+            {/* Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               <button
-                key={f}
-                className={`px-3 py-1.5 rounded-md border transition-colors ${
-                  i === 0
-                    ? "bg-[#7c3aed]/15 border-[#7c3aed]/40 text-white"
-                    : "bg-[#0b0b10] border-[#2a2a35] text-[#a1a1aa] hover:text-white"
-                }`}
+                data-testid={DASHBOARD.newProject + "-tile"}
+                onClick={() => navigate("/upload")}
+                className="rounded-xl border-2 border-dashed border-[#2a2a35] bg-[#0b0b10]/50 hover:border-[#7c3aed] hover:bg-[#7c3aed]/5 transition-colors min-h-[280px] flex flex-col items-center justify-center gap-3 text-[#a1a1aa] hover:text-white"
               >
-                {f}
+                <div className="w-12 h-12 rounded-full bg-[#7c3aed]/15 border border-[#7c3aed]/30 flex items-center justify-center">
+                  <Plus size={22} />
+                </div>
+                <div className="text-center">
+                  <p className="font-display font-semibold text-base">
+                    New project
+                  </p>
+                  <p className="text-xs text-[#71717a] mt-1">
+                    Upload video or paste YouTube URL
+                  </p>
+                </div>
               </button>
-            ))}
-          </div>
-        </div>
 
-        {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          <button
-            data-testid={DASHBOARD.newProject + "-tile"}
-            onClick={() => navigate("/upload")}
-            className="rounded-xl border-2 border-dashed border-[#2a2a35] bg-[#0b0b10]/50 hover:border-[#7c3aed] hover:bg-[#7c3aed]/5 transition-colors min-h-[280px] flex flex-col items-center justify-center gap-3 text-[#a1a1aa] hover:text-white"
-          >
-            <div className="w-12 h-12 rounded-full bg-[#7c3aed]/15 border border-[#7c3aed]/30 flex items-center justify-center">
-              <Plus size={22} />
+              {projects.map((p) => (
+                <ProjectCard key={p.id} project={p} onOpen={onOpen} onRemove={onRemove} />
+              ))}
+              {projectsLoading && projects.length === 0 && (
+                <div className="rounded-xl border border-[#2a2a35] bg-[#0b0b10] min-h-[280px] flex items-center justify-center text-sm text-[#71717a]">
+                  Loading projects…
+                </div>
+              )}
             </div>
-            <div className="text-center">
-              <p className="font-display font-semibold text-base">
-                New project
-              </p>
-              <p className="text-xs text-[#71717a] mt-1">
-                Upload video or paste YouTube URL
-              </p>
-            </div>
-          </button>
-
-          {projects.map((p) => (
-            <ProjectCard key={p.id} project={p} onOpen={onOpen} onRemove={onRemove} />
-          ))}
-          {projectsLoading && projects.length === 0 && (
-            <div className="rounded-xl border border-[#2a2a35] bg-[#0b0b10] min-h-[280px] flex items-center justify-center text-sm text-[#71717a]">
-              Loading projects…
-            </div>
-          )}
-        </div>
+          </>
+        )}
       </div>
     </AppShell>
   );

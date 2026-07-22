@@ -251,10 +251,30 @@ def load_clips(clips_path: str) -> dict:
 # Word extraction
 # ══════════════════════════════════════════════════════════════════════════════
 
-def get_words_for_clip(transcript: dict, clip_start: float, clip_end: float) -> list:
+def _word_text_for_script(word: dict, script: str) -> str:
+    """Display text of a transcript word in the requested caption script.
+
+    'tanglish' → the stored word_tanglish; when an old transcript has none,
+    derive it on demand (deterministic services/tanglish.py — same function
+    that populates it everywhere else, so on-demand == stored). Timestamps
+    are untouched either way; this is a display-text switch only.
+    """
+    if script == "tanglish":
+        stored = word.get("word_tanglish")
+        if isinstance(stored, str) and stored.strip():
+            return stored
+        from services.tanglish import telugu_to_tanglish
+        return telugu_to_tanglish(word["word"])
+    return word["word"]
+
+
+def get_words_for_clip(transcript: dict, clip_start: float, clip_end: float,
+                       script: str = "telugu") -> list:
     """
     Extract words that fall within a clip time range.
     Handles both Sarvam V3 and faster-whisper transcript formats.
+    script selects the caption text ('telugu' renders word, 'tanglish' renders
+    word_tanglish) — timing/windowing is identical in both.
     """
     raw_words = []
 
@@ -275,17 +295,21 @@ def get_words_for_clip(transcript: dict, clip_start: float, clip_end: float) -> 
         if w_end > clip_start and w_start < clip_end:
             adj_start = max(w_start, clip_start) - clip_start
             adj_end   = min(w_end,   clip_end)   - clip_start
+            # Empty-text drop stays keyed on the TELUGU source in both scripts,
+            # so the word list (and every raw index / lineSplit address built on
+            # it) is identical whichever script renders.
             text = word["word"].strip()
             if text:
                 words.append({
-                    "word":  text,
+                    "word":  _word_text_for_script(word, script).strip() or text,
                     "start": round(adj_start, 3),
                     "end":   round(adj_end,   3),
                 })
     return words
 
 
-def get_words_for_multisegment_clip(transcript: dict, clip: dict, sent_by_id: dict) -> list:
+def get_words_for_multisegment_clip(transcript: dict, clip: dict, sent_by_id: dict,
+                                     script: str = "telugu") -> list:
     """
     Extract + remap words for a clip with multiple (non-contiguous) segments
     — e.g. a dead zone (sponsor read, intro greeting) cut out of the middle.
@@ -299,7 +323,7 @@ def get_words_for_multisegment_clip(transcript: dict, clip: dict, sent_by_id: di
     """
     segments = clip.get("segments", [])
     if len(segments) <= 1:
-        return get_words_for_clip(transcript, clip["start"], clip["end"])
+        return get_words_for_clip(transcript, clip["start"], clip["end"], script)
 
     all_words = []
     output_time_offset = 0.0
@@ -313,7 +337,7 @@ def get_words_for_multisegment_clip(transcript: dict, clip: dict, sent_by_id: di
         seg_duration = seg_end - seg_start
 
         # Get words for this segment from the original transcript
-        seg_words = get_words_for_clip(transcript, seg_start, seg_end)
+        seg_words = get_words_for_clip(transcript, seg_start, seg_end, script)
 
         # Remap timestamps relative to this segment's position in the output file
         for w in seg_words:
@@ -687,8 +711,15 @@ def render_captions_for_clip(
     caption_y: float = None,
     caption_font_size: float = None,   # BUG-001 partial: 0-1 fraction of video height
     caption_pill: dict = None,         # BUG-001 partial: {enabled, color, opacity, padding, radius}
+    caption_script: str = "telugu",    # 'telugu' | 'tanglish' — caption display script
 ) -> str:
     """words → ASS → burn for a single clip with given style + caption font.
+
+    caption_script='tanglish' renders each word's word_tanglish (edits applied
+    first — apply_transcript_edits re-derives the Tanglish of an edited word, so
+    the resolver order matches the frontend). Everything else — timing, k-values,
+    fonts, positioning — is byte-identical to the telugu path; anything other
+    than the literal string 'tanglish' falls back to telugu.
 
     caption_x/caption_y (0-1 center) position the caption per the user's drag
     (Stage 6). Both None → unpositioned, byte-identical to the pre-Stage-6 path;
@@ -702,6 +733,8 @@ def render_captions_for_clip(
     if caption_font is not None and caption_font not in CAPTION_FONTS:
         print(f"✗ WARN: unknown caption font '{caption_font}' — falling back to {DEFAULT_CAPTION_FONT}")
         caption_font = None
+    if caption_script != "tanglish":
+        caption_script = "telugu"
     wpl = STYLES[style_name].get("words_per_line", MAX_WORDS_PER_LINE)
 
     transcript = load_transcript(transcript_path)
@@ -710,16 +743,17 @@ def render_captions_for_clip(
     sentences  = transcript.get("sentences", [])
     sent_by_id = {s["id"]: s for s in sentences}
 
-    print(f"📝 Generating captions [{style_name} / {caption_font or DEFAULT_CAPTION_FONT}] "
+    print(f"📝 Generating captions [{style_name} / {caption_font or DEFAULT_CAPTION_FONT} / {caption_script}] "
           f"for: {clip.get('why', clip.get('hook_text', 'clip'))}")
 
     segments = clip.get("segments", [])
 
     # ── Apply transcript edits ────────────────────────────────────────────────
     if transcript_edits:
-        _n_word  = len(transcript_edits.get("wordEdits",    []))
-        _n_merge = len(transcript_edits.get("mergedGroups", []))
-        _n_split = len(transcript_edits.get("lineSplits",   []))
+        _n_word    = len(transcript_edits.get("wordEdits",        []))
+        _n_merge   = len(transcript_edits.get("mergedGroups",     []))
+        _n_split   = len(transcript_edits.get("lineSplits",       []))
+        _n_realign = len(transcript_edits.get("lineRealignments", []))
         if len(segments) > 1:
             # wordEdits use global refs — safe to apply before segment carving.
             if _n_word:
@@ -738,12 +772,12 @@ def render_captions_for_clip(
                 else:
                     print(f"  ✎ multi-segment clip {clip_index}: {n_applied} word edit(s) applied",
                           flush=True)
-            if _n_merge or _n_split:
+            if _n_merge or _n_split or _n_realign:
                 print(f"  ⚠ multi-segment clip {clip_index}: "
-                      f"{_n_merge} merge(s), {_n_split} split(s) skipped — "
+                      f"{_n_merge} merge(s), {_n_split} split(s), {_n_realign} line realignment(s) skipped — "
                       f"frontend line indices include gap words; backend does not (not yet remapped)",
                       flush=True)
-            transcript_edits = None  # prevent lineSplits grouper below from misapplying
+            transcript_edits = None  # prevent lineSplits grouper / realignment overlay below from misapplying
         else:
             from services.apply_transcript_edits import apply_transcript_edits
             transcript, n_applied = apply_transcript_edits(
@@ -762,10 +796,10 @@ def render_captions_for_clip(
             s_start = sent_by_id.get(int(seg['start_sent_id']), {}).get('start', 0)
             s_end   = sent_by_id.get(int(seg['end_sent_id']),   {}).get('end',   0)
             print(f"   Part {i+1}: {s_start:.1f}s → {s_end:.1f}s (output: remapped)")
-        words = get_words_for_multisegment_clip(transcript, clip, sent_by_id)
+        words = get_words_for_multisegment_clip(transcript, clip, sent_by_id, caption_script)
     else:
         print(f"   Clip time: {clip['start']:.1f}s → {clip['end']:.1f}s")
-        words = get_words_for_clip(transcript, clip["start"], clip["end"])
+        words = get_words_for_clip(transcript, clip["start"], clip["end"], caption_script)
 
     print(f"   Found {len(words)} words")
 
@@ -817,6 +851,17 @@ def render_captions_for_clip(
         lines = group_words_with_splits(words, wpl, _line_splits)
     else:
         lines = group_words_into_lines(words, wpl)
+
+    # Line-level re-alignments overlay AFTER grouping: a matched line's words
+    # are replaced with the realigned set (fresh karaoke timing inside the
+    # line's FIXED span); line boundaries and every other line are untouched.
+    # Same cumulative-index matching as the frontend's applyLineRealignments,
+    # so preview and burn agree line-for-line.
+    _realignments = transcript_edits.get("lineRealignments", []) if transcript_edits else []
+    if _realignments:
+        from services.apply_transcript_edits import apply_line_realignments
+        _n_applied = apply_line_realignments(lines, _realignments, caption_script)
+        print(f"   ✎ Line realignments: {_n_applied}/{len(_realignments)} applied", flush=True)
 
     print(f"   {len(lines)} lines × up to {wpl} words — karaoke highlight mode")
 

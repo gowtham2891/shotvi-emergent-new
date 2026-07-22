@@ -1,7 +1,12 @@
 import React, { useMemo } from "react";
-import { useAppStore } from "@/store/useAppStore";
+import { useAppStore, useDisplayWord } from "@/store/useAppStore";
+import { outputFileUrl } from "@/api/client";
 import { getCaptionStylePreview, getCaptionFontStack } from "@/data/captionStylePreview";
-import { buildCaptionLines, findActiveLine, findActiveWordIndex } from "@/lib/captionLines";
+import {
+  buildCaptionLinesWithRealignments,
+  findActiveLine,
+  findActiveWordIndex,
+} from "@/lib/captionLines";
 
 /**
  * Per-type element content renderers — extracted from ElementRenderer so
@@ -20,9 +25,20 @@ export const ElementBody = ({ element, canvasH }) => {
       return <ProgressBody element={element} canvasH={canvasH} />;
     case "logo":
       return <LogoBody element={element} canvasH={canvasH} />;
+    case "image":
+      return <ImageBody element={element} canvasH={canvasH} />;
     default:
       return null;
   }
+};
+
+// Aspect ratio of the current canvas (w/h) — the editor stage and the burn
+// both follow exportSettings.format, so width-fraction props scale off the
+// REAL canvas width, not the retired 9:16-only canvasW=canvasH*9/16 shortcut.
+const ASPECT_WH = { "9:16": 9 / 16, "1:1": 1, "16:9": 16 / 9 };
+const useCanvasAspectWH = () => {
+  const format = useAppStore((s) => s.exportSettings.format);
+  return ASPECT_WH[format] || ASPECT_WH["9:16"];
 };
 
 const animationClass = (anim) => {
@@ -41,6 +57,11 @@ const animationClass = (anim) => {
 const CaptionBody = ({ element, canvasH }) => {
   const transcript = useAppStore((s) => s.transcript);
   const currentTime = useAppStore((s) => s.currentTime);
+  // Word display text ALWAYS reads through the store's script-aware resolver
+  // (edits win over the original; the Telugu ⇄ Tanglish toggle picks the
+  // script) — never w.text directly. Karaoke timing is script-independent:
+  // only the rendered text changes when the toggle flips.
+  const displayWord = useDisplayWord();
 
   const { presetId, font, fontSize, animation, pill } = element.props;
   const preview = getCaptionStylePreview(presetId);
@@ -51,13 +72,28 @@ const CaptionBody = ({ element, canvasH }) => {
   // the SAME @font-face .ttf the backend burns via fontsdir, so preview == export.
   const fontFamily = getCaptionFontStack(font);
 
-  // Mirrors services/caption_renderer.py's group_words_into_lines: chunk
-  // into wordsPerLine-word lines (4, or 2 for big-bold), each held on
-  // screen for [lineStart, lineEnd) — not a fast sliding word-window — so
-  // preview line breaks and pacing match export.
+  // Mirrors services/caption_renderer.py's line grouping: chunk into
+  // wordsPerLine-word lines (4, or 2 for big-bold), each held on screen
+  // for [lineStart, lineEnd) — not a fast sliding word-window — so preview
+  // line breaks and pacing match export. lineSplits (forced breaks from
+  // the Split button) re-group exactly like the backend's
+  // group_words_with_splits, so a split re-breaks the preview live.
+  const lineSplits = useAppStore((s) => s.transcriptEdits.lineSplits);
+  // Line re-alignments overlay after grouping (applyLineRealignments — the
+  // same lockstep mirror of the backend the transcript panel uses), so a
+  // line edited with added/removed words plays its fresh karaoke timing in
+  // the preview exactly as the burn will render it.
+  const lineRealignments = useAppStore((s) => s.transcriptEdits.lineRealignments);
+  const captionScript = useAppStore((s) => s.exportSettings.captionScript);
   const lines = useMemo(
-    () => buildCaptionLines(transcript, preview.wordsPerLine),
-    [transcript, preview.wordsPerLine]
+    () =>
+      buildCaptionLinesWithRealignments(
+        transcript,
+        preview.wordsPerLine,
+        lineSplits,
+        lineRealignments
+      ),
+    [transcript, preview.wordsPerLine, lineSplits, lineRealignments]
   );
   const activeLine = findActiveLine(lines, currentTime);
   const activeWordIdx = findActiveWordIndex(activeLine, currentTime);
@@ -93,7 +129,7 @@ const CaptionBody = ({ element, canvasH }) => {
           role === "active" ? preview.colorHighlight : role === "spoken" ? preview.colorSpoken : preview.colorUnspoken;
         return (
           <span
-            key={`${gIdx}-${w.text}`}
+            key={`${gIdx}-${w.id ?? w.text}`}
             className={gIdx === activeWordIdx ? animationClass(animation) : ""}
             style={{
               fontFamily,
@@ -106,7 +142,14 @@ const CaptionBody = ({ element, canvasH }) => {
               transition: "color 120ms linear, transform 120ms linear",
             }}
           >
-            {w.text}
+            {w.realigned
+              ? // Realigned words are synthetic (no transcript id, so no
+                // resolver): the record carries both scripts; pick by the
+                // same toggle displayWord honors, falling back to Telugu.
+                captionScript === "tanglish"
+                ? w.text_tanglish || w.text
+                : w.text
+              : displayWord(w.id)}
           </span>
         );
       })}
@@ -139,8 +182,9 @@ const HeadlineBody = ({ element, canvasH }) => {
 const ProgressBody = ({ element, canvasH }) => {
   const currentTime = useAppStore((s) => s.currentTime);
   const duration = useAppStore((s) => s.duration);
+  const aspectWH = useCanvasAspectWH();
   const p = element.props;
-  const canvasW = (canvasH * 9) / 16;
+  const canvasW = canvasH * aspectWH;
   const pct = duration ? (currentTime / duration) * 100 : 0;
   return (
     <div
@@ -186,6 +230,31 @@ const LogoBody = ({ element, canvasH }) => {
         {p.text}
       </span>
     </div>
+  );
+};
+
+// User-uploaded image overlay. Sizing contract shared with the burn
+// (services/overlay_renderer.py :: _prepare_image_layer): props.height is a
+// fraction of canvas HEIGHT, width follows the image's natural aspect ratio
+// (width: auto), element.scale multiplies via the positioning wrapper's
+// transform, and props.opacity maps 1:1 to the burned alpha multiply.
+const ImageBody = ({ element, canvasH }) => {
+  const p = element.props;
+  const src = p.src || (p.image_id ? outputFileUrl(p.image_id) : null);
+  if (!src) return null;
+  return (
+    <img
+      src={src}
+      alt=""
+      draggable={false}
+      style={{
+        height: (p.height ?? 0.18) * canvasH,
+        width: "auto",
+        opacity: p.opacity ?? 1,
+        display: "block",
+        pointerEvents: "none",
+      }}
+    />
   );
 };
 

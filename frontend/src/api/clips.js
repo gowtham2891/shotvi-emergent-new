@@ -34,9 +34,19 @@ export function mapClipToUi(clipOut, index, jobId) {
     segments: clipOut.segments || [],
     startAt: formatTimecode(clipOut.start),
     thumbnail: thumbnailFileUrl(clipOut.thumbnail_path),
-    // Playable URLs via the static /outputs mount
+    // Playable URLs via the static /outputs mount.
     previewUrl: outputFileUrl(clipOut.captioned_path || clipOut.vertical_path || clipOut.raw_path),
-    videoUrl: outputFileUrl(clipOut.vertical_path || clipOut.raw_path),
+    // Sprint 4: the editor canvas plays the 16:9 MASTER (raw_path) and
+    // simulates the crop window client-side (lib/cropWindow.js), so every
+    // aspect can reframe without re-fetching media. Vertical fallback keeps
+    // legacy records (no raw on disk) playable — their crop simulation then
+    // runs over the already-cropped file, which degrades to a full-frame
+    // window. Like before, this URL is set once per clip and NEVER refreshed
+    // by rerenders (see applyExportUpdate's videoUrl immutability).
+    videoUrl: outputFileUrl(clipOut.raw_path || clipOut.vertical_path),
+    // The AI face-crop as a 0–1 window over the master — the editor's
+    // default framing; null on pre-Sprint-4 jobs (centered default applies).
+    defaultCropBox: clipOut.default_crop_box || null,
     // Raw server paths (needed for download + sidecar lookup)
     rawPath: clipOut.raw_path || "",
     verticalPath: clipOut.vertical_path || "",

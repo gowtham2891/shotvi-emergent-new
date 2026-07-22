@@ -241,7 +241,7 @@ def test_telugu_vattu_shapes_correctly_via_real_burn_path(caption_font):
 def test_caption_burn_pipeline_end_to_end_ass_fontsdir_smoke():
     """Rebuild the whole caption burn stack — a small lavfi-generated sample
     clip, ASS from generate_ass_karaoke, and burn_captions rendering via
-    `ass=` + `fontsdir=services/assets/fonts` — and prove:
+    `ass=` + `fontsdir=services/assets/fonts/captions` — and prove:
 
       (a) ffmpeg exits 0 (the caption filtergraph is valid on THIS ffmpeg build,
           not just an assumed one — caught a regression to `subtitles=` or a

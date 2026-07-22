@@ -100,6 +100,9 @@ export const ElementRenderer = ({ element, canvasRef }) => {
     };
     const up = () => {
       setActiveGuides({ vertical: [], horizontal: [] });
+      // Gesture over: the whole drag was ONE undo frame; the next drag of
+      // this element must start a new one.
+      useAppStore.getState().endHistoryCoalescing();
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", up);
     };
