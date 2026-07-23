@@ -223,7 +223,7 @@ def test_cache_hit_missing_outputs_triggers_regeneration(storage, monkeypatch):
     deleted = []
     store = {}
 
-    def fake_create_job(job_id, url, language="te", owner=""):
+    def fake_create_job(job_id, url, language="te", owner="", **kwargs):
         store[job_id] = {
             "job_id": job_id, "owner": owner, "status": "pending", "progress": 0,
             "current_stage": "queued", "video_id": "", "error": "",
@@ -266,7 +266,7 @@ def test_cache_hit_missing_transcript_still_regenerates(storage, monkeypatch):
     monkeypatch.setattr(main, "delete_job", lambda jid: None)
     monkeypatch.setattr(main, "video_lock_held", lambda vid: False)
     monkeypatch.setattr(main, "create_job",
-                        lambda job_id, url, language="te", owner="": store.setdefault(
+                        lambda job_id, url, language="te", owner="", **kwargs: store.setdefault(
                             job_id, {"job_id": job_id, "owner": owner, "status": "pending",
                                      "progress": 0,
                                      "current_stage": "queued", "video_id": "", "error": "",

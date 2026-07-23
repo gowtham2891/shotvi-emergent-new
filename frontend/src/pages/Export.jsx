@@ -22,7 +22,8 @@ import { AppShell } from "@/components/shotvi/AppShell";
 import { useAppStore } from "@/store/useAppStore";
 import { useJobPolling } from "@/hooks/useJobPolling";
 import { USE_MOCKS } from "@/api/client";
-import { clipDownloadUrl } from "@/api/clips";
+import { downloadClip } from "@/api/clips";
+import { toast } from "sonner";
 import { BACKGROUND_OPTIONS } from "@/api/renders";
 import { EXPORT } from "@/constants/testIds";
 import { getClipsForProject } from "@/data/mockData";
@@ -195,7 +196,22 @@ export default function Export() {
   const downloadPath = exportSettings.burnInCaptions
     ? exportResultPath
     : exportJob?.vertical_path || exportResultPath;
-  const downloadHref = USE_MOCKS ? "#" : clipDownloadUrl(downloadPath);
+
+  // Authenticated download — a bare <a href> navigation can't carry the
+  // Supabase bearer token, so /clips/download 401'd. downloadClip fetches
+  // through the authed API client and saves the blob (api/clips.js).
+  const [downloading, setDownloading] = useState(false);
+  const onDownload = async () => {
+    if (USE_MOCKS || !downloadPath || downloading) return;
+    setDownloading(true);
+    try {
+      await downloadClip(downloadPath);
+    } catch (err) {
+      toast.error(err.message || "Could not download the clip");
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   const captionStyle = getEditDocument().style;
 
@@ -552,6 +568,9 @@ export default function Export() {
             </div>
           </section>
 
+          {/* Feature #17-20 — tier status: watermark, render-minute meter, expiry. */}
+          <TierStrip />
+
           {/* Progress / Start / Done / Failed */}
           {(status === "idle" || !status) && (
             <button
@@ -631,14 +650,19 @@ export default function Export() {
                 </div>
               )}
               <div className="flex flex-wrap gap-2">
-                <a
+                <button
                   data-testid={EXPORT.download}
-                  href={downloadHref}
-                  download
-                  className="inline-flex items-center gap-2 bg-white text-black font-semibold px-5 py-2.5 rounded-md hover:bg-[#e5e5e5] transition-colors"
+                  onClick={onDownload}
+                  disabled={downloading || !downloadPath}
+                  className="inline-flex items-center gap-2 bg-white text-black font-semibold px-5 py-2.5 rounded-md hover:bg-[#e5e5e5] disabled:opacity-60 transition-colors"
                 >
-                  <Download size={14} /> Download MP4
-                </a>
+                  {downloading ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <Download size={14} />
+                  )}
+                  {downloading ? "Downloading…" : "Download MP4"}
+                </button>
                 <button className="inline-flex items-center gap-2 bg-[#111116] border border-[#2a2a35] hover:border-[#7c3aed]/50 text-white font-medium px-4 py-2.5 rounded-md transition-colors">
                   <Instagram size={14} /> Share to Instagram
                 </button>
@@ -727,5 +751,61 @@ export default function Export() {
         </div>
       </div>
     </AppShell>
+  );
+}
+
+// Feature #17-20 — compact tier status shown above the export button: the
+// free-tier watermark notice, the monthly render-minute meter (#18), and the
+// published-clip expiry (#20). Reads the live entitlements from billingStatus.
+function TierStrip() {
+  const billing = useAppStore((s) => s.billingStatus);
+  const loadBillingStatus = useAppStore((s) => s.loadBillingStatus);
+  useEffect(() => {
+    if (!billing) loadBillingStatus();
+  }, [billing, loadBillingStatus]);
+  if (!billing) return null;
+
+  const used = billing.render_minutes_used ?? 0;
+  const budget = billing.render_minutes_budget ?? 0;
+  const pct = budget > 0 ? Math.min(100, (used / budget) * 100) : 0;
+  const near = pct >= 85;
+  const expiry = billing.expiry_hours;
+  const expiryLabel =
+    expiry == null ? "never expires" : expiry >= 48 ? `${Math.round(expiry / 24)} days` : `${expiry}h`;
+
+  return (
+    <div className="rounded-xl border border-[#1c1c24] bg-[#0b0b10] p-3 mb-3 space-y-2">
+      <div className="flex items-center justify-between text-[11px]">
+        <span className="text-[#9a9aa6]">
+          Render minutes this month
+          <span className="text-[#5a5a66]"> · resets monthly</span>
+        </span>
+        <span className={`font-mono ${near ? "text-amber-400" : "text-white"}`}>
+          {used.toFixed(1)} / {budget.toFixed(0)}
+        </span>
+      </div>
+      <div className="h-1.5 rounded-full bg-[#1c1c24] overflow-hidden">
+        <div
+          className={`h-full rounded-full transition-all ${near ? "bg-amber-400" : "bg-[#7c3aed]"}`}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+      <div className="flex items-center justify-between text-[10px] text-[#71717a] pt-0.5">
+        <span>
+          {billing.watermark ? (
+            <span className="text-amber-400/90">● Watermarked (free tier)</span>
+          ) : (
+            <span className="text-[#22ff9c]">● No watermark</span>
+          )}
+        </span>
+        <span>Clips expire: <span className="text-[#9a9aa6]">{expiryLabel}</span></span>
+      </div>
+      {billing.watermark && (
+        <p className="text-[10px] text-[#5a5a66] leading-snug">
+          Upgrade to Creator or Studio to remove the watermark, unlock PRO caption
+          presets, get more render minutes, and keep clips longer.
+        </p>
+      )}
+    </div>
   );
 }

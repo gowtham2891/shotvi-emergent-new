@@ -65,6 +65,14 @@ log_auth_startup()
 app.mount("/outputs", StaticFiles(directory=str(OUTPUT_DIR)), name="outputs")
 
 
+def _tier_ttl(user_id: str) -> Optional[int]:
+    """Feature #20 — the published-clip TTL (seconds) for a user's tier, or
+    None for a no-expiry tier. Free = 24h; paid = longer/none."""
+    from api import tiers
+    hours = tiers.expiry_hours(get_user_billing(user_id).get("plan", tiers.FREE))
+    return int(hours * 3600) if hours else None
+
+
 def _get_owned_job(job_id: str, user: AuthUser) -> dict:
     """Fetch a job the caller owns, or 404. Not-found and not-yours are the
     SAME 404 on purpose — existence of other users' jobs must not leak."""
@@ -157,7 +165,7 @@ def create_job_endpoint(payload: JobCreate, user: AuthUser = Depends(get_current
             # Drop the dead record so a future video-id scan doesn't re-find it.
             delete_job(existing["job_id"])
             job_id = str(uuid.uuid4())
-            create_job(job_id, url=payload.url, language=payload.language, owner=user.id)
+            create_job(job_id, url=payload.url, language=payload.language, owner=user.id, ttl_seconds=_tier_ttl(user.id))
             if payload.email:
                 update_job(job_id, email=payload.email)
             process_video.delay(job_id, payload.url, payload.language, known_video_id=video_id)
@@ -177,7 +185,7 @@ def create_job_endpoint(payload: JobCreate, user: AuthUser = Depends(get_current
                    "Wait for the current job to finish.",
         )
     job_id = str(uuid.uuid4())
-    create_job(job_id, url=payload.url, language=payload.language, owner=user.id)
+    create_job(job_id, url=payload.url, language=payload.language, owner=user.id, ttl_seconds=_tier_ttl(user.id))
     if payload.email:
         update_job(job_id, email=payload.email)
     process_video.delay(job_id, payload.url, payload.language)
@@ -200,7 +208,7 @@ async def create_job_upload(
         content = await file.read()
         f.write(content)
 
-    create_job(job_id, url=str(save_path), language=language, owner=user.id)
+    create_job(job_id, url=str(save_path), language=language, owner=user.id, ttl_seconds=_tier_ttl(user.id))
     # is_upload=True: the ONLY way the worker treats a task's url as a local
     # file — set exclusively here, for a path this route itself just wrote.
     process_video.delay(job_id, str(save_path), language, is_upload=True)
@@ -314,6 +322,10 @@ def recover_job(video_id: str, user: AuthUser = Depends(get_current_user)):
             "end":             clip.get("end", 0),
             "duration":        clip.get("duration", 0),
             "segments":        clip.get("segments", []),
+            "refined_start":   clip.get("refined_start"),
+            "refined_end":     clip.get("refined_end"),
+            "refined_segments": clip.get("refined_segments", []),
+            "emphasis_indices": clip.get("emphasis_indices", []),
             "raw_path":        str(raw_files[0])       if raw_files       else "",
             "captioned_path":  str(captioned_files[0]) if captioned_files else "",
             "vertical_path":   str(vertical_files[0])  if vertical_files  else "",
@@ -324,7 +336,7 @@ def recover_job(video_id: str, user: AuthUser = Depends(get_current_user)):
     # Create a fresh done job in Redis
     job_id = str(uuid.uuid4())
     from api.database import set_job_clips
-    create_job(job_id, url=f"recovered:{video_id}", language="te", owner=user.id)
+    create_job(job_id, url=f"recovered:{video_id}", language="te", owner=user.id, ttl_seconds=_tier_ttl(user.id))
     from api.database import update_job
     update_job(job_id, status="done", progress=100, current_stage="Complete", video_id=video_id)
     set_job_clips(job_id, output_clips)
@@ -394,6 +406,42 @@ def rerender_clip_endpoint(job_id: str, clip_index: int, payload: RerenderReques
                            "does not belong to this clip",
                 )
 
+    # ── Tier gates (features #17/#18/#21) ─────────────────────────────────────
+    # Resolve the caller's plan → entitlements ONCE, at the authenticated API
+    # boundary; the worker never does billing lookups (it only receives the
+    # resolved `watermark` flag).
+    from api import tiers
+    from api.database import (
+        get_render_minutes_used, get_render_minutes_pack, add_render_minutes,
+    )
+    plan = get_user_billing(user.id).get("plan", tiers.FREE)
+
+    # #21 — premium presets are export-gated for free tiers (the gallery still
+    # shows them; only the export is blocked, nudging an upgrade).
+    if tiers.is_premium_preset(payload.style) and not tiers.can_use_premium_presets(plan):
+        raise HTTPException(
+            status_code=402,
+            detail="This caption preset is a paid feature. Upgrade to Creator "
+                   "or Studio to export with it.",
+        )
+
+    # #18 — render-minute metering. Charge the clip's output minutes against
+    # the monthly budget (+ any ₹99 top-up pack); block when exhausted.
+    clip_dur = float(clips[clip_index].get("duration") or 0)
+    clip_minutes = round(clip_dur / 60.0, 3)
+    budget = tiers.render_minutes_budget(plan) + get_render_minutes_pack(user.id)
+    used = get_render_minutes_used(user.id)
+    if clip_minutes > 0 and used + clip_minutes > budget + 1e-6:
+        raise HTTPException(
+            status_code=402,
+            detail=f"You've used {used:.0f} of {budget:.0f} render minutes this "
+                   f"month. Upgrade your plan or buy a top-up pack to export more.",
+        )
+    add_render_minutes(user.id, clip_minutes)
+
+    # #17 — free tiers get a burned-in watermark; paid tiers pass False.
+    watermark = tiers.has_watermark(plan)
+
     rerender_job_id = str(uuid.uuid4())
     # Owner travels via the job record in Redis, never via the Celery task —
     # the worker only receives ids the API resolved from the verified token.
@@ -423,6 +471,11 @@ def rerender_clip_endpoint(job_id: str, clip_index: int, payload: RerenderReques
         caption_font_size=payload.caption_font_size,
         caption_pill=payload.caption_pill,
         caption_script=payload.caption_script,
+        emphasis_indices=payload.emphasis_indices,
+        crop_keyframes=payload.crop_keyframes,
+        cut_spans=payload.cut_spans,
+        caption_animation=payload.caption_animation,
+        watermark=watermark,
     )
 
     return {"rerender_job_id": rerender_job_id}
@@ -857,6 +910,10 @@ def _recover_from_storage(video_id: str, owner: str = "") -> Optional[dict]:
             "end":             clip.get("end", 0),
             "duration":        clip.get("duration", 0),
             "segments":        clip.get("segments", []),
+            "refined_start":   clip.get("refined_start"),
+            "refined_end":     clip.get("refined_end"),
+            "refined_segments": clip.get("refined_segments", []),
+            "emphasis_indices": clip.get("emphasis_indices", []),
             "raw_path":        str(raw_files[0])       if raw_files       else "",
             "captioned_path":  str(captioned_files[0]) if captioned_files else "",
             "vertical_path":   str(vertical_files[0])  if vertical_files  else "",
@@ -865,7 +922,7 @@ def _recover_from_storage(video_id: str, owner: str = "") -> Optional[dict]:
         })
 
     job_id = str(uuid.uuid4())
-    create_job(job_id, url=f"recovered:{video_id}", language="te", owner=owner)
+    create_job(job_id, url=f"recovered:{video_id}", language="te", owner=owner, ttl_seconds=_tier_ttl(owner))
     update_job(job_id, status="done", progress=100, current_stage="Complete", video_id=video_id)
     set_job_clips(job_id, output_clips)
 
@@ -893,6 +950,10 @@ def _job_to_out(job: dict) -> JobOut:
             end             = c.get("end", 0),
             duration        = c.get("duration", 0),
             segments        = c.get("segments", []),
+            refined_start   = c.get("refined_start"),
+            refined_end     = c.get("refined_end"),
+            refined_segments = c.get("refined_segments", []) or [],
+            emphasis_indices = c.get("emphasis_indices", []) or [],
             raw_path        = c.get("raw_path", ""),
             captioned_path  = c.get("captioned_path", ""),
             vertical_path   = c.get("vertical_path", ""),
@@ -926,14 +987,22 @@ def _job_to_out(job: dict) -> JobOut:
 # paid so a FUTURE feature can check `plan == 'studio'`.
 
 def _billing_status_payload(user: AuthUser) -> BillingStatusOut:
+    from api import tiers
+    from api.database import get_render_minutes_used, get_render_minutes_pack
     b = get_user_billing(user.id)
     configured = billing.billing_configured()
+    plan = b.get("plan", tiers.FREE)
     return BillingStatusOut(
-        plan                = b.get("plan", "free"),
+        plan                = plan,
         subscription_status = b.get("subscription_status", ""),
         subscription_id     = b.get("subscription_id", ""),
         configured          = configured,
         plan_info           = PlanInfo(**billing.public_plan_info()) if configured else None,
+        # Tier entitlements + live usage (features #17–20).
+        watermark             = tiers.has_watermark(plan),
+        render_minutes_used   = round(get_render_minutes_used(user.id), 1),
+        render_minutes_budget = tiers.render_minutes_budget(plan) + get_render_minutes_pack(user.id),
+        expiry_hours          = tiers.expiry_hours(plan),
     )
 
 

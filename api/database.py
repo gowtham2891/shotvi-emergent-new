@@ -17,11 +17,16 @@ def get_redis():
 
 # ── Job operations ────────────────────────────────────────────
 
-def create_job(job_id: str, url: str, language: str = "te", owner: str = ""):
+def create_job(job_id: str, url: str, language: str = "te", owner: str = "",
+               ttl_seconds: Optional[int] = 86400):
     """owner: verified user id resolved by the API from the Supabase JWT
     (never client-supplied). Stamped once at creation; Celery tasks only ever
     carry job_id and read the owner from here — workers never see user ids
-    from the client."""
+    from the client.
+
+    ttl_seconds (feature #20): the published-clip expiry. Default 86400 (24h,
+    the free-tier limit). Paid tiers pass a longer value, or None for NO
+    expiry (the key persists). The API computes this from the owner's tier."""
     r = get_redis()
     job = {
         "job_id":        job_id,
@@ -37,7 +42,9 @@ def create_job(job_id: str, url: str, language: str = "te", owner: str = ""):
         "created_at":    datetime.utcnow().isoformat(),
     }
     r.hset(f"job:{job_id}", mapping=job)
-    r.expire(f"job:{job_id}", 86400)  # 24hr TTL
+    if ttl_seconds:
+        r.expire(f"job:{job_id}", ttl_seconds)
+    # ttl_seconds None → no expiry (paid/no-expiry tier); the key persists.
     return job
 
 
@@ -154,6 +161,52 @@ def set_user_billing(user_id: str, **fields):
         return
     fields["updated_at"] = datetime.utcnow().isoformat()
     get_redis().hset(f"user:{user_id}", mapping=fields)
+
+
+# ── Feature #18: render-minute metering ──────────────────────────────────────
+# Used minutes live on the same no-TTL user:{id} hash, keyed BY MONTH
+# (minutes_used_YYYYMM) so the budget resets naturally each calendar month
+# without a cron — a new month is simply a new, absent (→ 0) field. A ₹99
+# credit pack adds to `minutes_pack` (no monthly reset).
+
+def _minutes_used_field() -> str:
+    return f"minutes_used_{datetime.utcnow():%Y%m}"
+
+
+def get_render_minutes_used(user_id: str) -> float:
+    """Render minutes consumed this calendar month (0.0 if none / no user)."""
+    if not user_id:
+        return 0.0
+    raw = get_redis().hget(f"user:{user_id}", _minutes_used_field())
+    try:
+        return float(raw) if raw else 0.0
+    except (ValueError, TypeError):
+        return 0.0
+
+
+def add_render_minutes(user_id: str, minutes: float):
+    """Add to this month's used minutes (atomic incr). Ignores non-positive."""
+    if not user_id or not minutes or minutes <= 0:
+        return
+    get_redis().hincrbyfloat(f"user:{user_id}", _minutes_used_field(), float(minutes))
+
+
+def get_render_minutes_pack(user_id: str) -> float:
+    """Extra minutes bought via ₹99 top-up packs (no monthly reset)."""
+    if not user_id:
+        return 0.0
+    raw = get_redis().hget(f"user:{user_id}", "minutes_pack")
+    try:
+        return float(raw) if raw else 0.0
+    except (ValueError, TypeError):
+        return 0.0
+
+
+def add_render_minutes_pack(user_id: str, minutes: float):
+    """Credit a top-up pack's minutes onto the user (no reset)."""
+    if not user_id or not minutes or minutes <= 0:
+        return
+    get_redis().hincrbyfloat(f"user:{user_id}", "minutes_pack", float(minutes))
 
 
 def get_user_caption_template(user_id: str) -> Optional[dict]:

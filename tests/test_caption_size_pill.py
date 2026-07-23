@@ -147,9 +147,58 @@ def test_pill_enabled_overrides_backcolour_and_border_style():
     # BackColour is &HAA BB GG RR — opacity 1.0 → alpha 00, colour #7C3AED reversed → EDBB7C? Let's decode:
     # #7c3aed → r=7C, g=3A, b=ED. ASS wants &H{aa}{bb}{gg}{rr} → &H00ED3A7C.
     assert _get_field(f, "BackColour") == "&H00ED3A7C"
-    # Enabled pill switches to BorderStyle=4 (opaque box), no outline.
+    # Enabled pill switches to BorderStyle=4 (opaque box). Feature #4: with
+    # BorderStyle=4, libass pads the box by Outline — the editor padding
+    # (legacy px 12 @640 stage → 12/640 of height) scales to the render:
+    # 12/640 × 1920 = 36px.
     assert _get_field(f, "BorderStyle") == "4"
-    assert _get_field(f, "Outline") == "0"
+    assert _get_field(f, "Outline") == "36"
+
+
+# ── Feature #4: pill padding unit contract ─────────────────────────────────
+
+def test_pill_padding_fraction_scales_with_render_height():
+    """Wire fraction (new unit) → Outline px = frac × video_height."""
+    ass = generate_ass_karaoke(_words_line(), "bold-yellow",
+                               video_width=1080, video_height=1920,
+                               caption_pill={"enabled": True, "color": "#000000",
+                                             "opacity": 1.0, "padding": 8 / 640, "radius": 0})
+    # 8/640 × 1920 = 24
+    assert _get_field(_style_fields(ass), "Outline") == "24"
+    # Same fraction on a 16:9 render (1080 tall) pads proportionally less px.
+    ass_169 = generate_ass_karaoke(_words_line(), "bold-yellow",
+                                   video_width=1920, video_height=1080,
+                                   caption_pill={"enabled": True, "color": "#000000",
+                                                 "opacity": 1.0, "padding": 8 / 640, "radius": 0})
+    # 8/640 × 1080 = 13.5 → 14 (round-half-even → 14)
+    assert _get_field(_style_fields(ass_169), "Outline") == str(round(8 / 640 * 1080))
+
+
+def test_pill_legacy_px_padding_converts_once():
+    """Legacy absolute-px payloads (>1) act as px at the 640px 9:16 stage."""
+    ass = generate_ass_karaoke(_words_line(), "bold-yellow",
+                               video_width=1080, video_height=1920,
+                               caption_pill={"enabled": True, "color": "#000000",
+                                             "opacity": 1.0, "padding": 10, "radius": 0})
+    # 10/640 × 1920 = 30
+    assert _get_field(_style_fields(ass), "Outline") == "30"
+
+
+def test_pill_padding_zero_and_junk_are_safe():
+    for bad in (0, None, "junk", -3):
+        ass = generate_ass_karaoke(_words_line(), "bold-yellow",
+                                   caption_pill={"enabled": True, "color": "#000000",
+                                                 "opacity": 1.0, "padding": bad, "radius": 0})
+        assert _get_field(_style_fields(ass), "Outline") == "0"
+
+
+def test_pill_padding_clamped_to_sane_maximum():
+    """No pill pads more than 10% of the frame height, however wild the wire."""
+    ass = generate_ass_karaoke(_words_line(), "bold-yellow",
+                               video_width=1080, video_height=1920,
+                               caption_pill={"enabled": True, "color": "#000000",
+                                             "opacity": 1.0, "padding": 0.9, "radius": 0})
+    assert _get_field(_style_fields(ass), "Outline") == "192"  # 0.10 × 1920
 
 
 def test_pill_opacity_maps_to_ass_alpha_correctly():

@@ -7,6 +7,7 @@ import {
   findActiveLine,
   findActiveWordIndex,
 } from "@/lib/captionLines";
+import { normalizePillUnits } from "@/lib/pillUnits";
 
 /**
  * Per-type element content renderers — extracted from ElementRenderer so
@@ -36,18 +37,23 @@ export const ElementBody = ({ element, canvasH }) => {
 // both follow exportSettings.format, so width-fraction props scale off the
 // REAL canvas width, not the retired 9:16-only canvasW=canvasH*9/16 shortcut.
 const ASPECT_WH = { "9:16": 9 / 16, "1:1": 1, "16:9": 16 / 9 };
+
+// Stable empty array so the emphasis selector doesn't re-render every frame.
+const EMPTY_EMPHASIS = [];
 const useCanvasAspectWH = () => {
   const format = useAppStore((s) => s.exportSettings.format);
   return ASPECT_WH[format] || ASPECT_WH["9:16"];
 };
 
-const animationClass = (anim) => {
+export const animationClass = (anim) => {
   switch (anim) {
     case "pop":
       return "anim-pop";
     case "fade":
       return "anim-fade";
-    case "bounce":
+    case "slide-up":
+      return "anim-slide-up";
+    case "bounce": // legacy alias (old drafts) → slide-up motion
       return "anim-bounce";
     default:
       return "";
@@ -98,15 +104,33 @@ const CaptionBody = ({ element, canvasH }) => {
   const activeLine = findActiveLine(lines, currentTime);
   const activeWordIdx = findActiveWordIndex(activeLine, currentTime);
 
+  // Feature #6 — keyword emphasis. Effective set = user toggles when
+  // materialized, else the clip's Gemini auto set (getEffectiveEmphasis).
+  // Indices address the transcript array; membership is checked by word id
+  // because grouped lines don't carry raw positions.
+  const emphasisIndices = useAppStore((s) =>
+    Array.isArray(s.transcriptEdits.emphasisIndices)
+      ? s.transcriptEdits.emphasisIndices
+      : s.currentClip?.emphasis_indices || EMPTY_EMPHASIS
+  );
+  const emphasisIds = useMemo(
+    () => new Set(emphasisIndices.map((i) => transcript[i]?.id).filter(Boolean)),
+    [emphasisIndices, transcript]
+  );
+
   // User's manual pill toggle overrides the preset's own box (an explicit
   // customization); otherwise fall back to the backend style's real
   // back_color/border_style-derived box, so the untouched default already
   // matches what caption_renderer.py burns in.
-  const pillStyle = pill?.enabled
+  // Feature #4: padding/radius are FRACTIONS of canvas height (same unit as
+  // fontSize) so the pill scales with the text on every aspect and matches
+  // the burn. normalizePillUnits converts legacy absolute-px drafts once.
+  const pillN = pill?.enabled ? normalizePillUnits(pill) : null;
+  const pillStyle = pillN
     ? {
-        background: hexToRgba(pill.color, pill.opacity),
-        padding: `${pill.padding}px ${pill.padding * 1.6}px`,
-        borderRadius: `${pill.radius}px`,
+        background: hexToRgba(pillN.color, pillN.opacity),
+        padding: `${pillN.padding * canvasH}px ${pillN.padding * canvasH * 1.6}px`,
+        borderRadius: `${pillN.radius * canvasH}px`,
       }
     : preview.box || {};
 
@@ -125,18 +149,23 @@ const CaptionBody = ({ element, canvasH }) => {
         // Non-karaoke animations show every word in its base (unspoken)
         // color; animationClass() drives the motion instead.
         const role = !isKaraoke ? "unspoken" : gIdx < activeWordIdx ? "spoken" : gIdx === activeWordIdx ? "active" : "unspoken";
-        const color =
-          role === "active" ? preview.colorHighlight : role === "spoken" ? preview.colorSpoken : preview.colorUnspoken;
+        // Feature #6: emphasized words stay in the highlight colour, bold,
+        // at 112% for their whole lifetime — mirror of the ASS override
+        // tags generate_ass_karaoke emits (\b1\fscx112\fscy112 + highlight).
+        const emphasized = w.id != null && emphasisIds.has(w.id);
+        const color = emphasized
+          ? preview.colorHighlight
+          : role === "active" ? preview.colorHighlight : role === "spoken" ? preview.colorSpoken : preview.colorUnspoken;
         return (
           <span
             key={`${gIdx}-${w.id ?? w.text}`}
             className={gIdx === activeWordIdx ? animationClass(animation) : ""}
             style={{
               fontFamily,
-              fontWeight: preview.fontWeight,
+              fontWeight: emphasized ? 800 : preview.fontWeight,
               color,
               textShadow: preview.textShadow,
-              fontSize: fontSize * canvasH,
+              fontSize: fontSize * canvasH * (emphasized ? 1.12 : 1),
               lineHeight: 1.25,
               transform: role === "active" && isKaraoke ? "scale(1.06)" : "scale(1)",
               transition: "color 120ms linear, transform 120ms linear",

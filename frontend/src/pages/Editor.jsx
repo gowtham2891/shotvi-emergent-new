@@ -18,6 +18,8 @@ import { getClipsForProject } from "@/data/mockData";
 import { EDITOR } from "@/constants/testIds";
 import { LeftClips } from "@/components/editor/LeftClips";
 import { CanvasArea } from "@/components/editor/CanvasArea";
+import { EditorHotkeys } from "@/components/editor/EditorHotkeys";
+import { MarqueeSelect } from "@/components/editor/MarqueeSelect";
 import { Inspector } from "@/components/editor/Inspector";
 import { TimelineRow } from "@/components/editor/TimelineRow";
 
@@ -251,6 +253,11 @@ export default function Editor() {
         </main>
         <Inspector />
       </div>
+      {/* Feature #8: duplicate/copy-paste/z-order hotkeys — same resolver +
+          typing guard as CanvasArea's listener, disjoint action set. */}
+      <EditorHotkeys />
+      {/* Feature #9: rubber-band multi-select over the stage background. */}
+      <MarqueeSelect />
     </div>
   );
 }

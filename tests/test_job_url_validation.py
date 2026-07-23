@@ -61,7 +61,7 @@ def test_post_jobs_rejects_absolute_path_and_garbage(monkeypatch):
 def test_post_jobs_still_accepts_youtube_urls(monkeypatch):
     store = {}
 
-    def fake_create(job_id, url, language="te", owner=""):
+    def fake_create(job_id, url, language="te", owner="", **kwargs):
         store[job_id] = {"job_id": job_id, "status": "pending", "progress": 0,
                          "current_stage": "queued", "video_id": "", "error": "",
                          "clips": [], "captioned_path": "", "vertical_path": ""}

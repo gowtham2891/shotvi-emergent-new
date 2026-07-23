@@ -18,6 +18,7 @@ const SNAP_PX = 6;
  */
 export const ElementRenderer = ({ element, canvasRef }) => {
   const selectedId = useAppStore((s) => s.selectedElementId);
+  const selectedIds = useAppStore((s) => s.selectedIds);
   const setSelected = useAppStore((s) => s.setSelected);
   const updateElement = useAppStore((s) => s.updateElement);
   const setActiveGuides = useAppStore((s) => s.setActiveGuides);
@@ -27,14 +28,30 @@ export const ElementRenderer = ({ element, canvasRef }) => {
   const wrapRef = useRef(null);
   const [rects, setRects] = useState({ canvas: null, el: null });
 
-  const isSelected = selectedId === element.id;
+  // Feature #9: primary drives TransformBox/Inspector; any other selected
+  // member renders a dashed ring. Both derive from the same selection state.
+  const isPrimary = selectedId === element.id;
+  const isSelected = selectedIds.includes(element.id);
   if (!element.visible) return null;
 
   // ---------- Drag with snapping ----------
   const onPointerDown = (e) => {
     if (element.locked) return;
     e.stopPropagation();
-    setSelected(element.id);
+
+    // Feature #9: shift-click is a pure selection gesture — toggle
+    // membership, never start a drag.
+    if (e.shiftKey) {
+      useAppStore.getState().toggleInSelection(element.id);
+      return;
+    }
+    // Clicking a member of a multi-selection KEEPS the group (so it can be
+    // group-dragged); clicking anything else selects it solo.
+    if (!useAppStore.getState().selectedIds.includes(element.id)) {
+      setSelected(element.id);
+    } else {
+      useAppStore.setState({ selectedElementId: element.id });
+    }
 
     const canvasRect = canvasRef.current?.getBoundingClientRect();
     if (!canvasRect) return;
@@ -43,6 +60,16 @@ export const ElementRenderer = ({ element, canvasRef }) => {
     const startY = e.clientY;
     const startNX = element.x;
     const startNY = element.y;
+
+    // Group-drag snapshot: start positions of every selected element (this
+    // one included). Deltas apply to these absolutes — no clamp drift.
+    const groupIds = useAppStore.getState().selectedIds;
+    const groupStart = {};
+    if (groupIds.length > 1) {
+      for (const el of useAppStore.getState().elements) {
+        if (groupIds.includes(el.id)) groupStart[el.id] = { x: el.x, y: el.y };
+      }
+    }
 
     // Snap targets (normalized)
     const others = elements.filter(
@@ -96,7 +123,19 @@ export const ElementRenderer = ({ element, canvasRef }) => {
         }
       }
       setActiveGuides(guides);
-      updateElement(element.id, { x: nx, y: ny });
+      if (Object.keys(groupStart).length > 1) {
+        // Feature #9: group drag — the grabbed element lands on its snapped
+        // (nx, ny); every other member moves by the same delta.
+        const ddx = nx - startNX;
+        const ddy = ny - startNY;
+        const positions = {};
+        for (const [id, p] of Object.entries(groupStart)) {
+          positions[id] = id === element.id ? { x: nx, y: ny } : { x: p.x + ddx, y: p.y + ddy };
+        }
+        useAppStore.getState().moveElementsTo(positions);
+      } else {
+        updateElement(element.id, { x: nx, y: ny });
+      }
     };
     const up = () => {
       setActiveGuides({ vertical: [], horizontal: [] });
@@ -120,7 +159,10 @@ export const ElementRenderer = ({ element, canvasRef }) => {
 
   const onClick = (e) => {
     e.stopPropagation();
-    setSelected(element.id);
+    // Feature #9: selection is decided entirely in onPointerDown (shift-click
+    // toggles; a plain click on a group member keeps the group so it can be
+    // group-dragged). Re-running setSelected here would clobber that — the
+    // click only needs to (re)measure rects for the TransformBox.
     const canvasRect = canvasRef.current?.getBoundingClientRect();
     setRects({
       canvas: canvasRect || null,
@@ -128,7 +170,13 @@ export const ElementRenderer = ({ element, canvasRef }) => {
     });
   };
 
-  const canvasH = canvasRef.current?.getBoundingClientRect()?.height || 640;
+  // Zoom² bug fix: element bodies size fonts as fraction-of-canvas-height in
+  // LAYOUT px, and the whole stage then scales visually by the zoom wrapper's
+  // scale(zoom). getBoundingClientRect() returns the VISUAL (post-transform)
+  // height — stage.h × zoom — so fonts rendered at frac × visualH × zoom grew
+  // by zoom². offsetHeight is transform-immune: always the stage's layout
+  // height (STAGE_DIMS[aspect].h), zoom scales everything exactly once.
+  const canvasH = canvasRef.current?.offsetHeight || 640;
 
   return (
     <div
@@ -143,10 +191,15 @@ export const ElementRenderer = ({ element, canvasRef }) => {
         transform: `translate(-50%, -50%) rotate(${element.rotation}deg) scale(${element.scale})`,
         cursor: element.locked ? "default" : "grab",
         zIndex: 20 + elements.findIndex((el) => el.id === element.id),
+        // Feature #9: non-primary members of a multi-selection get a dashed
+        // ring; the primary keeps the full TransformBox below.
+        outline:
+          isSelected && !isPrimary ? "1.5px dashed rgba(124,58,237,0.9)" : undefined,
+        outlineOffset: isSelected && !isPrimary ? 2 : undefined,
       }}
     >
       <ElementBody element={element} canvasH={canvasH} />
-      {isSelected && !element.locked && (
+      {isPrimary && !element.locked && (
         <TransformBox
           element={element}
           canvasRect={rects.canvas}

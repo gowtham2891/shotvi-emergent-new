@@ -3,6 +3,7 @@ ClipForge AI — Celery Worker
 """
 
 import os
+import re
 import sys
 import json
 import uuid
@@ -243,6 +244,10 @@ def process_video(self, job_id: str, url: str, language: str = "te", known_video
                 "end":             clip.get("end", 0),
                 "duration":        clip.get("duration", 0),
                 "segments":        clip.get("segments", []),
+                "refined_start":   clip.get("refined_start"),
+                "refined_end":     clip.get("refined_end"),
+                "refined_segments": clip.get("refined_segments", []),
+                "emphasis_indices": clip.get("emphasis_indices", []),
                 "raw_path":        str(raw_files[0])      if raw_files      else "",
                 "vertical_path":   str(vertical_file[0])  if vertical_file  else "",
                 "captioned_path":  str(captioned_file[0]) if captioned_file else "",
@@ -304,7 +309,9 @@ def rerender_clip(self, rerender_job_id: str, source_job_id: str, clip_index: in
                   crop_mode: str = "auto", elements=None, caption_font=None,
                   caption_x=None, caption_y=None,
                   caption_font_size=None, caption_pill=None,
-                  caption_script: str = "telugu"):
+                  caption_script: str = "telugu", emphasis_indices=None,
+                  crop_keyframes=None, cut_spans=None,
+                  caption_animation: str = "karaoke", watermark: bool = False):
     """
     Export a single clip with:
     - Source: auto-cropped vertical OR original cut
@@ -329,6 +336,14 @@ def rerender_clip(self, rerender_job_id: str, source_job_id: str, clip_index: in
     - caption_script: 'telugu' (default) or 'tanglish' — which script the caption text
       renders in. Tanglish burns word_tanglish through the SAME ASS path (fonts,
       k-values, \\an5\\pos, timing all unchanged); anything else falls back to telugu.
+    - emphasis_indices (feature #6): clip-local word indices to emphasize in the
+      burn. None (old payloads) → the clip's own Gemini-tagged set; an explicit
+      list — including [] — is the editor's final say.
+    - crop_keyframes (feature #13): [{time,x,y,w,h}] centered-zoom keyframes for
+      animated punch-ins. None/[] → no zoom stage, byte-identical to before.
+    - cut_spans (feature #14): [[start,end], ...] clip-local seconds to remove
+      (filler/silence). Applied FIRST; trim/zoom/caption timings remap onto the
+      shortened timeline. None/[] → no cuts, byte-identical to before.
     """
     try:
         from services.caption_renderer import render_captions_for_clip, STYLES, DEFAULT_STYLE
@@ -364,6 +379,31 @@ def rerender_clip(self, rerender_job_id: str, source_job_id: str, clip_index: in
         print(f"  [Export] Source: {source_path}")
         print(f"  [Export] Format: {fmt}, BG: {background}, Style: {style}, "
               f"CropMode: {crop_mode}, AutoCrop: {use_autocrop}")
+
+        # ── Filler/silence removal (feature #14) — FIRST transformation ───────
+        # Cuts are clip-local [start,end] spans; dropping them shortens the
+        # timeline, so every OTHER time-based input (trim handles, auto-zoom
+        # keyframes, caption words) must be remapped onto the post-cut timeline.
+        # The cut file becomes the new source for the rest of the chain.
+        if cut_spans:
+            from services.filler_removal import remap_time_after_cuts
+            _clip_dur = _get_duration(source_path)
+            _cut_stem = Path(source_path).stem
+            cut_out = str(OUTPUT_DIR / f"{_cut_stem}_{rerender_job_id[:8]}_cut.mp4")
+            new_source = _apply_cuts(source_path, cut_out, cut_spans, _clip_dur)
+            if new_source != source_path:
+                source_path = new_source
+                # Remap trim handles + zoom keyframe times through the cuts.
+                if trim_start and trim_start > 0:
+                    trim_start = remap_time_after_cuts(trim_start, cut_spans)
+                if trim_end and trim_end > 0:
+                    trim_end = remap_time_after_cuts(trim_end, cut_spans)
+                if crop_keyframes:
+                    crop_keyframes = [
+                        {**k, "time": remap_time_after_cuts(k.get("time", 0), cut_spans)}
+                        for k in crop_keyframes
+                    ]
+                print(f"  [Export] Source after cuts: {source_path}")
 
         safe_style = style.replace(":", "_")
         safe_fmt   = fmt.replace(":", "_")
@@ -408,6 +448,16 @@ def rerender_clip(self, rerender_job_id: str, source_job_id: str, clip_index: in
             working_path = prepared_path
         else:
             working_path = source_path
+
+        # ── Auto-zoom / punch-ins (feature #13) ───────────────────────────────
+        # Animated crop on the reframed source, BEFORE the canvas stage so the
+        # zoom happens on the content and the bg/letterbox wraps the result.
+        # No-op passthrough (returns working_path unchanged) when there are no
+        # keyframes — a zoom-free export is byte-identical to before.
+        if crop_keyframes:
+            update_job(rerender_job_id, progress=25, current_stage="Applying auto-zoom")
+            zoom_out = str(OUTPUT_DIR / f"{out_stem}_{job_suffix}_zoom.mp4")
+            working_path = _apply_crop_keyframes(working_path, zoom_out, crop_keyframes)
 
         update_job(rerender_job_id, progress=30, current_stage="Applying canvas")
 
@@ -456,10 +506,21 @@ def rerender_clip(self, rerender_job_id: str, source_job_id: str, clip_index: in
             caption_font_size=caption_font_size,
             caption_pill=caption_pill,
             caption_script=caption_script,
+            emphasis_indices=emphasis_indices,
+            cut_spans=cut_spans,
+            animation=caption_animation,
         )
 
         if not result:
             raise RuntimeError("Caption burn failed")
+
+        # Feature #17 — free-tier watermark on the FINAL export. Paid tiers
+        # pass watermark=False (computed from the owner's plan at the API
+        # boundary), so their output is byte-identical to before this existed.
+        if watermark:
+            update_job(rerender_job_id, progress=96, current_stage="Adding watermark")
+            wm_out = str(OUTPUT_DIR / f"{Path(result).stem}_wm.mp4")
+            result = _apply_watermark(result, wm_out)
 
         # Surface multi-segment edit-skip warning in job status (only when
         # mergedGroups/lineSplits are present — wordEdits are now applied normally).
@@ -531,6 +592,143 @@ def _get_duration(path: str):
               f"{out!r} (stderr: {r.stderr[-200:]!r}): {e}",
               flush=True)
         return None
+
+
+def _get_dimensions_fps(path: str):
+    """(width, height, fps) of the first video stream via ffprobe, or
+    (None, None, None) on any failure. fps is parsed from the r_frame_rate
+    'num/den' rational. Mirrors _get_duration's narrow-except discipline."""
+    import subprocess
+    try:
+        r = subprocess.run(
+            ["ffprobe", "-v", "quiet", "-select_streams", "v:0",
+             "-show_entries", "stream=width,height,r_frame_rate",
+             "-of", "csv=p=0", path],
+            capture_output=True, text=True, timeout=15,
+        )
+    except (FileNotFoundError, subprocess.SubprocessError) as e:
+        print(f"  [_get_dimensions_fps] ffprobe unavailable/failed for {path!r}: {e}", flush=True)
+        return None, None, None
+    parts = r.stdout.strip().split(",")
+    if len(parts) < 3:
+        print(f"  [_get_dimensions_fps] unexpected ffprobe output {r.stdout!r}", flush=True)
+        return None, None, None
+    try:
+        w = int(parts[0]); h = int(parts[1])
+        num, den = parts[2].split("/")
+        fps = float(num) / float(den) if float(den) else float(num)
+        return w, h, fps
+    except (ValueError, ZeroDivisionError, TypeError) as e:
+        print(f"  [_get_dimensions_fps] parse failed on {r.stdout!r}: {e}", flush=True)
+        return None, None, None
+
+
+def _apply_crop_keyframes(input_path: str, output_path: str, crop_keyframes: list) -> str:
+    """Feature #13 — animated punch-in zoom via a single FFmpeg zoompan pass.
+
+    crop_keyframes: [{time, x, y, w, h}] centered-zoom fractions
+    (services/auto_zoom.py). Returns output_path when a zoom was applied, or
+    the ORIGINAL input_path (no re-encode) when there's nothing to zoom — so a
+    zoom-free export stays byte-identical to before this stage existed.
+    """
+    if not crop_keyframes:
+        return input_path
+    from services.auto_zoom import build_zoompan_filter
+    import subprocess
+
+    w, h, fps = _get_dimensions_fps(input_path)
+    if not (w and h and fps):
+        print(f"  [AutoZoom] ⚠ could not probe {input_path!r} — skipping zoom", flush=True)
+        return input_path
+
+    vf = build_zoompan_filter(crop_keyframes, w, h, fps)
+    if not vf:
+        print("  [AutoZoom] keyframes describe no zoom — skipping", flush=True)
+        return input_path
+
+    print(f"  [AutoZoom] {len(crop_keyframes)} keyframe(s) → zoompan ({w}x{h}@{fps:.2f}fps)", flush=True)
+    cmd = [
+        "ffmpeg", "-y", "-i", input_path,
+        "-vf", vf,
+        "-c:v", "libx264", "-c:a", "copy", "-preset", "fast", "-crf", "23",
+        output_path,
+    ]
+    r = subprocess.run(cmd, capture_output=True, text=True,
+                       encoding="utf-8", errors="replace", timeout=300)
+    if r.returncode != 0:
+        # Never fail the whole export over a cosmetic zoom — fall back to the
+        # un-zoomed source and warn.
+        print(f"  [AutoZoom] ⚠ zoompan failed ({r.stderr[-300:]}) — using un-zoomed source", flush=True)
+        return input_path
+    return output_path
+
+
+def _apply_watermark(input_path: str, output_path: str, text: str = "Shotvi") -> str:
+    """Feature #17 — burn a semi-transparent text watermark (bottom-right) for
+    free-tier exports. Returns output_path on success, or the ORIGINAL
+    input_path on any failure (a watermark must never fail the export).
+    Uses a bundled caption font (Latin glyphs, clean filename) so drawtext
+    never depends on host fonts.
+    """
+    import subprocess
+    from services.fonts import CAPTION_FONTS
+    font = CAPTION_FONTS["Noto Sans Telugu"].replace("\\", "/")
+    font = re.sub(r"^([A-Za-z]):/", r"\1\\:/", font)  # escape drive colon for the filter
+    safe_text = str(text).replace("\\", "").replace("'", "").replace(":", "")
+    vf = (f"drawtext=fontfile='{font}':text='{safe_text}':fontcolor=white@0.55:"
+          f"fontsize=h/26:x=w-tw-20:y=h-th-20:"
+          f"shadowcolor=black@0.5:shadowx=2:shadowy=2")
+    cmd = [
+        "ffmpeg", "-y", "-i", input_path, "-vf", vf,
+        "-c:v", "libx264", "-c:a", "copy", "-preset", "fast", "-crf", "23",
+        output_path,
+    ]
+    r = subprocess.run(cmd, capture_output=True, text=True,
+                       encoding="utf-8", errors="replace", timeout=300)
+    if r.returncode != 0:
+        print(f"  [Watermark] ⚠ drawtext failed ({r.stderr[-300:]}) — un-watermarked", flush=True)
+        return input_path
+    print("  [Watermark] applied (free tier)", flush=True)
+    return output_path
+
+
+def _apply_cuts(input_path: str, output_path: str, cut_spans: list, duration: float) -> str:
+    """Feature #14 — drop filler/silence spans via a single trim/concat pass.
+
+    Returns output_path when cuts were applied, or the ORIGINAL input_path
+    (no re-encode) when there's nothing to cut — so a cut-free export stays
+    byte-identical. Never fails the export over cuts: on error, returns the
+    un-cut source and warns.
+    """
+    if not cut_spans:
+        return input_path
+    from services.filler_removal import build_cut_filtergraph
+    import subprocess
+
+    if not duration or duration <= 0:
+        duration = _get_duration(input_path)
+    if not duration or duration <= 0:
+        print(f"  [Cuts] ⚠ unknown duration for {input_path!r} — skipping cuts", flush=True)
+        return input_path
+
+    fg = build_cut_filtergraph(cut_spans, duration)
+    if not fg:
+        print("  [Cuts] spans remove nothing — skipping", flush=True)
+        return input_path
+
+    print(f"  [Cuts] removing {len(cut_spans)} span(s) via trim/concat", flush=True)
+    cmd = [
+        "ffmpeg", "-y", "-i", input_path,
+        "-filter_complex", fg, "-map", "[outv]", "-map", "[outa]",
+        "-c:v", "libx264", "-c:a", "aac", "-preset", "fast", "-crf", "23",
+        output_path,
+    ]
+    r = subprocess.run(cmd, capture_output=True, text=True,
+                       encoding="utf-8", errors="replace", timeout=300)
+    if r.returncode != 0:
+        print(f"  [Cuts] ⚠ cut render failed ({r.stderr[-300:]}) — using un-cut source", flush=True)
+        return input_path
+    return output_path
 
 
 def _trim_clip(input_path: str, output_path: str, start: float, end: float):

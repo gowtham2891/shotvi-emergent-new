@@ -181,6 +181,87 @@ STYLES = {
         "shadow":          1,
         "border_style":    1,
     },
+    # ── Feature #16: 6 new preset bundles (colours only — the 3 bundled
+    # Telugu fonts are unchanged; caption_font drives the family, font_name
+    # here is decoupled/dead per Stage 5). ASS colour is &H00BBGGRR. ────────
+    "purple-punch": {
+        "font_name":       "Noto Sans Telugu SemiBold",
+        "font_size":       64,
+        "bold":            -1,
+        "color_highlight": "&H00F755A8",   # #A855F7 purple → BGR F755A8
+        "color_spoken":    "&H00999999",
+        "color_unspoken":  "&H00FFFFFF",
+        "outline_color":   "&H00000000",
+        "back_color":      "&H30000000",   # light black scrim
+        "outline_width":   3,
+        "shadow":          0,
+        "border_style":    1,
+    },
+    "ocean-blue": {
+        "font_name":       "Noto Sans Telugu",
+        "font_size":       60,
+        "bold":            -1,
+        "color_highlight": "&H00EED322",   # #22D3EE cyan → BGR EED322
+        "color_spoken":    "&H00888888",
+        "color_unspoken":  "&H00FFFFFF",
+        "outline_color":   "&H00000000",
+        "back_color":      "&H00000000",
+        "outline_width":   3,
+        "shadow":          1,
+        "border_style":    1,
+    },
+    "sunshine": {
+        "font_name":       "Noto Sans Telugu SemiBold",
+        "font_size":       64,
+        "bold":            -1,
+        "color_highlight": "&H003C92FB",   # #FB923C orange → BGR 3C92FB
+        "color_spoken":    "&H00AAAAAA",
+        "color_unspoken":  "&H00FFFFFF",
+        "outline_color":   "&H00000000",
+        "back_color":      "&H00000000",
+        "outline_width":   3,
+        "shadow":          0,
+        "border_style":    1,
+    },
+    "mono-bold": {
+        "font_name":       "Noto Sans Telugu SemiBold",
+        "font_size":       62,
+        "bold":            -1,
+        "color_highlight": "&H00FFFFFF",   # all-white, weight-only emphasis
+        "color_spoken":    "&H00BBBBBB",
+        "color_unspoken":  "&H00FFFFFF",
+        "outline_color":   "&H00000000",
+        "back_color":      "&H00000000",
+        "outline_width":   4,              # thick black outline, no box
+        "shadow":          0,
+        "border_style":    1,
+    },
+    "pink-pop": {
+        "font_name":       "Noto Sans Telugu SemiBold",
+        "font_size":       66,
+        "bold":            -1,
+        "color_highlight": "&H009948EC",   # #EC4899 hot pink → BGR 9948EC
+        "color_spoken":    "&H00888888",
+        "color_unspoken":  "&H00FFFFFF",
+        "outline_color":   "&H00000000",
+        "back_color":      "&HCC000000",   # near-opaque black box
+        "outline_width":   3,
+        "shadow":          0,
+        "border_style":    3,
+    },
+    "lime-shock": {
+        "font_name":       "Noto Sans Telugu SemiBold",
+        "font_size":       64,
+        "bold":            -1,
+        "color_highlight": "&H0035E6A3",   # #A3E635 lime → BGR 35E6A3
+        "color_spoken":    "&H00227700",   # dark green spoken
+        "color_unspoken":  "&H00FFFFFF",
+        "outline_color":   "&H00000000",
+        "back_color":      "&H20000000",
+        "outline_width":   3,
+        "shadow":          0,
+        "border_style":    1,
+    },
 }
 
 DEFAULT_STYLE = "bold-yellow"
@@ -269,13 +350,23 @@ def _word_text_for_script(word: dict, script: str) -> str:
 
 
 def get_words_for_clip(transcript: dict, clip_start: float, clip_end: float,
-                       script: str = "telugu") -> list:
+                       script: str = "telugu", time_zero: float = None) -> list:
     """
     Extract words that fall within a clip time range.
     Handles both Sarvam V3 and faster-whisper transcript formats.
     script selects the caption text ('telugu' renders word, 'tanglish' renders
     word_tanglish) — timing/windowing is identical in both.
+
+    time_zero (caption-sync fix): the absolute timestamp that is t=0 of the CUT
+    output file — the energy-refined start the cutter actually used, which can
+    differ from clip_start (raw CTC) by up to ~0.5s. Word SELECTION still
+    windows on [clip_start, clip_end] (the filtered word array is the index
+    space for lineSplits/wordEdits — it must not change), but timestamps are
+    shifted relative to time_zero. None → clip_start (pre-fix behavior for old
+    clips JSONs that carry no refined boundaries).
     """
+    if time_zero is None:
+        time_zero = clip_start
     raw_words = []
 
     # Sarvam format: top-level word_timestamps list
@@ -293,8 +384,8 @@ def get_words_for_clip(transcript: dict, clip_start: float, clip_end: float,
         w_start = word["start"]
         w_end   = word["end"]
         if w_end > clip_start and w_start < clip_end:
-            adj_start = max(w_start, clip_start) - clip_start
-            adj_end   = min(w_end,   clip_end)   - clip_start
+            adj_start = max(0.0, max(w_start, clip_start) - time_zero)
+            adj_end   = max(0.0, min(w_end,   clip_end)   - time_zero)
             # Empty-text drop stays keyed on the TELUGU source in both scripts,
             # so the word list (and every raw index / lineSplit address built on
             # it) is identical whichever script renders.
@@ -323,21 +414,35 @@ def get_words_for_multisegment_clip(transcript: dict, clip: dict, sent_by_id: di
     """
     segments = clip.get("segments", [])
     if len(segments) <= 1:
-        return get_words_for_clip(transcript, clip["start"], clip["end"], script)
+        return get_words_for_clip(transcript, clip["start"], clip["end"], script,
+                                  time_zero=clip.get("refined_start"))
+
+    # Caption-sync fix: the cutter refines each segment's boundaries before
+    # concatenating, so the stitched file's segments start at refined_start
+    # and last (refined_end - refined_start) — use those when available.
+    refined = clip.get("refined_segments") or []
+    if len(refined) != len(segments):
+        refined = None
 
     all_words = []
     output_time_offset = 0.0
 
-    for seg in segments:
+    for seg_i, seg in enumerate(segments):
         s_id = int(seg["start_sent_id"])
         e_id = int(seg["end_sent_id"])
 
         seg_start = sent_by_id[s_id]["start"]
         seg_end   = sent_by_id[e_id]["end"]
-        seg_duration = seg_end - seg_start
+        if refined:
+            seg_time_zero = refined[seg_i]["start"]
+            seg_duration  = refined[seg_i]["end"] - refined[seg_i]["start"]
+        else:
+            seg_time_zero = None
+            seg_duration  = seg_end - seg_start
 
         # Get words for this segment from the original transcript
-        seg_words = get_words_for_clip(transcript, seg_start, seg_end, script)
+        seg_words = get_words_for_clip(transcript, seg_start, seg_end, script,
+                                       time_zero=seg_time_zero)
 
         # Remap timestamps relative to this segment's position in the output file
         for w in seg_words:
@@ -403,6 +508,27 @@ def format_ass_time(seconds: float) -> str:
     if cs >= 100:
         cs = 99
     return f"{h}:{m:02d}:{s:02d}.{cs:02d}"
+
+
+def _pill_padding_px(pill: dict, video_height: int) -> int:
+    """Editor pill padding → BorderStyle-4 box padding in output px.
+
+    Feature #4: the wire value is a FRACTION of canvas height (the same unit
+    caption_font_size uses), so preview pill and burned box pad proportionally
+    on every aspect. Legacy payloads (drafts saved before this) carried
+    absolute CSS px designed against the 640px-tall 9:16 stage — anything > 1
+    is unambiguously that, so it converts once (mirrors frontend
+    lib/pillUnits.js::normalizePillScalar — keep in lockstep).
+    """
+    try:
+        raw = float(pill.get("padding", 0) or 0)
+    except (TypeError, ValueError):
+        return 0
+    if raw <= 0:
+        return 0
+    frac = raw / 640.0 if raw > 1 else raw
+    frac = min(frac, 0.10)  # safety: never pad more than 10% of frame height
+    return int(round(frac * int(video_height)))
 
 
 def _pill_to_ass_back_color(pill: dict) -> str:
@@ -485,7 +611,8 @@ def generate_ass_karaoke(lines: list, style_name: str = DEFAULT_STYLE,
                          caption_font: str = None,
                          caption_x: float = None, caption_y: float = None,
                          caption_font_size_frac: float = None,
-                         caption_pill: dict = None) -> str:
+                         caption_pill: dict = None,
+                         animation: str = "karaoke") -> str:
     """
     Generate ASS with per-word color highlight animation.
     style_name must be one of: bold-yellow, white-minimal, red-pop, clean-dark,
@@ -518,12 +645,14 @@ def generate_ass_karaoke(lines: list, style_name: str = DEFAULT_STYLE,
     either). When None, we keep the previous behaviour: preset default × the
     calibrated per-font k.
 
-    caption_pill (BUG-001 partial fix): {enabled, color '#rrggbb', opacity 0-1,
-    padding, radius}. When enabled, overrides the preset's back_color +
-    border_style + outline (padding + radius aren't representable in ASS
-    without libass patches, so we ignore them for now — see KNOWN_ISSUES).
-    When None or enabled=False, the preset's own back_color renders exactly
-    as before this argument existed.
+    caption_pill (BUG-001 partial fix + feature #4): {enabled, color '#rrggbb',
+    opacity 0-1, padding, radius}. When enabled, overrides the preset's
+    back_color + border_style + outline. padding is a FRACTION of canvas
+    height (legacy absolute-px payloads >1 are converted — see
+    _pill_padding_px) and reaches the burn as the BorderStyle-4 box's Outline
+    padding; radius is still not representable in ASS without libass patches
+    and stays ignored (KNOWN_ISSUES). When None or enabled=False, the
+    preset's own back_color renders exactly as before this argument existed.
 
     caption_position is now dead for placement (kept in the signature for
     backwards compat; a future cleanup can remove it — see KNOWN_ISSUES).
@@ -554,7 +683,11 @@ def generate_ass_karaoke(lines: list, style_name: str = DEFAULT_STYLE,
     if isinstance(caption_pill, dict) and caption_pill.get("enabled"):
         style_back_color   = _pill_to_ass_back_color(caption_pill)
         style_border_style = 4          # box (opaque background) around text
-        style_outline      = 0          # no stroke on top of the box
+        # Feature #4: with BorderStyle=4 libass pads the box by Outline, so
+        # the editor's pill padding (fraction of canvas height, same unit as
+        # the text Size) reaches the burn. Radius remains unrepresentable in
+        # ASS (KNOWN_ISSUES) — carried but ignored here.
+        style_outline      = _pill_padding_px(caption_pill, video_height)
 
     # Commit 4: unified default anchor. Untouched captions (either coord missing)
     # fall back to the frontend's default center, so the export burns exactly
@@ -563,6 +696,23 @@ def generate_ass_karaoke(lines: list, style_name: str = DEFAULT_STYLE,
     eff_y = CAPTION_DEFAULT_Y_FRAC if caption_y is None else float(caption_y)
     c = to_pixel_center(eff_x, eff_y, video_width, video_height)
     pos_override = f"{{\\an5\\pos({c.cx},{c.cy})}}"
+
+    # Feature #15 — reveal animation. 'karaoke' keeps the per-word highlight
+    # path below untouched; the reveal presets emit ONE event per line with a
+    # motion tag on appearance (pop = scale-up via \t, fade = \fad, slide-up =
+    # \move from below). Unknown values degrade to the karaoke path.
+    _anim = animation if animation in ("none", "pop", "fade", "slide-up") else "karaoke"
+    _slide = max(int(round(0.05 * video_height)), 20)
+
+    def _reveal_override():
+        if _anim == "fade":
+            return f"{{\\an5\\pos({c.cx},{c.cy})\\fad(180,0)}}"
+        if _anim == "pop":
+            return (f"{{\\an5\\pos({c.cx},{c.cy})"
+                    f"\\fscx70\\fscy70\\t(0,180,\\fscx100\\fscy100)}}")
+        if _anim == "slide-up":
+            return f"{{\\an5\\move({c.cx},{c.cy + _slide},{c.cx},{c.cy},0,200)}}"
+        return pos_override  # 'none'
 
     # MarginV is now cosmetic — \an5\pos overrides Alignment/MarginV on every
     # event — but a sensible default keeps the Style block valid and readable.
@@ -585,10 +735,37 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
     events = []
 
+    style_bold_tag_global = "\\b1" if str(s['bold']) in ("-1", "1") else "\\b0"
+
     for line in lines:
         words      = line["words"]
         line_start = line["line_start"]
         line_end   = line["line_end"]
+
+        # ── Feature #15: reveal animations — one event per line ──────────────
+        # Non-karaoke: all words in base (unspoken) colour, no per-word timing
+        # slices; a single event carries the reveal motion. Emphasis words keep
+        # their highlight+bold+scale (feature #6) even here.
+        if _anim != "karaoke":
+            _has_emph = any(w.get("emphasis") for w in words)
+            parts = []
+            for w in words:
+                safe_word = _escape_ass_text(w['word'])
+                if w.get("emphasis"):
+                    tags = f"{_color_tag(s['color_highlight'])}\\b1\\fscx112\\fscy112"
+                elif _has_emph:
+                    tags = f"{_color_tag(s['color_unspoken'])}{style_bold_tag_global}\\fscx100\\fscy100"
+                else:
+                    tags = _color_tag(s['color_unspoken'])
+                parts.append(f"{{{tags}}}{safe_word}")
+            line_text = _reveal_override() + " ".join(parts)
+            e_start = line_start
+            e_end = max(line_end, line_start + 0.05)
+            events.append(
+                f"Dialogue: 0,{format_ass_time(e_start)},{format_ass_time(e_end)},"
+                f"Default,,0,0,0,,{line_text}"
+            )
+            continue
 
         for idx, word in enumerate(words):
             evt_start = max(word["start"], line_start)
@@ -605,15 +782,33 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             # BEFORE being wrapped in the {\1c...} override tag so ASS control
             # characters in transcript text ({, }, \, newline) don't break out
             # of the run, corrupt override syntax, or drop text (BUG-008).
+            #
+            # Feature #6 — keyword emphasis: words flagged w["emphasis"] render
+            # in the preset's highlight colour, bold, at 112% scale for their
+            # whole lifetime (not just the karaoke instant). ASS override tags
+            # persist until changed, so once a line contains ANY emphasized
+            # word, every non-emphasized word explicitly resets bold + scale;
+            # emphasis-free lines emit the color tag alone — byte-identical to
+            # the pre-feature output.
+            line_has_emphasis = any(w.get("emphasis") for w in words)
+            style_bold_tag = "\\b1" if str(s['bold']) in ("-1", "1") else "\\b0"
             parts = []
             for j, w in enumerate(words):
                 safe_word = _escape_ass_text(w['word'])
                 if j < idx:
-                    parts.append(f"{{{_color_tag(s['color_spoken'])}}}{safe_word}")
+                    role_color = s['color_spoken']
                 elif j == idx:
-                    parts.append(f"{{{_color_tag(s['color_highlight'])}}}{safe_word}")
+                    role_color = s['color_highlight']
                 else:
-                    parts.append(f"{{{_color_tag(s['color_unspoken'])}}}{safe_word}")
+                    role_color = s['color_unspoken']
+                if w.get("emphasis"):
+                    tags = (f"{_color_tag(s['color_highlight'])}"
+                            f"\\b1\\fscx112\\fscy112")
+                elif line_has_emphasis:
+                    tags = f"{_color_tag(role_color)}{style_bold_tag}\\fscx100\\fscy100"
+                else:
+                    tags = _color_tag(role_color)
+                parts.append(f"{{{tags}}}{safe_word}")
 
             line_text = pos_override + " ".join(parts)
             events.append(
@@ -712,6 +907,14 @@ def render_captions_for_clip(
     caption_font_size: float = None,   # BUG-001 partial: 0-1 fraction of video height
     caption_pill: dict = None,         # BUG-001 partial: {enabled, color, opacity, padding, radius}
     caption_script: str = "telugu",    # 'telugu' | 'tanglish' — caption display script
+    emphasis_indices: list = None,     # Feature #6: clip-local word indices to emphasize;
+                                       # None → the clip's own auto-tagged set; [] → none
+    cut_spans: list = None,            # Feature #14: [[start,end],...] clip-local seconds cut
+                                       # from the clip; caption words remap onto the shortened
+                                       # timeline (mirrors the worker's video cut). None/[] → no cuts
+    animation: str = "karaoke",        # Feature #15: caption reveal animation preset
+                                       # 'karaoke' (default) = per-word highlight (unchanged);
+                                       # 'none'/'pop'/'fade'/'slide-up' = one-event-per-line reveal
 ) -> str:
     """words → ASS → burn for a single clip with given style + caption font.
 
@@ -798,14 +1001,31 @@ def render_captions_for_clip(
             print(f"   Part {i+1}: {s_start:.1f}s → {s_end:.1f}s (output: remapped)")
         words = get_words_for_multisegment_clip(transcript, clip, sent_by_id, caption_script)
     else:
-        print(f"   Clip time: {clip['start']:.1f}s → {clip['end']:.1f}s")
-        words = get_words_for_clip(transcript, clip["start"], clip["end"], caption_script)
+        print(f"   Clip time: {clip['start']:.1f}s → {clip['end']:.1f}s"
+              + (f" (t=0 at refined {clip['refined_start']:.2f}s)"
+                 if clip.get("refined_start") is not None else ""))
+        words = get_words_for_clip(transcript, clip["start"], clip["end"], caption_script,
+                                   time_zero=clip.get("refined_start"))
 
     print(f"   Found {len(words)} words")
 
     if not words:
         print("   ⚠ No words found — skipping captions for this clip")
         return None
+
+    # Feature #6 — keyword emphasis. Indices address the clip's filtered word
+    # array (the SAME index space lineSplits use). None → the auto set Gemini
+    # tagged at selection time (clip["emphasis_indices"]); an explicit list
+    # (possibly empty) from the editor wins — the user's toggles are final.
+    _effective_emphasis = (emphasis_indices if emphasis_indices is not None
+                           else clip.get("emphasis_indices") or [])
+    _n_emph = 0
+    for _i in _effective_emphasis:
+        if isinstance(_i, int) and 0 <= _i < len(words):
+            words[_i]["emphasis"] = True
+            _n_emph += 1
+    if _n_emph:
+        print(f"   ★ Emphasis on {_n_emph} word(s)")
 
     # Load xfade segment sidecar and remap word timestamps onto output timeline.
     # Without this, captions drift progressively later when xfade overlap removes
@@ -863,6 +1083,28 @@ def render_captions_for_clip(
         _n_applied = apply_line_realignments(lines, _realignments, caption_script)
         print(f"   ✎ Line realignments: {_n_applied}/{len(_realignments)} applied", flush=True)
 
+    # Feature #14 — filler/silence cuts. Applied at the LINE level (AFTER
+    # grouping + realignments) so emphasis flags and lineSplits indices, both
+    # defined on the uncut word array, stay valid: we only drop the words the
+    # cut removes and remap survivors onto the post-cut timeline, preserving
+    # the line structure. Empty lines vanish. Mirrors the worker's video cut
+    # (same spans) so burned captions land on the shortened output.
+    if cut_spans:
+        from services.filler_removal import apply_cuts_to_words
+        _kept_lines = []
+        _dropped = 0
+        for _line in lines:
+            _new_words = apply_cuts_to_words(_line["words"], cut_spans)
+            if not _new_words:
+                _dropped += 1
+                continue
+            _line["words"] = _new_words
+            _line["line_start"] = _new_words[0]["start"]
+            _line["line_end"] = _new_words[-1]["end"]
+            _kept_lines.append(_line)
+        lines = _kept_lines
+        print(f"   ✂ Cuts applied: {len(cut_spans)} span(s), {_dropped} line(s) removed", flush=True)
+
     print(f"   {len(lines)} lines × up to {wpl} words — karaoke highlight mode")
 
     ass_path    = safe_ass_path(vertical_clip_path, style_name)
@@ -887,6 +1129,7 @@ def render_captions_for_clip(
                                        caption_position=caption_position,
                                        video_width=video_width,
                                        video_height=video_height,
+                                       animation=animation,
                                        caption_font=caption_font,
                                        caption_x=caption_x,
                                        caption_y=caption_y,

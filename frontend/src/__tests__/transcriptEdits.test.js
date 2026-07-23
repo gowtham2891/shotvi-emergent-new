@@ -44,6 +44,9 @@ const SAMPLE_EDITS = {
   mergedGroups: [1],
   lineSplits: [7],
   lineRealignments: {},
+  // Feature #6: null = user never touched emphasis (the clip's auto set
+  // applies); part of the persisted shape so drafts round-trip it.
+  emphasisIndices: null,
 };
 
 beforeEach(() => {
@@ -52,12 +55,13 @@ beforeEach(() => {
 });
 
 describe("transcriptEdits store slice", () => {
-  test("initializes to the full empty shape — all four keys present from day one", () => {
+  test("initializes to the full empty shape — every key present from day one", () => {
     expect(useAppStore.getState().transcriptEdits).toEqual({
       wordEdits: {},
       mergedGroups: [],
       lineSplits: [],
       lineRealignments: {},
+      emphasisIndices: null,
     });
   });
 
@@ -68,6 +72,7 @@ describe("transcriptEdits store slice", () => {
       mergedGroups: [],
       lineSplits: [],
       lineRealignments: {},
+      emphasisIndices: null,
     });
   });
 });

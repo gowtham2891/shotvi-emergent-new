@@ -85,7 +85,7 @@ def client(monkeypatch, tmp_path):
 
     store = {}
 
-    def fake_create_job(job_id, url, language="te", owner=""):
+    def fake_create_job(job_id, url, language="te", owner="", **kwargs):
         store[job_id] = {
             "job_id": job_id, "url": url, "language": language, "owner": owner,
             "status": "pending", "progress": 0, "current_stage": "queued",

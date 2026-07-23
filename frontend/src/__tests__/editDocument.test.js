@@ -200,6 +200,9 @@ describe("BUG-001 partial fix — caption Size / Pill reach the export payload",
     expect("caption_pill" in offReq).toBe(false);
 
     // Enabled → payload carries the exact snake-case shape the API expects.
+    // Feature #4: padding/radius ride the wire as fractions of canvas height;
+    // legacy absolute-px values (this draft predates the unit change) are
+    // normalized against the 640px 9:16 stage exactly once (lib/pillUnits.js).
     const onReq = buildRerenderRequest({
       captionPill: { enabled: true, color: "#7c3aed", opacity: 0.6, padding: 10, radius: 6 },
     });
@@ -207,9 +210,16 @@ describe("BUG-001 partial fix — caption Size / Pill reach the export payload",
       enabled: true,
       color: "#7c3aed",
       opacity: 0.6,
-      padding: 10,
-      radius: 6,
+      padding: 10 / 640,
+      radius: 6 / 640,
     });
+
+    // Already-fraction values (new-unit drafts) pass through untouched.
+    const fracReq = buildRerenderRequest({
+      captionPill: { enabled: true, color: "#7c3aed", opacity: 0.6, padding: 8 / 640, radius: 8 / 640 },
+    });
+    expect(fracReq.caption_pill.padding).toBeCloseTo(8 / 640, 10);
+    expect(fracReq.caption_pill.radius).toBeCloseTo(8 / 640, 10);
   });
 
   test("size + pill are ignored for zero/negative fontSize (guard against jitter)", () => {

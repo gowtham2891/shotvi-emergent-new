@@ -35,34 +35,37 @@ export const CAPTION_PRESETS = [
 ];
 
 // Default pill background per preset — user overridable
+// Feature #4: padding/radius are FRACTIONS of canvas height (px at the
+// 640px-tall 9:16 stage ÷ 640) — the same unit caption fontSize uses, so the
+// pill scales with the text on every aspect and in the burn (lib/pillUnits.js).
 export const PILL_DEFAULTS_BY_PRESET = {
   "bold-yellow": {
     enabled: true,
     color: "#000000",
     opacity: 0.5,
-    padding: 10,
-    radius: 8,
+    padding: 10 / 640,
+    radius: 8 / 640,
   },
   "neon-green": {
     enabled: false,
     color: "#000000",
     opacity: 0.6,
-    padding: 8,
-    radius: 12,
+    padding: 8 / 640,
+    radius: 12 / 640,
   },
   "fire-gradient": {
     enabled: true,
     color: "#000000",
     opacity: 0.35,
-    padding: 8,
-    radius: 8,
+    padding: 8 / 640,
+    radius: 8 / 640,
   },
   "clean-white": {
     enabled: false,
     color: "#000000",
     opacity: 0.5,
-    padding: 8,
-    radius: 6,
+    padding: 8 / 640,
+    radius: 6 / 640,
   },
 };
 

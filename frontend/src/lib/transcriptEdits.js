@@ -42,6 +42,14 @@ export const createEmptyTranscriptEdits = () => ({
   // yields that exact line, so a style/split change safely degrades to the
   // original words instead of mis-timing a different line.
   lineRealignments: {},
+  // Feature #6 — keyword emphasis. Raw indices into the clip's filtered word
+  // array (SAME index space as lineSplits). null = "never materialized":
+  // preview/wire fall back to the clip's Gemini-tagged auto set
+  // (clip.emphasis_indices); the first user toggle materializes an array
+  // (possibly []). NOT part of the transcript_edits wire shape —
+  // serializeTranscriptEdits deliberately excludes it; emphasis rides
+  // RerenderRequest.emphasis_indices as its own top-level field.
+  emphasisIndices: null,
 });
 
 // Store/wire key for one realigned line.
@@ -135,6 +143,11 @@ export function sanitizeTranscriptEdits(raw) {
     const cleanRec = sanitizeRealignment(key, rec);
     if (cleanRec) clean.lineRealignments[key] = cleanRec;
   }
+  // Feature #6: a saved array (even []) is the user's materialized emphasis
+  // set; anything else (old drafts) stays null so the clip's auto set applies.
+  clean.emphasisIndices = Array.isArray(raw.emphasisIndices)
+    ? raw.emphasisIndices.filter(Number.isInteger)
+    : null;
   return clean;
 }
 

@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useMemo, useRef } from "react";
 import {
   Play,
   Pause,
@@ -9,6 +9,20 @@ import {
 import { useAppStore } from "@/store/useAppStore";
 import { EDITOR } from "@/constants/testIds";
 import EditableTranscript from "@/components/editor/EditableTranscript";
+import { useWaveform } from "@/hooks/useWaveform";
+import { wordTickFractions } from "@/lib/waveform";
+import { useFilmstrip } from "@/hooks/useFilmstrip";
+import { subtitleBlocks } from "@/lib/filmstrip";
+import { buildCaptionLines } from "@/lib/captionLines";
+import { getCaptionStylePreview } from "@/data/captionStylePreview";
+import { generatePunchPoints } from "@/lib/autoZoom";
+import { Zap } from "lucide-react";
+
+const WAVE_BARS = 120;
+const FILM_THUMBS = 14;
+// Flat baseline shown while decoding, or when audio can't be decoded — a
+// clearly-inert line, never the old fabricated sine curve.
+const FLAT_PEAKS = Array.from({ length: WAVE_BARS }, () => 0.1);
 
 const clamp01 = (v) => Math.max(0, Math.min(1, v));
 
@@ -39,8 +53,51 @@ export const TimelineRow = () => {
   const trimStart = useAppStore((s) => s.exportSettings.trimStart);
   const trimEnd = useAppStore((s) => s.exportSettings.trimEnd);
   const resetTrim = useAppStore((s) => s.resetTrim);
+  const transcript = useAppStore((s) => s.transcript);
+  // The clip's own media file (raw cut / vertical). Its audio track is what
+  // the waveform decodes; its duration equals the editor's clip duration
+  // (both use the refined cut boundaries — feature #1), so peaks and word
+  // ticks share the timeline's [0, duration] axis.
+  const waveUrl = useAppStore((s) => s.currentClip?.videoUrl || s.currentClip?.previewUrl || null);
 
   const barRef = useRef(null);
+
+  // Feature #11: real peaks (WebAudio) replace the retired Math.sin bars.
+  const { peaks, status: waveStatus } = useWaveform(waveUrl, WAVE_BARS);
+  const displayPeaks = peaks && peaks.length ? peaks : FLAT_PEAKS;
+  // Word ticks from existing clip-local word timestamps.
+  const tickFractions = useMemo(
+    () => wordTickFractions(transcript, duration),
+    [transcript, duration]
+  );
+
+  // Feature #12: filmstrip thumbnails (client-side frame capture) + subtitle
+  // blocks from the SAME caption lines the preview/burn agree on.
+  const { frames, status: filmStatus } = useFilmstrip(waveUrl, duration, FILM_THUMBS);
+  const lineSplits = useAppStore((s) => s.transcriptEdits.lineSplits);
+  const presetId = useAppStore(
+    (s) => s.elements.find((el) => el.type === "caption")?.props?.presetId
+  );
+  const blocks = useMemo(() => {
+    const wpl = getCaptionStylePreview(presetId)?.wordsPerLine || 4;
+    const lines = buildCaptionLines(transcript, wpl, lineSplits);
+    return subtitleBlocks(lines, duration);
+  }, [transcript, presetId, lineSplits, duration]);
+
+  // Feature #13 — effective punch points (user set, or auto from word beats).
+  // Subscribed to both inputs so the markers re-derive when either changes.
+  const punchStored = useAppStore((s) => s.exportSettings.punchPoints);
+  const punchPoints = useMemo(
+    () => (Array.isArray(punchStored) ? punchStored : generatePunchPoints(transcript)),
+    [punchStored, transcript]
+  );
+
+  // Feature #14 — filler/silence removal state.
+  const cutSpans = useAppStore((s) => s.exportSettings.cutSpans);
+  const fillerOn = Array.isArray(cutSpans);
+  const removedSecs = fillerOn
+    ? cutSpans.reduce((a, s) => a + (s.end - s.start), 0)
+    : 0;
 
   // Effective trim window (trimEnd -1 sentinel → clip end) — same math as
   // the store's getTrimBounds, kept local for render.
@@ -130,24 +187,192 @@ export const TimelineRow = () => {
         </div>
       </div>
 
-      {/* Waveform / playhead scrubber + trim handles */}
-      <div className="relative h-12 border-b border-[#1c1c24] px-4 flex items-center">
-        <div ref={barRef} className="relative flex-1 h-8 bg-[#111116] rounded overflow-hidden">
-          <div className="absolute inset-0 flex items-center gap-[2px] px-1">
-            {Array.from({ length: 120 }).map((_, i) => {
-              const h =
-                20 + Math.abs(Math.sin(i * 0.35) * 60) + (i * 7) % 30;
+      {/* Feature #12 — filmstrip band: thumbnails + subtitle blocks + scrub.
+          Shares the timeline's [0, duration] axis with the waveform below;
+          click anywhere to seek, playhead + trim dimming mirror the scrubber. */}
+      <div className="relative h-14 border-b border-[#1c1c24] px-4 flex items-center">
+        <div
+          data-testid={EDITOR.filmstrip}
+          data-film-status={filmStatus}
+          className="relative flex-1 h-12 bg-[#0d0d12] rounded overflow-hidden cursor-pointer"
+          title="Click to seek · Alt+click to add/remove an auto-zoom punch"
+          onClick={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const t = ((e.clientX - rect.left) / rect.width) * duration;
+            // Feature #13: Alt+click toggles a punch here; plain click seeks.
+            if (e.altKey) {
+              useAppStore.getState().togglePunchPoint(t);
+              return;
+            }
+            seek(t);
+          }}
+        >
+          {/* Thumbnail row — tiled evenly; neutral cells until frames decode. */}
+          <div className="absolute inset-0 flex">
+            {(frames.length ? frames : Array.from({ length: FILM_THUMBS })).map((src, i) => (
+              <div key={i} className="h-full flex-1 border-r border-black/40 overflow-hidden bg-[#15151c]">
+                {src && (
+                  <img src={src} alt="" draggable={false}
+                    className="h-full w-full object-cover select-none" />
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Subtitle blocks — one per caption line, positioned by its span. */}
+          <div data-testid={EDITOR.subtitleBlocks} className="absolute inset-x-0 bottom-0 h-4 pointer-events-none">
+            {blocks.map((b, i) => {
+              const active = currentTime >= b.lineStart && currentTime < b.lineEnd;
               return (
                 <div
                   key={i}
-                  className="wave-bar flex-1"
-                  style={{
-                    height: `${Math.min(100, h)}%`,
-                    opacity: (i / 120) * 100 < playheadPct ? 1 : 0.35,
-                  }}
-                />
+                  title={b.text}
+                  className={`absolute bottom-0 h-4 rounded-sm border truncate text-[8px] leading-4 px-1 text-white/90 ${
+                    active
+                      ? "bg-[#7c3aed]/85 border-[#a78bfa]"
+                      : "bg-[#7c3aed]/45 border-[#7c3aed]/50"
+                  }`}
+                  style={{ left: `${b.left * 100}%`, width: `${b.width * 100}%` }}
+                >
+                  {b.text}
+                </div>
               );
             })}
+          </div>
+
+          {/* Trim dimming (mirror of the scrubber) */}
+          {startPct > 0 && (
+            <div className="absolute top-0 bottom-0 left-0 bg-black/60 pointer-events-none z-10"
+              style={{ width: `${startPct}%` }} />
+          )}
+          {endPct < 100 && (
+            <div className="absolute top-0 bottom-0 right-0 bg-black/60 pointer-events-none z-10"
+              style={{ width: `${100 - endPct}%` }} />
+          )}
+
+          {/* Feature #13 — punch markers (auto-zoom points). Click a marker to
+              remove it; Alt+click empty timeline to add. */}
+          <div data-testid={EDITOR.punchMarkers} className="absolute inset-x-0 top-0 h-full pointer-events-none z-20">
+            {duration > 0 && punchPoints.map((t, i) => (
+              <button
+                key={i}
+                data-testid={EDITOR.punchMarker(i)}
+                title={`Auto-zoom punch at ${formatTime(t)} — click to remove`}
+                onClick={(e) => { e.stopPropagation(); useAppStore.getState().togglePunchPoint(t); }}
+                className="absolute top-0 -ml-1.5 w-3 h-3 pointer-events-auto cursor-pointer"
+                style={{ left: `${(t / duration) * 100}%` }}
+              >
+                <span className="block w-0 h-0 border-l-[6px] border-r-[6px] border-t-[7px] border-l-transparent border-r-transparent border-t-[#22ff9c] drop-shadow-[0_0_4px_rgba(34,255,156,0.9)]" />
+              </button>
+            ))}
+          </div>
+
+          {/* Playhead */}
+          <div
+            className="absolute top-0 bottom-0 w-0.5 bg-[#7c3aed] pointer-events-none z-20"
+            style={{ left: `${playheadPct}%`, boxShadow: "0 0 10px rgba(124,58,237,0.9)" }}
+          />
+        </div>
+      </div>
+
+      {/* Feature #13 — auto-zoom controls */}
+      <div className="flex items-center gap-2 px-4 py-1.5 border-b border-[#1c1c24] text-[11px] text-[#9a9aa6]">
+        <Zap size={11} className="text-[#22ff9c]" />
+        <span>
+          Auto-zoom: <span className="font-mono text-white">{punchPoints.length}</span> punch
+          {punchPoints.length === 1 ? "" : "es"}
+        </span>
+        <span className="text-[#3a3a44]">·</span>
+        <span className="text-[#71717a]">
+          <kbd className="px-1 py-0.5 rounded bg-[#111116] border border-[#2a2a35] font-mono text-[9px] mr-1">Alt</kbd>
+          +click timeline to add/remove
+        </span>
+        <button
+          data-testid={EDITOR.punchAuto}
+          onClick={() => useAppStore.getState().autoGeneratePunchPoints()}
+          className="ml-auto text-[10px] font-semibold text-[#c4b5fd] hover:text-white transition-colors"
+        >
+          Auto
+        </button>
+        <button
+          data-testid={EDITOR.punchClear}
+          onClick={() => useAppStore.getState().clearPunchPoints()}
+          className="text-[10px] font-semibold text-[#71717a] hover:text-white transition-colors"
+        >
+          Clear
+        </button>
+      </div>
+
+      {/* Feature #14 — filler/silence removal controls */}
+      <div className="flex items-center gap-2 px-4 py-1.5 border-b border-[#1c1c24] text-[11px] text-[#9a9aa6]">
+        <Scissors size={11} className={fillerOn ? "text-[#22ff9c]" : "text-[#5a5a66]"} />
+        <span>
+          Filler / silence:{" "}
+          {fillerOn ? (
+            <>
+              <span className="font-mono text-white">{cutSpans.length}</span> cut
+              {cutSpans.length === 1 ? "" : "s"}
+              <span className="text-[#5a5a66]"> · saves </span>
+              <span className="font-mono text-white">{removedSecs.toFixed(1)}s</span>
+            </>
+          ) : (
+            <span className="text-[#71717a]">off</span>
+          )}
+        </span>
+        {fillerOn && (
+          <span className="text-[#71717a]">
+            <span className="text-[#3a3a44]">·</span> click a{" "}
+            <span className="line-through text-[#8a5a6a]">struck word</span> to restore
+          </span>
+        )}
+        <button
+          data-testid={EDITOR.fillerToggle}
+          onClick={() =>
+            fillerOn
+              ? useAppStore.getState().disableFillerRemoval()
+              : useAppStore.getState().enableFillerRemoval()
+          }
+          className="ml-auto text-[10px] font-semibold text-[#c4b5fd] hover:text-white transition-colors"
+        >
+          {fillerOn ? "Turn off" : "Detect fillers"}
+        </button>
+      </div>
+
+      {/* Waveform / playhead scrubber + trim handles */}
+      <div className="relative h-12 border-b border-[#1c1c24] px-4 flex items-center">
+        <div
+          ref={barRef}
+          data-testid={EDITOR.waveform}
+          data-wave-status={waveStatus}
+          className="relative flex-1 h-8 bg-[#111116] rounded overflow-hidden"
+        >
+          {/* Real peaks (WebAudio-decoded) — bars past the playhead dim.
+              Height floors at 6% so silence still reads as a baseline. */}
+          <div className="absolute inset-0 flex items-center gap-[2px] px-1">
+            {displayPeaks.map((p, i) => (
+              <div
+                key={i}
+                className="wave-bar flex-1"
+                style={{
+                  height: `${Math.max(6, Math.min(100, p * 100))}%`,
+                  opacity: (i / displayPeaks.length) * 100 < playheadPct ? 1 : 0.35,
+                }}
+              />
+            ))}
+          </div>
+          {/* Word ticks — one mark per word start, from the clip's existing
+              word-level timestamps. Subtle so they read as a guide, not clutter. */}
+          <div
+            data-testid={EDITOR.waveformTicks}
+            className="absolute inset-x-1 bottom-0 top-0 pointer-events-none"
+          >
+            {tickFractions.map((f, i) => (
+              <div
+                key={i}
+                className="absolute bottom-0 w-px h-1.5 bg-white/25"
+                style={{ left: `${f * 100}%` }}
+              />
+            ))}
           </div>
           <div
             data-testid={EDITOR.timelinePlayhead}
@@ -245,6 +470,9 @@ export const TimelineRow = () => {
             merge
             <span className="mx-1.5 text-[#3a3a44]">·</span>
             type to fix
+            <span className="mx-1.5 text-[#3a3a44]">·</span>
+            <kbd className="px-1 py-0.5 rounded bg-[#111116] border border-[#2a2a35] font-mono text-[9px] mr-1">Alt</kbd>
+            +click emphasize
           </span>
         </div>
         {transcriptStatus === "loading" && (

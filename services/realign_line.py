@@ -166,15 +166,28 @@ def output_time_to_absolute(t: float, clip: dict, sentences: list) -> float:
     """
     segments = clip.get("segments") or []
     if len(segments) <= 1:
-        return float(clip["start"]) + t
+        # Caption-sync fix: clip-local t=0 is the energy-refined cut start
+        # when the cutter persisted it (see video_cutter.cut_all_clips).
+        zero = clip.get("refined_start")
+        return float(zero if zero is not None else clip["start"]) + t
+
+    # Mirror get_words_for_multisegment_clip's stacking: refined per-segment
+    # boundaries when available (and consistent), raw sentence spans otherwise.
+    refined = clip.get("refined_segments") or []
+    if len(refined) != len(segments):
+        refined = None
 
     sent_by_id = {s["id"]: s for s in sentences}
     offset = 0.0
     seg_end = float(clip["start"])
-    for seg in segments:
+    for seg_i, seg in enumerate(segments):
         try:
-            seg_start = float(sent_by_id[int(seg["start_sent_id"])]["start"])
-            seg_end   = float(sent_by_id[int(seg["end_sent_id"])]["end"])
+            if refined:
+                seg_start = float(refined[seg_i]["start"])
+                seg_end   = float(refined[seg_i]["end"])
+            else:
+                seg_start = float(sent_by_id[int(seg["start_sent_id"])]["start"])
+                seg_end   = float(sent_by_id[int(seg["end_sent_id"])]["end"])
         except (KeyError, TypeError, ValueError):
             continue
         dur = seg_end - seg_start

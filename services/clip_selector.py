@@ -1023,6 +1023,14 @@ never feel something is missing.
 
 Score honestly — not generously. A 7 means good. A 9 means exceptional.
 
+━━━ STEP 3.5 — EMPHASIS WORDS (feature #6) ━━━
+For each clip, pick the 2-6 PUNCH words a CapCut editor would pop —
+the words carrying the emotional or informational spike (the shocking
+number, the myth-busted noun, the consequence verb). Copy each word
+EXACTLY as it appears in the clip's sentences (same script, same
+spelling, single words — not phrases). They will be visually emphasised
+(bigger/bolder/coloured) in the burned captions.
+
 ━━━ STEP 4 — RANK ━━━
 confidence_rank 1 = the clip you'd post first if you could only post one.
 
@@ -1062,6 +1070,7 @@ Return ONLY valid JSON. No markdown, no explanation.
       "cultural_score": 8,
       "engagement_score": 7,
       "psychological_trigger": "<e.g. Curiosity Gap, Myth Busting, Middle-Class Relatability, Controversial Take>",
+      "emphasis_words": ["<2-6 exact punch words copied verbatim from the clip's sentences>"],
       "trimmed": false,
       "trim_reason": "",
       "notes": ""
@@ -1372,6 +1381,11 @@ def gemini_fine_cut(candidates: list[dict], sentences: list[dict],
             "cultural_score":        cultural_score,
             "engagement_score":      engagement_score,
             "psychological_trigger": gc.get("psychological_trigger", ""),
+            # Feature #6: raw punch-word strings from Gemini; resolved to
+            # clip-local word indices in select_clips (map_emphasis_to_indices)
+            # once the word-level transcript is in hand.
+            "emphasis_words":        [str(w) for w in (gc.get("emphasis_words") or [])
+                                      if isinstance(w, (str,))][:8],
             "trimmed":               gc.get("trimmed", False),
             "trim_reason":           gc.get("trim_reason", ""),
             "notes":                 gc.get("notes", ""),
@@ -1706,6 +1720,57 @@ def attach_transcripts(clips, all_sentences, word_timestamps=None):
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# Feature #6 — emphasis word → clip-local index mapping
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_EMPHASIS_STRIP = ".,!?;:\"'“”‘’()[]…-–—"
+
+
+def _norm_token(t: str) -> str:
+    return str(t).strip().strip(_EMPHASIS_STRIP).lower()
+
+
+def map_emphasis_to_indices(clip: dict, transcript: dict) -> list:
+    """
+    Resolve Gemini's emphasis word strings to indices into the clip's
+    FILTERED word array — the exact index space lineSplits and the frontend
+    transcript use (caption_renderer.get_words_for_(multisegment_)clip is
+    the single source of that array, so we build it with the same code).
+
+    Matching is per-token, first unused occurrence wins, punctuation-and-
+    case-insensitive. Unmatched tokens are silently dropped — emphasis is
+    cosmetic, never worth failing a pipeline over.
+    """
+    from services.caption_renderer import get_words_for_multisegment_clip
+
+    raw = clip.get("emphasis_words") or []
+    if not raw:
+        return []
+
+    sent_by_id = {s["id"]: s for s in transcript.get("sentences", [])}
+    try:
+        words = get_words_for_multisegment_clip(transcript, clip, sent_by_id)
+    except Exception as e:
+        print(f"  [Emphasis] ⚠ word extraction failed ({e}) — no emphasis")
+        return []
+
+    tokens = [_norm_token(w["word"]) for w in words]
+    used: set = set()
+    out: list = []
+    for phrase in raw:
+        for part in str(phrase).split():
+            p = _norm_token(part)
+            if not p:
+                continue
+            for i, t in enumerate(tokens):
+                if i not in used and t == p:
+                    used.add(i)
+                    out.append(i)
+                    break
+    return sorted(out)
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # Main entry point
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -1776,6 +1841,15 @@ def select_clips(transcript_path: str) -> dict:
         raise RuntimeError("Pipeline returned no clips")
 
     clips = attach_transcripts(clips, sentences, word_timestamps)
+
+    # Feature #6: resolve Gemini's punch words to clip-local word indices
+    # (the lineSplits index space) so render + frontend emphasize the same
+    # words without re-matching strings.
+    for clip in clips:
+        clip["emphasis_indices"] = map_emphasis_to_indices(clip, data)
+        if clip["emphasis_indices"]:
+            print(f"  [Emphasis] {clip.get('clip_id', '?')}: "
+                  f"{len(clip['emphasis_indices'])} word(s) at {clip['emphasis_indices']}")
 
     elapsed = time.time() - pipeline_start
     print(f"\n{'='*65}")

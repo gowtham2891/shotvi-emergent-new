@@ -1,5 +1,6 @@
 import { client, toApiError } from "@/api/client";
 import { serializeTranscriptEdits } from "@/lib/transcriptEdits";
+import { normalizePillUnits } from "@/lib/pillUnits";
 
 // ── Caption styles ───────────────────────────────────────────────
 // The backend exposes no styles endpoint; these ids mirror STYLES in
@@ -20,9 +21,24 @@ export const CAPTION_STYLES = [
   { id: "big-bold", name: "Big Bold" },
   { id: "typewriter", name: "Typewriter" },
   { id: "split-color", name: "Split Color" },
+  // Feature #16 — 6 new preset bundles.
+  { id: "purple-punch", name: "Purple Punch" },
+  { id: "ocean-blue", name: "Ocean Blue" },
+  { id: "sunshine", name: "Sunshine" },
+  { id: "mono-bold", name: "Mono Bold" },
+  { id: "pink-pop", name: "Pink Pop" },
+  { id: "lime-shock", name: "Lime Shock" },
 ];
 export const DEFAULT_STYLE_ID = "bold-yellow";
 export const isKnownStyle = (id) => CAPTION_STYLES.some((s) => s.id === id);
+
+// Feature #21 — premium presets (mirror of api/tiers.PREMIUM_PRESETS). Free
+// users SEE them in the gallery but the export gate (backend 402) blocks
+// exporting with one; the Inspector marks them "PRO".
+export const PREMIUM_PRESET_IDS = new Set([
+  "purple-punch", "ocean-blue", "sunshine", "mono-bold", "pink-pop", "lime-shock",
+]);
+export const isPremiumPreset = (id) => PREMIUM_PRESET_IDS.has(id);
 
 // ── Caption fonts ────────────────────────────────────────────────
 // The three bundled Telugu caption fonts the backend resolves deterministically
@@ -92,6 +108,21 @@ export function buildRerenderRequest(editDoc = {}) {
     // values (old drafts) are also omitted → backend renders telugu.
     captionScript = null,
     elements = null, // full EditDocument elements (0–1 coords); filtered below
+    // Feature #6 — the EFFECTIVE emphasis set (clip auto set ∪ user toggles),
+    // clip-local raw indices. Sent as emphasis_indices whenever it's an array;
+    // null/undefined (pre-feature callers) omits the field → the backend
+    // falls back to the clip's own Gemini-tagged set.
+    emphasisIndices = null,
+    // Feature #13 — animated punch-in crop keyframes [{time,x,y,w,h}].
+    // Non-empty → sent as crop_keyframes; empty/absent omits the field so a
+    // zoom-free export payload stays byte-identical to before.
+    cropKeyframes = null,
+    // Feature #14 — filler/silence cut spans [[start,end],...] clip-local.
+    // Non-empty → sent as cut_spans; empty/null omits it (no cuts).
+    cutSpans = null,
+    // Feature #15 — caption reveal animation. 'karaoke' is the backend
+    // default, so omit it to keep animation-untouched payloads byte-identical.
+    captionAnimation = null,
   } = editDoc;
 
   const req = {
@@ -121,6 +152,27 @@ export function buildRerenderRequest(editDoc = {}) {
   // omitted and an edit-free export payload stays byte-identical to today.
   const wireTranscriptEdits = serializeTranscriptEdits(transcriptEdits);
   if (wireTranscriptEdits) req.transcript_edits = wireTranscriptEdits;
+  // Feature #6: an explicit array — including [] (user removed every
+  // emphasis) — is the editor's final say and always crosses the wire.
+  if (Array.isArray(emphasisIndices)) {
+    req.emphasis_indices = emphasisIndices.filter(Number.isInteger);
+  }
+  // Feature #13: only send crop_keyframes when there's an actual zoom to
+  // apply — an empty list is the same as "no zoom", so omit it to keep
+  // zoom-free payloads byte-identical.
+  if (Array.isArray(cropKeyframes) && cropKeyframes.length) {
+    req.crop_keyframes = cropKeyframes;
+  }
+  // Feature #14: only send cut_spans when there are actual cuts.
+  if (Array.isArray(cutSpans) && cutSpans.length) {
+    req.cut_spans = cutSpans;
+  }
+  // Feature #15: send caption_animation only for a non-default (non-karaoke)
+  // preset, so karaoke exports stay byte-identical to before this existed.
+  const KNOWN_ANIMS = ["karaoke", "none", "pop", "fade", "slide-up"];
+  if (KNOWN_ANIMS.includes(captionAnimation) && captionAnimation !== "karaoke") {
+    req.caption_animation = captionAnimation;
+  }
   // Send caption center only when moved from default (both coords required by the
   // backend); epsilon stops float-noise from flipping default↔positioned paths.
   if (captionX != null && captionY != null) {
@@ -144,12 +196,16 @@ export function buildRerenderRequest(editDoc = {}) {
   }
   if (captionPill && captionPill.enabled) {
     // Snake-case for the API; only the fields the backend consumes.
+    // Feature #4: padding/radius ride the wire as fractions of canvas height
+    // (normalized here so legacy absolute-px drafts convert exactly once);
+    // the backend scales them by the real render height.
+    const pillN = normalizePillUnits(captionPill);
     req.caption_pill = {
       enabled: true,
-      color: captionPill.color,
-      opacity: captionPill.opacity,
-      padding: captionPill.padding,
-      radius: captionPill.radius,
+      color: pillN.color,
+      opacity: pillN.opacity,
+      padding: pillN.padding,
+      radius: pillN.radius,
     };
   }
   // Serialize the visible overlay elements (progress/logo/headline) for

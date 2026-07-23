@@ -49,6 +49,9 @@ import {
 import { fetchTanglish } from "@/api/tanglish";
 import { fetchTransliterations } from "@/api/transliterate";
 import { supabase, AUTH_ENABLED, mapSupabaseUser, DEV_USER } from "@/lib/supabaseClient";
+import { applyHookHeadline } from "@/lib/hookHeadline";
+import { generatePunchPoints, punchesToKeyframes, togglePunch } from "@/lib/autoZoom";
+import { detectRemovableSpans, wordInSpans, spansToPairs } from "@/lib/fillerRemoval";
 import { setUnauthorizedHandler } from "@/api/client";
 import { getBillingStatus, createSubscription, cancelSubscription } from "@/api/billing";
 import { loadRazorpay, openSubscriptionCheckout } from "@/lib/razorpayCheckout";
@@ -99,8 +102,23 @@ const DEFAULT_EXPORT_SETTINGS = {
   // 9:16). Empty = fully untouched, which keeps the 9:16 export payload —
   // and therefore its output — byte-identical to before this sprint.
   cropWindows: {},
+  // Feature #13 — auto-zoom / punch-ins. Sorted clip-local times (seconds)
+  // where the frame punches in (1.0→1.12→1.0). null = "not yet initialized"
+  // → openClip auto-seeds from word beats; an array (incl. []) is the user's
+  // final say (add/remove on the timeline). Part of the document, so it
+  // draft-persists, undoes, and serializes to export like every other field.
+  // Points → crop_keyframes happens only at the wire boundary (buildRerenderRequest).
+  punchPoints: null,
+  // Feature #14 — filler/silence removal. Active cut spans [{start,end,kind}]
+  // (clip-local seconds). null = feature off (no cuts). Enabling seeds it from
+  // detection; the user restores individual spans (struck-through transcript).
+  // Sent to the backend as cut_spans [[start,end],...]; the burn drops those
+  // words + remaps the rest. Part of the document → draft/undo/autosave.
+  cutSpans: null,
 };
-const defaultExportSettings = () => ({ ...DEFAULT_EXPORT_SETTINGS, cropWindows: {} });
+const defaultExportSettings = () => ({
+  ...DEFAULT_EXPORT_SETTINGS, cropWindows: {}, punchPoints: null, cutSpans: null,
+});
 
 // Stale-run token for openClip: rapid clip switching interleaves two async
 // runs, and the slower one's set() calls must not land on the newer clip's
@@ -325,6 +343,9 @@ export const useAppStore = create((set, get) => ({
         billingStatus: {
           plan: "free", subscription_status: "", subscription_id: "",
           configured: false, plan_info: null,
+          // Tier entitlements + usage (features #17-20).
+          watermark: true, render_minutes_used: 0, render_minutes_budget: 30,
+          expiry_hours: 24,
         },
       });
       return;
@@ -679,6 +700,7 @@ export const useAppStore = create((set, get) => ({
         transcriptEdits: createEmptyTranscriptEdits(),
         elements: initialElements(),
         selectedElementId: "el_caption_1",
+        selectedIds: ["el_caption_1"],
         exportSettings: defaultExportSettings(),
         masterDims: null,
         reframeMode: false,
@@ -701,6 +723,7 @@ export const useAppStore = create((set, get) => ({
       transcriptEdits: createEmptyTranscriptEdits(),
       elements: initialElements(),
       selectedElementId: "el_caption_1",
+      selectedIds: ["el_caption_1"],
       exportSettings: defaultExportSettings(),
       // Per-clip session view state: the master's measured dimensions and
       // the reframe overlay never survive a clip switch.
@@ -724,7 +747,23 @@ export const useAppStore = create((set, get) => ({
       return;
     }
     const { clip, jobId } = found;
-    set({ currentClip: clip, currentJobId: jobId, duration: clip.end - clip.start });
+    set({
+      currentClip: clip,
+      currentJobId: jobId,
+      // Caption-sync fix: the cut file actually spans the refined boundaries
+      // when the backend provides them (raw CTC span otherwise).
+      duration:
+        clip.refined_start != null && clip.refined_end != null
+          ? clip.refined_end - clip.refined_start
+          : clip.end - clip.start,
+    });
+
+    // Feature #5: auto hook title — pre-fill the headline element from the
+    // clip's hook_text. Part of the clip's INITIAL document (plain set, no
+    // history frame; resetHistory already ran); a saved draft's elements
+    // replace this wholesale in the draft-restore step below, so it only
+    // ever shows on clips the user hasn't edited yet.
+    set((s) => ({ elements: applyHookHeadline(s.elements, clip.hook) }));
 
     try {
       const project = get().projects.find((p) => p.id === jobId);
@@ -976,6 +1015,101 @@ export const useAppStore = create((set, get) => ({
         lineSplits: s.transcriptEdits.lineSplits.filter((i) => i !== rawIndex),
       },
     }));
+  },
+
+  // Feature #6 — keyword emphasis. Same raw-index space as lineSplits.
+  // transcriptEdits.emphasisIndices === null means the user never touched
+  // emphasis on this clip → the clip's Gemini-tagged auto set applies.
+  // The first toggle materializes an explicit array, which is then the
+  // single source of truth (drafts/undo carry it via transcriptEdits).
+  getEffectiveEmphasis: () => {
+    const s = get();
+    const materialized = s.transcriptEdits.emphasisIndices;
+    if (Array.isArray(materialized)) return materialized;
+    return s.currentClip?.emphasis_indices || [];
+  },
+
+  toggleEmphasis: (rawIndex) => {
+    const st = get();
+    if (!Number.isInteger(rawIndex) || rawIndex < 0 || rawIndex >= st.transcript.length) {
+      return;
+    }
+    const current = st.getEffectiveEmphasis();
+    const next = current.includes(rawIndex)
+      ? current.filter((i) => i !== rawIndex)
+      : [...current, rawIndex].sort((a, b) => a - b);
+    st.pushHistory();
+    set((s) => ({
+      transcriptEdits: { ...s.transcriptEdits, emphasisIndices: next },
+    }));
+  },
+
+  // ── Feature #13: auto-zoom punch points ──────────────────────────────
+  // exportSettings.punchPoints: null = never initialized → the auto set
+  // (generated from word beats) applies; an array (incl. []) is the user's
+  // final say. Effective set is what the timeline shows and export burns.
+  getEffectivePunchPoints: () => {
+    const s = get();
+    const stored = s.exportSettings.punchPoints;
+    if (Array.isArray(stored)) return stored;
+    return generatePunchPoints(s.transcript);
+  },
+
+  // Add a punch at time t, or remove the nearest existing one within tol.
+  togglePunchPoint: (t, tol = 0.15) => {
+    const st = get();
+    if (typeof t !== "number" || !Number.isFinite(t)) return;
+    const next = togglePunch(st.getEffectivePunchPoints(), t, tol);
+    st.pushHistory();
+    set((s) => ({ exportSettings: { ...s.exportSettings, punchPoints: next } }));
+  },
+
+  // Re-seed from word beats (the "Auto" button) — materializes the auto set
+  // as an explicit array so it persists and is editable from there.
+  autoGeneratePunchPoints: () => {
+    const st = get();
+    const next = generatePunchPoints(st.transcript);
+    st.pushHistory();
+    set((s) => ({ exportSettings: { ...s.exportSettings, punchPoints: next } }));
+  },
+
+  // Clear all punches (materialized empty array — distinct from null/auto).
+  clearPunchPoints: () => {
+    get().pushHistory();
+    set((s) => ({ exportSettings: { ...s.exportSettings, punchPoints: [] } }));
+  },
+
+  // ── Feature #14: filler/silence removal ──────────────────────────────
+  // cutSpans null = feature off. Enabling detects candidates and removes
+  // them all by default; the user restores individual spans. The effective
+  // set (what the burn cuts + what shows struck-through) is exportSettings.cutSpans.
+  isFillerRemovalOn: () => Array.isArray(get().exportSettings.cutSpans),
+
+  enableFillerRemoval: () => {
+    const st = get();
+    const spans = detectRemovableSpans(st.transcript, st.duration);
+    st.pushHistory();
+    set((s) => ({ exportSettings: { ...s.exportSettings, cutSpans: spans } }));
+  },
+
+  disableFillerRemoval: () => {
+    get().pushHistory();
+    set((s) => ({ exportSettings: { ...s.exportSettings, cutSpans: null } }));
+  },
+
+  // Restore (un-cut) a span by its start (the struck-through "restore" click).
+  restoreCutSpan: (start) => {
+    const st = get();
+    if (!Array.isArray(st.exportSettings.cutSpans)) return;
+    const next = st.exportSettings.cutSpans.filter((s) => s.start !== start);
+    st.pushHistory();
+    set((s) => ({ exportSettings: { ...s.exportSettings, cutSpans: next } }));
+  },
+
+  // Is a transcript word inside an active cut span? (struck-through UI)
+  isWordCut: (word) => {
+    const spans = get().exportSettings.cutSpans;
+    return Array.isArray(spans) && wordInSpans(word, spans);
   },
 
   // Commit a word-text fix from the editable transcript. Text-only by
@@ -1389,6 +1523,8 @@ export const useAppStore = create((set, get) => ({
       // pass-through of the Inspector state.
       captionFontSize: caption?.props?.fontSize ?? null,
       captionPill: caption?.props?.pill ?? null,
+      // Feature #15 — caption reveal animation preset ('karaoke' default).
+      captionAnimation: caption?.props?.animation ?? "karaoke",
       // Store shape (wordEdits keyed by word id) — persisted verbatim in
       // drafts; converted to the backend wire shape only at the export
       // boundary (serializeTranscriptEdits inside buildRerenderRequest).
@@ -1407,7 +1543,15 @@ export const useAppStore = create((set, get) => ({
             { ...r, words: r.words.map((w) => ({ ...w })) },
           ])
         ),
+        // Feature #6: null (untouched → auto set) round-trips as null;
+        // a materialized array copies.
+        emphasisIndices: Array.isArray(s.transcriptEdits.emphasisIndices)
+          ? [...s.transcriptEdits.emphasisIndices]
+          : null,
       },
+      // Feature #6: the EFFECTIVE emphasis set (materialized toggles, or the
+      // clip's auto set) — what both the preview shows and the burn renders.
+      emphasisIndices: s.getEffectiveEmphasis(),
     };
   },
 
@@ -1548,6 +1692,8 @@ export const useAppStore = create((set, get) => ({
       // BUG-001 partial fix — thread the caption Size + Background Pill.
       captionFontSize: doc.captionFontSize,
       captionPill: doc.captionPill,
+      // Feature #15 — caption reveal animation preset.
+      captionAnimation: doc.captionAnimation,
       // Telugu ⇄ Tanglish toggle — burned export renders the same script the
       // preview shows (omitted from the wire when 'telugu', the default).
       captionScript: s.exportSettings.captionScript,
@@ -1556,6 +1702,24 @@ export const useAppStore = create((set, get) => ({
       // in, wire shape out: buildRerenderRequest serializes (and omits the
       // field entirely when there are no edits).
       transcriptEdits: doc.transcriptEdits,
+      // Feature #6 — the effective emphasis set (user toggles win over the
+      // clip's Gemini auto set) reaches the burn as its own wire field.
+      // Omitted (null) when there's nothing to say — no auto set and no
+      // user toggles — so pre-feature payloads stay byte-identical.
+      emphasisIndices:
+        doc.emphasisIndices.length > 0 ||
+        Array.isArray(doc.transcriptEdits.emphasisIndices)
+          ? doc.emphasisIndices
+          : null,
+      // Feature #13 — effective punch points → crop_keyframes at the wire
+      // boundary (pulse math mirrors the backend). Omitted when there are no
+      // punches so a zoom-free export stays byte-identical.
+      cropKeyframes: punchesToKeyframes(s.getEffectivePunchPoints(), s.duration),
+      // Feature #14 — active cut spans → [[start,end],...]. Null (feature off)
+      // omits the field; the backend drops these spans + remaps captions.
+      cutSpans: Array.isArray(s.exportSettings.cutSpans)
+        ? spansToPairs(s.exportSettings.cutSpans)
+        : null,
     });
     try {
       const rerenderJobId = await startRerender(target.jobId, target.index, req);
@@ -1669,9 +1833,95 @@ export const useAppStore = create((set, get) => ({
   // ============ CANVAS ELEMENTS ============
   elements: initialElements(),
   selectedElementId: "el_caption_1",
+  // Feature #9 — multi-select. selectedIds is the FULL selection;
+  // selectedElementId stays the PRIMARY (last-clicked) member so every
+  // single-selection consumer (CanvasArea's frozen nudge/delete cases,
+  // TransformBox, Inspector) keeps working unchanged. Invariant:
+  // selectedElementId ∈ selectedIds, or both empty.
+  selectedIds: ["el_caption_1"],
 
-  setSelected: (id) => set({ selectedElementId: id }),
-  clearSelection: () => set({ selectedElementId: null }),
+  setSelected: (id) => set({ selectedElementId: id, selectedIds: id ? [id] : [] }),
+  clearSelection: () => set({ selectedElementId: null, selectedIds: [] }),
+
+  // Shift-click: add/remove from the selection. Removing the primary
+  // promotes the last remaining member; removing the last clears.
+  toggleInSelection: (id) =>
+    set((s) => {
+      if (!s.elements.some((el) => el.id === id)) return {};
+      if (s.selectedIds.includes(id)) {
+        const rest = s.selectedIds.filter((x) => x !== id);
+        return {
+          selectedIds: rest,
+          selectedElementId:
+            s.selectedElementId === id ? rest[rest.length - 1] ?? null : s.selectedElementId,
+        };
+      }
+      return { selectedIds: [...s.selectedIds, id], selectedElementId: id };
+    }),
+
+  // Marquee: replace the whole selection at once. Primary = explicit, or
+  // the last id in the list.
+  setSelection: (ids, primaryId = null) =>
+    set((s) => {
+      const valid = (ids || []).filter((id) => s.elements.some((el) => el.id === id));
+      return {
+        selectedIds: valid,
+        selectedElementId: valid.includes(primaryId)
+          ? primaryId
+          : valid[valid.length - 1] ?? null,
+      };
+    }),
+
+  // Group move (relative): one delta applied to the given ids, clamped like
+  // a drag. Coalesced so a held-arrow nudge burst is ONE history frame
+  // (CanvasArea's Arrow keyup calls endHistoryCoalescing globally).
+  moveElementsBy: (ids, dx, dy, coalesceKey = "group-move") => {
+    if (!ids?.length) return;
+    get().pushHistory(coalesceKey);
+    set((st) => ({
+      elements: st.elements.map((el) =>
+        ids.includes(el.id) && !el.locked
+          ? { ...el, x: clamp(el.x + dx, 0.02, 0.98), y: clamp(el.y + dy, 0.02, 0.98) }
+          : el
+      ),
+    }));
+  },
+
+  // Group move (absolute): drag positions computed from drag-start snapshots
+  // — no incremental clamp drift on fast pointer moves.
+  moveElementsTo: (positions, coalesceKey = "group-move") => {
+    if (!positions || !Object.keys(positions).length) return;
+    get().pushHistory(coalesceKey);
+    set((st) => ({
+      elements: st.elements.map((el) =>
+        positions[el.id] && !el.locked
+          ? {
+              ...el,
+              x: clamp(positions[el.id].x, 0.02, 0.98),
+              y: clamp(positions[el.id].y, 0.02, 0.98),
+            }
+          : el
+      ),
+    }));
+  },
+
+  // Group delete: every selected non-caption element in ONE history frame.
+  // (EditorHotkeys calls this INSTEAD of relying on CanvasArea's single-
+  // element delete composing — see removeSelectedExceptPrimary for the
+  // listener-composition variant.)
+  removeSelectedExceptPrimary: () => {
+    const s = get();
+    const doomed = s.selectedIds.filter(
+      (id) => id !== s.selectedElementId &&
+        s.elements.some((el) => el.id === id && el.type !== "caption")
+    );
+    if (!doomed.length) return;
+    get().pushHistory("group-delete");
+    set((st) => ({
+      elements: st.elements.filter((el) => !doomed.includes(el.id)),
+      selectedIds: st.selectedIds.filter((id) => !doomed.includes(id)),
+    }));
+  },
 
   // BUG-005 containment: keep `rotation` at 0 for element types whose
   // rotation the export path cannot render yet (progress). This is a UI-only
@@ -1716,6 +1966,7 @@ export const useAppStore = create((set, get) => ({
     set((s) => ({
       elements: [...s.elements, el],
       selectedElementId: el.id,
+      selectedIds: [el.id],
     }));
     return el.id;
   },
@@ -1754,6 +2005,7 @@ export const useAppStore = create((set, get) => ({
       elements: s.elements.filter((el) => el.id !== id),
       selectedElementId:
         s.selectedElementId === id ? null : s.selectedElementId,
+      selectedIds: s.selectedIds.filter((x) => x !== id),
     }));
   },
 
@@ -1765,6 +2017,51 @@ export const useAppStore = create((set, get) => ({
         el.id === id ? { ...el, visible: !el.visible } : el
       ),
     }));
+  },
+
+  // ── Feature #8: duplicate / copy / paste ─────────────────────────────
+  // The caption element is excluded from all three — the document model is
+  // single-caption by contract (deleteSelected already enforces the same).
+  // The clipboard is session-only view state: never part of the document,
+  // so it survives clip switches but is not drafted/undoable itself.
+  elementClipboard: null,
+
+  duplicateElement: (id) => {
+    const src = get().elements.find((el) => el.id === id);
+    if (!src || src.type === "caption") return null;
+    get().pushHistory();
+    const el = {
+      ...src,
+      props: { ...src.props },
+      id: nextElementId(src.type),
+      // Slight offset so the copy is visibly a copy, clamped like a drag.
+      x: clamp(src.x + 0.03, 0.02, 0.98),
+      y: clamp(src.y + 0.03, 0.02, 0.98),
+    };
+    set((s) => ({ elements: [...s.elements, el], selectedElementId: el.id, selectedIds: [el.id] }));
+    return el.id;
+  },
+
+  copyElement: (id) => {
+    const src = get().elements.find((el) => el.id === id);
+    if (!src || src.type === "caption") return false;
+    set({ elementClipboard: JSON.parse(JSON.stringify(src)) });
+    return true;
+  },
+
+  pasteElement: () => {
+    const src = get().elementClipboard;
+    if (!src) return null;
+    get().pushHistory();
+    const el = {
+      ...src,
+      props: { ...src.props },
+      id: nextElementId(src.type),
+      x: clamp((src.x ?? 0.5) + 0.03, 0.02, 0.98),
+      y: clamp((src.y ?? 0.5) + 0.03, 0.02, 0.98),
+    };
+    set((s) => ({ elements: [...s.elements, el], selectedElementId: el.id, selectedIds: [el.id] }));
+    return el.id;
   },
 
   bringForward: (id) => {
@@ -2029,8 +2326,10 @@ function defaultElementForType(type) {
             enabled: false,
             color: "#000000",
             opacity: 0.55,
-            padding: 8,
-            radius: 8,
+            // Feature #4: fraction of canvas height (8px at the 640px 9:16
+            // stage), same unit as fontSize — see lib/pillUnits.js.
+            padding: 8 / 640,
+            radius: 8 / 640,
           },
         },
       };

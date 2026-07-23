@@ -98,6 +98,47 @@ describe("prior bindings unchanged", () => {
   });
 });
 
+describe("feature #8 — duplicate / copy-paste / z-order", () => {
+  test("Ctrl/Cmd+D → duplicateSelected with preventDefault (blocks bookmark)", () => {
+    expect(resolveEditorKey(key({ key: "d", ctrlKey: true }), false)).toEqual({
+      action: "duplicateSelected",
+      preventDefault: true,
+    });
+    expect(resolveEditorKey(key({ key: "d", metaKey: true }), false).action).toBe(
+      "duplicateSelected"
+    );
+  });
+
+  test("Ctrl+C / Ctrl+V → copy/paste WITHOUT preventDefault (native copy unharmed)", () => {
+    expect(resolveEditorKey(key({ key: "c", ctrlKey: true }), false)).toEqual({
+      action: "copySelected",
+    });
+    expect(resolveEditorKey(key({ key: "v", ctrlKey: true }), false)).toEqual({
+      action: "pasteElement",
+    });
+  });
+
+  test("[ / ] → z-order backward/forward", () => {
+    expect(resolveEditorKey(key({ key: "[" }), false).action).toBe("zOrderBackward");
+    expect(resolveEditorKey(key({ key: "]" }), false).action).toBe("zOrderForward");
+  });
+
+  test("all of them pass through while editing text", () => {
+    expect(resolveEditorKey(key({ key: "d", ctrlKey: true }), true).action).toBe("passthrough");
+    expect(resolveEditorKey(key({ key: "c", ctrlKey: true }), true).action).toBe("passthrough");
+    expect(resolveEditorKey(key({ key: "v", ctrlKey: true }), true).action).toBe("passthrough");
+    expect(resolveEditorKey(key({ key: "[" }), true).action).toBe("passthrough");
+    expect(resolveEditorKey(key({ key: "]" }), true).action).toBe("passthrough");
+  });
+
+  test("Ctrl+Shift+C/V stay native (devtools etc.)", () => {
+    expect(resolveEditorKey(key({ key: "c", ctrlKey: true, shiftKey: true }), false).action)
+      .toBe("passthrough");
+    expect(resolveEditorKey(key({ key: "v", ctrlKey: true, shiftKey: true }), false).action)
+      .toBe("passthrough");
+  });
+});
+
 describe("the one shared guard", () => {
   test("isTextEditingTarget is the isEditing source: inputs yes, buttons/canvas no", () => {
     // The word inputs of the editable transcript:

@@ -25,9 +25,12 @@ import {
   CAPTION_FONTS,
   EXPORT_FORMATS,
   BACKGROUND_OPTIONS,
+  isPremiumPreset,
 } from "@/api/renders";
 import { getCaptionFontStack } from "@/data/captionStylePreview";
 import { getCaptionStylePreview } from "@/data/captionStylePreview";
+import { pillFracToSliderPx, pillSliderPxToFrac } from "@/lib/pillUnits";
+import { alignPatches, distributePatches } from "@/lib/alignDistribute";
 import { EDITOR } from "@/constants/testIds";
 
 const TABS = [
@@ -43,12 +46,15 @@ const TYPE_ICONS = {
   image: ImageIcon,
 };
 
+// Feature #15 — caption reveal animations. 'karaoke' is the per-word highlight
+// (default); the other three are line-reveal motions burned via ASS override
+// tags (services/caption_renderer.py). Order = button order.
 const ANIMATIONS = [
-  { id: "none", label: "None" },
+  { id: "karaoke", label: "Karaoke" },
   { id: "pop", label: "Pop" },
   { id: "fade", label: "Fade" },
-  { id: "bounce", label: "Bounce" },
-  { id: "karaoke", label: "Karaoke" },
+  { id: "slide-up", label: "Slide up" },
+  { id: "none", label: "None" },
 ];
 
 const POSITION_PRESETS = [
@@ -96,6 +102,70 @@ export const Inspector = ({ defaultTab = "style" }) => {
 
 /* ============================ STYLE ============================ */
 
+/* Feature #10 — align & distribute. Visible only with 2+ selected elements
+   (shift-click / marquee, feature #9). Pure math in lib/alignDistribute.js
+   over normalized centers; moveElementsTo applies each action as ONE
+   history frame (coalesce key per click via unique action names). */
+const ALIGN_ACTIONS = [
+  { id: "align-left", label: "⇤", title: "Align left", axis: "x", mode: "min" },
+  { id: "align-center-x", label: "⇹", title: "Align horizontal centers", axis: "x", mode: "center" },
+  { id: "align-right", label: "⇥", title: "Align right", axis: "x", mode: "max" },
+  { id: "align-top", label: "⤒", title: "Align top", axis: "y", mode: "min" },
+  { id: "align-center-y", label: "⇳", title: "Align vertical centers", axis: "y", mode: "center" },
+  { id: "align-bottom", label: "⤓", title: "Align bottom", axis: "y", mode: "max" },
+];
+
+const AlignDistributeSection = () => {
+  const selectedIds = useAppStore((s) => s.selectedIds);
+  const elements = useAppStore((s) => s.elements);
+  if (selectedIds.length < 2) return null;
+
+  const apply = (patches) => {
+    if (Object.keys(patches).length) {
+      useAppStore.getState().moveElementsTo(patches, null); // null key: distinct frame per click
+    }
+  };
+
+  return (
+    <div>
+      <SectionTitle>Align · {selectedIds.length} selected</SectionTitle>
+      <div className="grid grid-cols-6 gap-1 mb-2">
+        {ALIGN_ACTIONS.map((a) => (
+          <button
+            key={a.id}
+            data-testid={`editor-${a.id}`}
+            title={a.title}
+            onClick={() => apply(alignPatches(elements, selectedIds, a.axis, a.mode))}
+            className="py-1.5 rounded border border-[#2a2a35] text-[#a1a1aa] hover:text-white hover:border-[#7c3aed]/50 text-sm leading-none transition-colors"
+          >
+            {a.label}
+          </button>
+        ))}
+      </div>
+      {selectedIds.length >= 3 && (
+        <div className="grid grid-cols-2 gap-1">
+          <button
+            data-testid="editor-distribute-x"
+            title="Distribute horizontally (even center spacing)"
+            onClick={() => apply(distributePatches(elements, selectedIds, "x"))}
+            className="py-1.5 rounded border border-[#2a2a35] text-[11px] text-[#a1a1aa] hover:text-white hover:border-[#7c3aed]/50 transition-colors"
+          >
+            Distribute ↔
+          </button>
+          <button
+            data-testid="editor-distribute-y"
+            title="Distribute vertically (even center spacing)"
+            onClick={() => apply(distributePatches(elements, selectedIds, "y"))}
+            className="py-1.5 rounded border border-[#2a2a35] text-[11px] text-[#a1a1aa] hover:text-white hover:border-[#7c3aed]/50 transition-colors"
+          >
+            Distribute ↕
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const StyleTab = () => {
   const elements = useAppStore((s) => s.elements);
   const selectedId = useAppStore((s) => s.selectedElementId);
@@ -104,6 +174,7 @@ const StyleTab = () => {
   return (
     <>
       <ElementList />
+      <AlignDistributeSection />
       <PositionSection />
       {selected?.type === "caption" && <CaptionSection element={selected} />}
       {selected?.type === "headline" && <HeadlineSection element={selected} />}
@@ -244,7 +315,14 @@ const CaptionSection = ({ element }) => {
                 className="w-3.5 h-3.5 rounded-sm shrink-0 border border-white/10"
                 style={{ background: getCaptionStylePreview(p.id).colorHighlight }}
               />
-              {p.name}
+              <span className="truncate">{p.name}</span>
+              {/* Feature #21 — premium presets carry a PRO tag; free users can
+                  select+preview but the export gate (402) blocks the render. */}
+              {isPremiumPreset(p.id) && (
+                <span className="ml-auto text-[8px] font-bold tracking-wide text-[#22ff9c] bg-[#22ff9c]/12 px-1 py-0.5 rounded shrink-0">
+                  PRO
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -286,31 +364,34 @@ const CaptionSection = ({ element }) => {
         />
       </div>
 
-      {/* Animation — disabled: the burn path does not yet render caption
-          entrance animations (BUG-001 partial fix). Kept visible with a
-          "coming soon" hint, same pattern as the Font dropdown above, so the
-          UI intent is preserved without silently drifting preview from export. */}
+      {/* Feature #15 — caption reveal animation. Now live in the burn: the
+          selection rides caption_animation to the export. 'karaoke' keeps the
+          per-word highlight; pop/fade/slide-up are line-reveal motions. */}
       <div>
         <SectionTitle>Animation</SectionTitle>
-        <div className="flex flex-wrap gap-1.5 opacity-50 pointer-events-none select-none">
-          {ANIMATIONS.map((a) => (
-            <button
-              key={a.id}
-              data-testid={EDITOR.animationBtn(a.id)}
-              disabled
-              title="Caption animations coming soon — not applied in export yet."
-              className={`px-2.5 py-1.5 rounded-md text-[11px] font-medium border cursor-not-allowed ${
-                a.id === "none"
-                  ? "border-[#7c3aed] bg-[#7c3aed]/12 text-white"
-                  : "border-[#22222c] bg-[#131318] text-[#9a9aa6]"
-              }`}
-            >
-              {a.label}
-            </button>
-          ))}
+        <div className="flex flex-wrap gap-1.5">
+          {ANIMATIONS.map((a) => {
+            const active = (animation || "karaoke") === a.id;
+            return (
+              <button
+                key={a.id}
+                data-testid={EDITOR.animationBtn(a.id)}
+                onClick={() => patch({ animation: a.id })}
+                title={`Caption reveal: ${a.label}`}
+                className={`px-2.5 py-1.5 rounded-md text-[11px] font-medium border transition-colors ${
+                  active
+                    ? "border-[#7c3aed] bg-[#7c3aed]/12 text-white"
+                    : "border-[#22222c] bg-[#131318] text-[#9a9aa6] hover:text-white hover:border-[#7c3aed]/40"
+                }`}
+              >
+                {a.label}
+              </button>
+            );
+          })}
         </div>
         <p className="text-[10px] text-[#5a5a66] mt-1.5">
-          Caption animations coming soon — not applied in export yet.
+          Karaoke highlights each word as spoken; Pop / Fade / Slide up animate each
+          line as it appears.
         </p>
       </div>
 
@@ -350,17 +431,20 @@ const CaptionSection = ({ element }) => {
               value={pill.opacity}
               onChange={(v) => patchPill({ opacity: v })}
             />
+            {/* Feature #4: stored as fraction-of-canvas-height (same unit as
+                text Size) so pill and text scale together on every aspect and
+                in the burn; the slider still edits familiar px-at-9:16 numbers. */}
             <LabeledSlider
               testId={EDITOR.pillPadding}
               label="Padding" min={0} max={24} step={1}
-              value={pill.padding}
-              onChange={(v) => patchPill({ padding: v })}
+              value={pillFracToSliderPx(pill.padding)}
+              onChange={(v) => patchPill({ padding: pillSliderPxToFrac(v) })}
             />
             <LabeledSlider
               testId={EDITOR.pillRadius}
               label="Radius" min={0} max={24} step={1}
-              value={pill.radius}
-              onChange={(v) => patchPill({ radius: v })}
+              value={pillFracToSliderPx(pill.radius)}
+              onChange={(v) => patchPill({ radius: pillSliderPxToFrac(v) })}
             />
           </div>
         )}

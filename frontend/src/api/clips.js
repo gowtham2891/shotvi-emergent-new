@@ -1,4 +1,11 @@
-import { client, toApiError, outputFileUrl, thumbnailFileUrl, downloadFileUrl } from "@/api/client";
+import {
+  client,
+  toApiError,
+  outputFileUrl,
+  thumbnailFileUrl,
+  downloadFileUrl,
+  pathBasename,
+} from "@/api/client";
 
 // ── ClipOut → UI shape ───────────────────────────────────────────
 
@@ -23,7 +30,10 @@ export function mapClipToUi(clipOut, index, jobId) {
     hook: clipOut.hook_text || "",
     hookEn: clipOut.why || "",
     engagementType: clipOut.engagement_type || "",
-    virality: Math.round(clipOut.virality_score || 0),
+    // Feature #7: the backend's virality_score is 0-10 (compute_virality_score
+    // caps at 10.0); every display — gauge colour thresholds, "scored X/100"
+    // copy, avg % — speaks 0-100, so scale once here.
+    virality: Math.min(Math.round((clipOut.virality_score || 0) * 10), 100),
     rank: clipOut.rank,
     duration: Math.round(clipOut.duration || 0),
     start: clipOut.start,
@@ -32,6 +42,16 @@ export function mapClipToUi(clipOut, index, jobId) {
     // middle). Required for correct clip-local transcript remap. Empty until
     // the backend exposes segments on ClipOut — see proposed diff.
     segments: clipOut.segments || [],
+    // Caption-sync fix: energy-refined cut boundaries — t=0 of the actual cut
+    // file. snake_case on purpose: getClipWords/getWordsForRange mirror the
+    // backend byte-for-byte and read these under their wire names.
+    refined_start: clipOut.refined_start ?? null,
+    refined_end: clipOut.refined_end ?? null,
+    refined_segments: clipOut.refined_segments || [],
+    // Feature #6: Gemini-tagged punch words (clip-local raw indices, the
+    // lineSplits index space). Auto-set fallback when the user hasn't
+    // materialized transcriptEdits.emphasisIndices yet.
+    emphasis_indices: clipOut.emphasis_indices || [],
     startAt: formatTimecode(clipOut.start),
     thumbnail: thumbnailFileUrl(clipOut.thumbnail_path),
     // Playable URLs via the static /outputs mount.
@@ -55,6 +75,32 @@ export function mapClipToUi(clipOut, index, jobId) {
 }
 
 export const clipDownloadUrl = (serverPath) => downloadFileUrl(serverPath);
+
+// Authenticated download. GET /clips/download requires the Supabase bearer
+// token, and a plain <a href> browser navigation cannot carry it (the click
+// 401s with "Missing bearer token"). Fetch the file through the SAME authed
+// axios client every API call uses, then hand the bytes to the browser as a
+// one-shot object-URL save.
+export async function downloadClip(serverPath) {
+  try {
+    const { data } = await client.get("/clips/download", {
+      params: { path: serverPath },
+      responseType: "blob",
+    });
+    const name = pathBasename(serverPath) || "shotvi-clip.mp4";
+    const url = URL.createObjectURL(data);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    return name;
+  } catch (err) {
+    throw toApiError(err, "Could not download the clip");
+  }
+}
 
 // ── Editor drafts (7-day Redis TTL server-side) ──────────────────
 

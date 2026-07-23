@@ -18,8 +18,19 @@ export function resolveEditorKey(e, isEditing) {
     const k = typeof e.key === "string" ? e.key.toLowerCase() : "";
     if (k === "y" || (k === "z" && e.shiftKey)) return { action: "redo", preventDefault: true };
     if (k === "z") return { action: "undo", preventDefault: true };
+    // Feature #8 — element hotkeys. Dispatched by EditorHotkeys (NOT
+    // CanvasArea — its switch ignores unknown actions; see that file's
+    // single-listener warning: both listeners share THIS resolver and the
+    // same typing guard, so precedence cannot diverge).
+    if (k === "d") return { action: "duplicateSelected", preventDefault: true }; // stop browser bookmark
+    if (k === "c" && !e.shiftKey) return { action: "copySelected" };  // native copy still fires (harmless without a text selection)
+    if (k === "v" && !e.shiftKey) return { action: "pasteElement" };
     return { action: "passthrough" }; // other browser combos stay native
   }
+  // Feature #8 — z-order: [ sends the selected element backward, ] brings
+  // it forward (CapCut/Figma convention).
+  if (e.key === "[") return { action: "zOrderBackward" };
+  if (e.key === "]") return { action: "zOrderForward" };
 
   if (e.code === "Space") {
     // preventDefault in both cases: stops page scroll AND stops a still-

@@ -127,6 +127,23 @@ class RerenderRequest(BaseModel):
     # same fonts, same k-values, same \an5\pos; timestamps untouched).
     caption_script:    str                       = "telugu"
 
+    # Feature #6 — keyword emphasis. Clip-local word indices (the lineSplits
+    # index space) to emphasize in the burn. None (old payloads) → the clip's
+    # own Gemini-tagged set renders; an explicit list — INCLUDING [] — is the
+    # editor's final say (user toggles, possibly none).
+    emphasis_indices:  Optional[List[int]]       = None
+
+    # Feature #14 — filler/silence removal. [[start,end], ...] clip-local
+    # seconds to CUT from the clip. None/[] → no cuts (byte-identical). The
+    # worker drops these spans (trim/atrim+concat) and remaps caption/zoom/
+    # trim timings onto the shortened timeline (services/filler_removal.py).
+    cut_spans:         Optional[List[List[float]]] = None
+
+    # Feature #15 — caption reveal animation. 'karaoke' (default) keeps the
+    # per-word highlight burn byte-identical; 'none'/'pop'/'fade'/'slide-up'
+    # switch to a one-event-per-line reveal (services/caption_renderer.py).
+    caption_animation: str                       = "karaoke"
+
     @field_validator("bg_color")
     @classmethod
     def _bg_color_must_be_hex_triplet(cls, v: str) -> str:
@@ -156,6 +173,12 @@ class BillingStatusOut(BaseModel):
     subscription_id:     str = ""
     configured:          bool = False   # False → Razorpay env absent; UI shows a "not configured" state
     plan_info:           Optional[PlanInfo] = None  # the paid plan on offer (price/name), when configured
+    # Tier entitlements + usage (features #17–20) — the UI reads these to show
+    # the watermark badge, the render-minute meter, and the clip-expiry notice.
+    watermark:           bool = True     # #17 — free tier's exports are watermarked
+    render_minutes_used: float = 0.0     # #18 — consumed this calendar month
+    render_minutes_budget: float = 0.0   # #18 — tier budget + any top-up pack
+    expiry_hours:        Optional[int] = 24  # #20 — published-clip TTL; None = no expiry
 
 
 class SubscriptionCreateOut(BaseModel):
@@ -176,6 +199,17 @@ class ClipOut(BaseModel):
     end:              float
     duration:         float
     segments:         List[dict] = []   # [{start_sent_id, end_sent_id}] — >1 entry = dead zone cut out; needed for clip-local transcript remap
+    # Caption-sync fix: the energy-refined boundaries the cutter ACTUALLY used.
+    # t=0 of the cut file is refined_start (not start); multi-segment clips
+    # carry per-segment refined spans instead. None/[] for pre-fix clips —
+    # consumers fall back to start / sentence spans (the old drifty behavior).
+    refined_start:    Optional[float] = None
+    refined_end:      Optional[float] = None
+    refined_segments: List[dict] = []   # [{start, end}] aligned 1:1 with segments
+    # Feature #6: Gemini-tagged punch words as indices into the clip's
+    # filtered word array (the lineSplits index space). Seeds the editor's
+    # emphasis set; the user's toggles ride RerenderRequest.emphasis_indices.
+    emphasis_indices: List[int] = []
     raw_path:         Optional[str] = None
     video_path:       Optional[str] = None
     vertical_path:    Optional[str] = None

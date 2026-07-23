@@ -530,6 +530,24 @@ const WordToken = ({ word, wordCount, isLineStart, lineSplits }) => {
   const isTanglishView = useAppStore(
     (s) => s.exportSettings.captionScript === "tanglish"
   );
+  // Feature #6 — keyword emphasis. Effective set = materialized user toggles
+  // (transcriptEdits.emphasisIndices) or the clip's Gemini auto set.
+  const isEmphasized = useAppStore((s) => {
+    const set = Array.isArray(s.transcriptEdits.emphasisIndices)
+      ? s.transcriptEdits.emphasisIndices
+      : s.currentClip?.emphasis_indices || [];
+    return set.includes(word.rawIdx);
+  });
+  // Feature #14 — filler/silence removal. A word inside an active cut span
+  // renders struck-through; click restores that span. Returns the span's
+  // start (the restore key) or null.
+  const cutSpanStart = useAppStore((s) => {
+    const spans = s.exportSettings.cutSpans;
+    if (!Array.isArray(spans)) return null;
+    const mid = (word.start + word.end) / 2;
+    const hit = spans.find((sp) => mid >= sp.start && mid < sp.end);
+    return hit ? hit.start : null;
+  });
 
   // Two texts per word: the Telugu source (what edits STORE — Telugu remains
   // the source of truth) and the display text (script-aware — follows the
@@ -722,19 +740,44 @@ const WordToken = ({ word, wordCount, isLineStart, lineSplits }) => {
         value={value}
         onChange={onChange}
         onKeyDown={onKeyDown}
-        onClick={() => {
+        onClick={(e) => {
+          // Feature #14: a struck-through (cut) word — click restores its span.
+          if (cutSpanStart != null) {
+            e.preventDefault();
+            useAppStore.getState().restoreCutSpan(cutSpanStart);
+            return;
+          }
+          // Feature #6: Alt+click toggles keyword emphasis (bigger/bolder/
+          // highlighted in captions). Plain click keeps the existing seek.
+          if (e.altKey) {
+            e.preventDefault();
+            useAppStore.getState().toggleEmphasis(word.rawIdx);
+            return;
+          }
           if (!dirty) useAppStore.getState().seek(word.start + 0.02);
         }}
         onBlur={() => (dirty ? commitTyped(draft) : reset())}
         spellCheck={false}
         autoComplete="off"
+        readOnly={cutSpanStart != null}
+        title={
+          cutSpanStart != null
+            ? "Removed on export (filler/silence) — click to restore"
+            : isEmphasized
+              ? "Emphasized in captions — Alt+click to remove"
+              : "Alt+click to emphasize in captions"
+        }
         style={{ width: `${Math.max(value.length, 2) + 1.5}ch` }}
         className={`px-1.5 py-1 rounded text-xs font-medium text-center border outline-none transition-all ${
-          isActive
+          cutSpanStart != null
+            ? "bg-[#1a1116] text-[#8a5a6a] border-[#5a2a3a]/50 line-through opacity-70 hover:opacity-100"
+            : isActive
             ? "bg-[#7c3aed] text-white border-[#7c3aed] shadow-[0_0_12px_rgba(124,58,237,0.6)]"
-            : isEdited
-              ? "bg-[#111116] text-[#d8cdfa] border-[#7c3aed]/60"
-              : "bg-[#111116] text-[#a1a1aa] border-[#2a2a35] hover:text-white hover:border-[#7c3aed]/40"
+            : isEmphasized
+              ? "bg-amber-500/10 text-amber-300 border-amber-500/60 font-bold hover:text-amber-200"
+              : isEdited
+                ? "bg-[#111116] text-[#d8cdfa] border-[#7c3aed]/60"
+                : "bg-[#111116] text-[#a1a1aa] border-[#2a2a35] hover:text-white hover:border-[#7c3aed]/40"
         } focus:border-[#7c3aed] focus:text-white focus:bg-[#16161d]`}
       />
       {/* Edited-word tick: this word carries a wordEdits delta. Amber =

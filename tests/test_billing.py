@@ -63,6 +63,15 @@ class _FakeRedis:
     def hgetall(self, key):
         return dict(self.h.get(key, {}))
 
+    def hget(self, key, field):
+        return self.h.get(key, {}).get(field)
+
+    def hincrbyfloat(self, key, field, amount):
+        d = self.h.setdefault(key, {})
+        cur = float(d.get(field, 0) or 0) + float(amount)
+        d[field] = str(cur)
+        return cur
+
     def hset(self, key, mapping=None, **kw):
         d = self.h.setdefault(key, {})
         if mapping:

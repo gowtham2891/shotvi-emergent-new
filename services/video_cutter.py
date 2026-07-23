@@ -257,18 +257,24 @@ def get_segment_timestamps(clip: dict, sent_by_id: dict):
     return result if len(result) > 1 else None
 
 
-def cut_multi_segment_clip(video_path: str, segments: list, output_path: str, y, sr) -> bool:
+def cut_multi_segment_clip(video_path: str, segments: list, output_path: str, y, sr):
     """
     Cut a multi-segment clip: cut each segment separately (with the same
     boundary refinement used for single-segment clips), then concatenate
     them into one continuous output file. Used for clips where Gemini cut
     a dead zone out of the middle via the segments array (sponsor reads,
     intro animation, mid-video recaps, etc).
+
+    Returns (success, refined_segments) — the per-segment refined boundaries
+    actually used for cutting, so the caption stage can build word timings on
+    the stitched output file's REAL timeline (caption-sync fix): each output
+    segment starts at its refined_start, not the raw CTC segment start.
     """
     tmp_dir = output_path + "_segs"
     os.makedirs(tmp_dir, exist_ok=True)
 
     seg_paths = []
+    refined_segments = []
     for i, seg in enumerate(segments):
         seg_path = os.path.join(tmp_dir, f"seg{i}.mp4").replace("\\", "/")
 
@@ -287,8 +293,12 @@ def cut_multi_segment_clip(video_path: str, segments: list, output_path: str, y,
                 except OSError: pass
             try: os.rmdir(tmp_dir)
             except OSError: pass
-            return False
+            return False, []
         seg_paths.append(seg_path)
+        refined_segments.append({
+            "start": round(refined_start, 3),
+            "end":   round(refined_end,   3),
+        })
 
     # Concatenate segments
     list_path = output_path + ".concat.txt"
@@ -320,8 +330,8 @@ def cut_multi_segment_clip(video_path: str, segments: list, output_path: str, y,
 
     if result.returncode != 0:
         print(f"  ✗ Concat error: {result.stderr[-300:]}")
-        return False
-    return True
+        return False, []
+    return True, refined_segments
 
 
 def cut_all_clips(clips_path: str, video_path: str, output_dir: str = "storage/outputs") -> list:
@@ -387,9 +397,18 @@ def cut_all_clips(clips_path: str, video_path: str, output_dir: str = "storage/o
             print(f"  Multi-segment clip: {len(seg_timestamps)} parts")
             for j, seg in enumerate(seg_timestamps):
                 print(f"    Part {j+1}: {seg['start']:.2f}s → {seg['end']:.2f}s")
-            success = cut_multi_segment_clip(video_path, seg_timestamps, output_path, y, sr)
+            success, refined_segments = cut_multi_segment_clip(
+                video_path, seg_timestamps, output_path, y, sr)
+            if success:
+                # Caption-sync fix: persist the boundaries the cutter ACTUALLY
+                # used, so caption timing is built on the output file's real
+                # timeline instead of the raw CTC clip start (≤0.5s drift).
+                clip["refined_segments"] = refined_segments
         else:
             success = cut_clip(video_path, refined_start, refined_end, output_path)
+            if success:
+                clip["refined_start"] = round(refined_start, 3)
+                clip["refined_end"]   = round(refined_end,   3)
 
         if success:
             size_mb = os.path.getsize(output_path) / (1024 * 1024)
@@ -405,6 +424,17 @@ def cut_all_clips(clips_path: str, video_path: str, output_dir: str = "storage/o
                 print(f"  ⚠ Thumbnail failed (non-fatal): {e}")
         else:
             print(f"  ✗ Failed to cut clip {i}")
+
+    # Persist refined boundaries back into the clips JSON so every later
+    # stage (pipeline captions, re-renders, ClipOut → frontend preview) shares
+    # the same t=0 as the cut files. Old JSONs without these keys keep the
+    # pre-fix behavior via .get(..., clip["start"]) fallbacks downstream.
+    try:
+        with open(clips_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        print(f"✓ Refined boundaries saved into {clips_path}")
+    except OSError as e:
+        print(f"⚠ Could not persist refined boundaries: {e}")
 
     print(f"\n{'='*60}")
     print(f"✓ Cut {len(cut_paths)}/{len(clips)} clips successfully")

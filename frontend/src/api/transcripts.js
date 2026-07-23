@@ -42,7 +42,13 @@ export async function getSegmentSidecar(verticalPath) {
 // use on the wire (apply_transcript_edits.py). The ref must be captured here,
 // before the empty-text filter below, because dropping empties means a word's
 // clip-local array position no longer matches its global index.
-export function getWordsForRange(transcript, clipStart, clipEnd) {
+// timeZero (caption-sync fix): absolute timestamp that is t=0 of the cut
+// output file — the energy-refined start the cutter actually used (served as
+// clip.refined_start). Selection still windows on [clipStart, clipEnd] so the
+// filtered word array (the index space for lineSplits/wordEdits) is unchanged;
+// only the time base shifts. Defaults to clipStart for pre-fix clips.
+export function getWordsForRange(transcript, clipStart, clipEnd, timeZero = null) {
+  const zero = timeZero ?? clipStart;
   let rawWords = (transcript?.word_timestamps || []).map((w, index) => ({
     w,
     ref: { type: "flat", index },
@@ -72,8 +78,8 @@ export function getWordsForRange(transcript, clipStart, clipEnd) {
         ref,
         text,
         text_tanglish: tanglish || null,
-        start: round3(Math.max(w.start, clipStart) - clipStart),
-        end: round3(Math.min(w.end, clipEnd) - clipStart),
+        start: round3(Math.max(0, Math.max(w.start, clipStart) - zero)),
+        end: round3(Math.max(0, Math.min(w.end, clipEnd) - zero)),
       });
     }
   }
@@ -86,20 +92,27 @@ export function getWordsForRange(transcript, clipStart, clipEnd) {
 export function getClipWords(transcript, clip) {
   const segments = clip?.segments || [];
   if (segments.length <= 1) {
-    return getWordsForRange(transcript, clip.start, clip.end);
+    return getWordsForRange(transcript, clip.start, clip.end, clip.refined_start ?? null);
   }
   const sentById = new Map((transcript?.sentences || []).map((s) => [s.id, s]));
+  // Caption-sync fix: the cutter refines each segment's boundaries before
+  // concatenating — the stitched file's segments start at refined.start and
+  // last (refined.end - refined.start). Mirror of get_words_for_multisegment_clip.
+  const refined =
+    (clip?.refined_segments?.length || 0) === segments.length ? clip.refined_segments : null;
   const all = [];
   let outputOffset = 0;
-  for (const seg of segments) {
+  for (let i = 0; i < segments.length; i++) {
+    const seg = segments[i];
     const sStart = sentById.get(Number(seg.start_sent_id))?.start ?? 0;
     const sEnd = sentById.get(Number(seg.end_sent_id))?.end ?? 0;
-    for (const w of getWordsForRange(transcript, sStart, sEnd)) {
+    const zero = refined ? refined[i].start : null;
+    for (const w of getWordsForRange(transcript, sStart, sEnd, zero)) {
       // Spread keeps id/ref intact: the global address survives the stacking,
       // even though the word's output-timeline position has moved.
       all.push({ ...w, start: round3(outputOffset + w.start), end: round3(outputOffset + w.end) });
     }
-    outputOffset += sEnd - sStart;
+    outputOffset += refined ? refined[i].end - refined[i].start : sEnd - sStart;
   }
   return all;
 }
