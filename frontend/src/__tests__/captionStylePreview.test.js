@@ -101,8 +101,11 @@ describe("CAPTION_STYLE_PREVIEW — sanity-checked against style names, not just
     for (const [id, style] of Object.entries(CAPTION_STYLE_PREVIEW)) {
       expect(style.colorHighlight).toBeTruthy();
       expect(style.colorUnspoken === "transparent" || style.colorUnspoken).toBeTruthy();
-      // No style should render pure black text — every style burns
-      // light/bright text onto dark video for legibility.
+      // Black text is only legible ON A LIGHT BOX. The "classic" preset
+      // (feature #16) deliberately burns black text onto an opaque white box —
+      // legit and legible. Every BOX-LESS style must still use bright text so
+      // it reads on dark video.
+      if (style.box) continue;
       expect(style.colorHighlight).not.toBe("#000000");
       if (style.colorUnspoken !== "transparent") {
         expect(style.colorUnspoken).not.toBe("#000000");
@@ -154,5 +157,17 @@ describe("Deterministic Telugu font stack (Known Issue 2 — WYSIWYG preview)", 
     // Unknown / undefined → deterministic Noto stack (never OS Telugu font).
     expect(getCaptionFontStack("SomeUnknown")).toMatch(/^"Noto Sans Telugu"/);
     expect(getCaptionFontStack(undefined)).toMatch(/^"Noto Sans Telugu"/);
+  });
+
+  test("getCaptionFontStack leads with each bundled Latin family (feature #16)", () => {
+    // Tanglish mode selects one of the 6 bundled Latin display fonts; each
+    // stack must lead with its own @font-face family (byte-identical .ttf to
+    // the burn) before any OS fallback.
+    expect(getCaptionFontStack("Montserrat")).toMatch(/^"Montserrat"/);
+    expect(getCaptionFontStack("Anton")).toMatch(/^"Anton"/);
+    expect(getCaptionFontStack("Bebas Neue")).toMatch(/^"Bebas Neue"/);
+    expect(getCaptionFontStack("Oswald")).toMatch(/^"Oswald"/);
+    expect(getCaptionFontStack("Poppins")).toMatch(/^"Poppins"/);
+    expect(getCaptionFontStack("Inter")).toMatch(/^"Inter"/);
   });
 });

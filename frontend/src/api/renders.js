@@ -21,34 +21,62 @@ export const CAPTION_STYLES = [
   { id: "big-bold", name: "Big Bold" },
   { id: "typewriter", name: "Typewriter" },
   { id: "split-color", name: "Split Color" },
-  // Feature #16 — 6 new preset bundles.
-  { id: "purple-punch", name: "Purple Punch" },
-  { id: "ocean-blue", name: "Ocean Blue" },
-  { id: "sunshine", name: "Sunshine" },
-  { id: "mono-bold", name: "Mono Bold" },
-  { id: "pink-pop", name: "Pink Pop" },
-  { id: "lime-shock", name: "Lime Shock" },
+  // Feature #16 (research-grounded) — Replix's 9 named presets + the market
+  // "Hormozi formula". Each maps to a recommended Latin font for Tanglish mode
+  // (latinFont); Telugu mode keeps the user's Telugu pick.
+  { id: "classic", name: "Classic", latinFont: "Poppins" },
+  { id: "yellow", name: "Yellow", latinFont: "Poppins" },
+  { id: "minimal", name: "Minimal", latinFont: "Inter" },
+  { id: "dark", name: "Dark", latinFont: "Montserrat" },
+  { id: "punch", name: "Punch", latinFont: "Anton" },
+  { id: "cove", name: "Cove", latinFont: "Poppins" },
+  { id: "spotlight", name: "Spotlight", latinFont: "Montserrat" },
+  { id: "reel", name: "Reel", latinFont: "Bebas Neue" },
+  { id: "noir", name: "Noir", latinFont: "Oswald" },
+  { id: "hormozi-caps", name: "Hormozi Caps", latinFont: "Montserrat" },
 ];
 export const DEFAULT_STYLE_ID = "bold-yellow";
 export const isKnownStyle = (id) => CAPTION_STYLES.some((s) => s.id === id);
+export const presetLatinFont = (id) =>
+  CAPTION_STYLES.find((s) => s.id === id)?.latinFont || null;
 
 // Feature #21 — premium presets (mirror of api/tiers.PREMIUM_PRESETS). Free
 // users SEE them in the gallery but the export gate (backend 402) blocks
-// exporting with one; the Inspector marks them "PRO".
+// exporting with one; the Inspector marks them "PRO". Mirrors Replix's own
+// free/paid split.
 export const PREMIUM_PRESET_IDS = new Set([
-  "purple-punch", "ocean-blue", "sunshine", "mono-bold", "pink-pop", "lime-shock",
+  "punch", "cove", "spotlight", "reel", "noir",
 ]);
 export const isPremiumPreset = (id) => PREMIUM_PRESET_IDS.has(id);
 
-// ── Caption fonts ────────────────────────────────────────────────
-// The three bundled Telugu caption fonts the backend resolves deterministically
-// via libass fontsdir (services/fonts.py :: CAPTION_FONTS). Order = dropdown
-// order; the first is the default the backend falls back to when caption_font
-// is omitted, so an untouched default selection must NOT be serialized (keeps
-// default exports byte-identical to before the dropdown existed).
-export const CAPTION_FONTS = ["Noto Sans Telugu", "Ramabhadra", "Mandali"];
-export const DEFAULT_CAPTION_FONT = "Noto Sans Telugu";
+// ── Caption fonts (script-aware — feature #16) ───────────────────
+// Telugu-script captions use the 3 bundled Telugu fonts; Tanglish (Latin
+// script) captions use the 6 bundled Latin display fonts. Both sets resolve
+// deterministically via libass fontsdir and load in the preview from the SAME
+// .ttf via public/fonts.css. Mirrors services/fonts.py exactly.
+export const TELUGU_CAPTION_FONTS = ["Noto Sans Telugu", "Ramabhadra", "Mandali"];
+export const LATIN_CAPTION_FONTS = ["Montserrat", "Anton", "Bebas Neue", "Oswald", "Poppins", "Inter"];
+export const DEFAULT_CAPTION_FONT = "Noto Sans Telugu";       // Telugu mode default
+export const DEFAULT_LATIN_CAPTION_FONT = "Montserrat";       // Tanglish default (Montserrat Black)
+
+// Legacy alias: the full set (both scripts). isKnownCaptionFont stays permissive.
+export const CAPTION_FONTS = [...TELUGU_CAPTION_FONTS, ...LATIN_CAPTION_FONTS];
 export const isKnownCaptionFont = (name) => CAPTION_FONTS.includes(name);
+export const isLatinCaptionFont = (name) => LATIN_CAPTION_FONTS.includes(name);
+
+// The dropdown list for a given script.
+export const fontsForScript = (script) =>
+  script === "tanglish" ? LATIN_CAPTION_FONTS : TELUGU_CAPTION_FONTS;
+
+// Script-aware resolution mirror (services/fonts.py :: resolve_caption_font):
+// a font invalid for the active script falls back to that script's default,
+// NEVER the other script's set (which would tofu).
+export const resolveCaptionFont = (name, script) => {
+  if (script === "tanglish") {
+    return LATIN_CAPTION_FONTS.includes(name) ? name : DEFAULT_LATIN_CAPTION_FONT;
+  }
+  return TELUGU_CAPTION_FONTS.includes(name) ? name : DEFAULT_CAPTION_FONT;
+};
 
 // Formats supported by FORMAT_CONFIG in api/worker.py. Output is always mp4
 // at fixed 1080-based canvas sizes — resolution/container are NOT selectable.

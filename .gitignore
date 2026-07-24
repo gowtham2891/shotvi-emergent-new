@@ -87,3 +87,8 @@ credentials.json
 *.key
 .credentials
 storage/
+
+# Font calibration samples — bulk Google Fonts download used once to measure
+# cap-heights; 74MB, not referenced at runtime. Only the 3 Telugu + 6 Latin
+# caption .ttf (immediate children of captions/) are the real bundled fonts.
+services/assets/fonts/captions/Akaya_Telivigala,Anek_Telugu,Baloo_Tammudu_2,Chathura,Google_Sans,etc/

@@ -167,16 +167,20 @@ def test_caption_fonts_bundled_and_resolvable():
 
 
 def test_caption_font_sizes_are_calibrated():
-    """Noto anchors each preset's size (keeps the preset's own font_size);
-    the heavier-metric fonts scale down to match Noto's cap-height."""
+    """Noto anchors each preset's size (keeps the preset's own font_size); the
+    taller-metric Telugu fonts scale down to match Noto's cap-height. The Latin
+    fonts (feature #16) are calibrated the same way but can scale slightly UP
+    (shorter metrics), so they only need to land in a sane range."""
     base = 62
     assert caption_font_size(base, "Noto Sans Telugu") == base
+    # Telugu fonts with k > the Noto anchor scale DOWN.
     for fam in ("Ramabhadra", "Mandali"):
         sz = caption_font_size(base, fam)
         assert 6 <= sz < base, f"{fam} size {sz} not scaled below Noto anchor {base}"
-    # every registered font has a calibration coefficient
+    # every registered font has a calibration coefficient and a sane size.
     for fam in CAPTION_FONTS:
         assert fam in CAPTION_FONT_CAP_K
+        assert 6 <= caption_font_size(base, fam) <= 2 * base
 
 
 # ── Real-path shaping check (the CI/Docker gate) ─────────────────────────────

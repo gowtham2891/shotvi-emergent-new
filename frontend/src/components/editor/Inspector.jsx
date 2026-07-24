@@ -22,10 +22,10 @@ import { useAppStore } from "@/store/useAppStore";
 // resolves deterministically via fontsdir (services/fonts.py :: CAPTION_FONTS).
 import {
   CAPTION_STYLES,
-  CAPTION_FONTS,
   EXPORT_FORMATS,
   BACKGROUND_OPTIONS,
   isPremiumPreset,
+  fontsForScript,
 } from "@/api/renders";
 import { getCaptionFontStack } from "@/data/captionStylePreview";
 import { getCaptionStylePreview } from "@/data/captionStylePreview";
@@ -289,10 +289,19 @@ const PositionSection = () => {
 const CaptionSection = ({ element }) => {
   const setCaptionPreset = useAppStore((s) => s.setCaptionPreset);
   const updateElementProps = useAppStore((s) => s.updateElementProps);
+  const captionScript = useAppStore((s) => s.exportSettings.captionScript);
   const { presetId, font, fontSize, animation, pill } = element.props;
 
   const patch = (p) => updateElementProps(element.id, p);
   const patchPill = (p) => patch({ pill: { ...pill, ...p } });
+
+  // Feature #16 — the font list is script-scoped: Telugu script shows the 3
+  // Telugu fonts, Tanglish the 6 Latin display fonts (services/fonts.py mirror).
+  const fontOptions = fontsForScript(captionScript);
+  // Replix parity: reveal animations run only on background-OFF (outline)
+  // styles; a boxed style plays no motion (the box would jitter). getPreview's
+  // bgOff flag is the single source of truth, mirrored from the backend STYLES.
+  const animatable = getCaptionStylePreview(presetId).bgOff;
 
   return (
     <>
@@ -328,20 +337,23 @@ const CaptionSection = ({ element }) => {
         </div>
       </div>
 
-      {/* Font — the three bundled Telugu caption fonts. The backend resolves
-          the selection deterministically via libass fontsdir (services/fonts.py
-          :: CAPTION_FONTS) and the preview renders the same @font-face family
-          from /public/fonts, so the dropdown is true WYSIWYG. Decoupled from
-          the preset (Stage 5): font is chosen here, style only drives colors. */}
+      {/* Font — script-scoped (feature #16). Telugu script → the 3 bundled
+          Telugu fonts; Tanglish → the 6 Latin display fonts (Montserrat Black
+          default). The backend resolves the selection deterministically via
+          libass fontsdir (services/fonts.py) and the preview renders the same
+          @font-face family from /public/fonts, so the dropdown is true WYSIWYG.
+          Decoupled from the preset (Stage 5): font is chosen here, style only
+          drives colors — except a Tanglish preset seeds its recommended Latin
+          font on pick (setCaptionPreset). */}
       <div>
-        <SectionTitle>Font</SectionTitle>
+        <SectionTitle>Font{captionScript === "tanglish" ? " (Latin)" : " (Telugu)"}</SectionTitle>
         <select
           data-testid={EDITOR.fontSelect}
           value={font}
           onChange={(e) => patch({ font: e.target.value })}
           className="w-full bg-[#131318] border border-[#22222c] rounded-md px-2 py-2 text-xs text-[#d7d7de] outline-none focus:border-[#7c3aed]/60"
         >
-          {CAPTION_FONTS.map((f) => (
+          {fontOptions.map((f) => (
             <option key={f} value={f} style={{ fontFamily: getCaptionFontStack(f) }}>
               {f}
             </option>
@@ -364,25 +376,36 @@ const CaptionSection = ({ element }) => {
         />
       </div>
 
-      {/* Feature #15 — caption reveal animation. Now live in the burn: the
-          selection rides caption_animation to the export. 'karaoke' keeps the
-          per-word highlight; pop/fade/slide-up are line-reveal motions. */}
+      {/* Feature #15 + #16 — caption reveal animation. The selection rides
+          caption_animation to the burn: 'karaoke' keeps the per-word highlight;
+          pop/fade/slide-up are line-reveal motions. Replix parity — reveal
+          MOTION runs only on background-OFF styles; a boxed style keeps just
+          karaoke/none (the box would jitter under a line reveal). */}
       <div>
         <SectionTitle>Animation</SectionTitle>
         <div className="flex flex-wrap gap-1.5">
           {ANIMATIONS.map((a) => {
             const active = (animation || "karaoke") === a.id;
+            // karaoke/none always available; the 3 line-reveal motions are
+            // gated to bg-off presets (animatable).
+            const isMotion = a.id !== "karaoke" && a.id !== "none";
+            const disabled = isMotion && !animatable;
             return (
               <button
                 key={a.id}
                 data-testid={EDITOR.animationBtn(a.id)}
-                onClick={() => patch({ animation: a.id })}
-                title={`Caption reveal: ${a.label}`}
+                onClick={() => !disabled && patch({ animation: a.id })}
+                disabled={disabled}
+                title={
+                  disabled
+                    ? `${a.label} needs a background-off style (this preset has a background box)`
+                    : `Caption reveal: ${a.label}`
+                }
                 className={`px-2.5 py-1.5 rounded-md text-[11px] font-medium border transition-colors ${
                   active
                     ? "border-[#7c3aed] bg-[#7c3aed]/12 text-white"
                     : "border-[#22222c] bg-[#131318] text-[#9a9aa6] hover:text-white hover:border-[#7c3aed]/40"
-                }`}
+                } ${disabled ? "opacity-35 cursor-not-allowed hover:border-[#22222c] hover:text-[#9a9aa6]" : ""}`}
               >
                 {a.label}
               </button>
@@ -390,8 +413,9 @@ const CaptionSection = ({ element }) => {
           })}
         </div>
         <p className="text-[10px] text-[#5a5a66] mt-1.5">
-          Karaoke highlights each word as spoken; Pop / Fade / Slide up animate each
-          line as it appears.
+          {animatable
+            ? "Karaoke highlights each word as spoken; Pop / Fade / Slide up animate each line as it appears."
+            : "This style has a background box — only Karaoke and None are available. Pick a background-off style to enable reveal motion."}
         </p>
       </div>
 

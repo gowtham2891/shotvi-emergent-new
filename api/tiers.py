@@ -64,9 +64,11 @@ CREDIT_PACK = {
 
 # Feature #21 — the caption presets that require a paid tier to EXPORT. Free
 # users still SEE them in the gallery (marketing); the export gate rejects a
-# free-tier export that selected one. These are the 6 added in feature #16.
+# free-tier export that selected one. Mirrors Replix's own free/paid split:
+# free = classic/yellow/minimal/dark (+ the market hormozi-caps); paid =
+# punch/cove/spotlight/reel/noir.
 PREMIUM_PRESETS = frozenset({
-    "purple-punch", "ocean-blue", "sunshine", "mono-bold", "pink-pop", "lime-shock",
+    "punch", "cove", "spotlight", "reel", "noir",
 })
 
 

@@ -142,60 +142,58 @@ export const RAW_STYLES = {
     borderStyle: 1,
     shadow: 1,
   },
-  // Feature #16 — transcribed from services/caption_renderer.py :: STYLES.
-  "purple-punch": {
-    colorHighlight: "&H00F755A8",
-    colorSpoken: "&H00999999",
-    colorUnspoken: "&H00FFFFFF",
-    backColor: "&H30000000",
-    outlineWidth: 3,
-    borderStyle: 1,
-    shadow: 0,
+  // Feature #16 (research-grounded) — Replix's 9 + Hormozi formula.
+  // Transcribed verbatim from services/caption_renderer.py :: STYLES, incl.
+  // the new keys uppercase/glow/bgOff the preview + Inspector read.
+  "classic": {
+    colorHighlight: "&H00000000", colorSpoken: "&H00000000", colorUnspoken: "&H00888888",
+    backColor: "&H00FFFFFF", outlineWidth: 0, borderStyle: 4, shadow: 0,
+    uppercase: false, glow: false, bgOff: false,
   },
-  "ocean-blue": {
-    colorHighlight: "&H00EED322",
-    colorSpoken: "&H00888888",
-    colorUnspoken: "&H00FFFFFF",
-    backColor: "&H00000000",
-    outlineWidth: 3,
-    borderStyle: 1,
-    shadow: 1,
+  "yellow": {
+    colorHighlight: "&H0000FFFF", colorSpoken: "&H00AAAAAA", colorUnspoken: "&H00FFFFFF",
+    backColor: "&H00000000", outlineWidth: 3, borderStyle: 1, shadow: 0,
+    uppercase: false, glow: false, bgOff: true,
   },
-  "sunshine": {
-    colorHighlight: "&H003C92FB",
-    colorSpoken: "&H00AAAAAA",
-    colorUnspoken: "&H00FFFFFF",
-    backColor: "&H00000000",
-    outlineWidth: 3,
-    borderStyle: 1,
-    shadow: 0,
+  "minimal": {
+    colorHighlight: "&H00FFFFFF", colorSpoken: "&H00CCCCCC", colorUnspoken: "&H00AAAAAA",
+    backColor: "&H00000000", outlineWidth: 2, borderStyle: 1, shadow: 1,
+    uppercase: false, glow: false, bgOff: true,
   },
-  "mono-bold": {
-    colorHighlight: "&H00FFFFFF",
-    colorSpoken: "&H00BBBBBB",
-    colorUnspoken: "&H00FFFFFF",
-    backColor: "&H00000000",
-    outlineWidth: 4,
-    borderStyle: 1,
-    shadow: 0,
+  "dark": {
+    colorHighlight: "&H0000FFFF", colorSpoken: "&H00AAAAAA", colorUnspoken: "&H00FFFFFF",
+    backColor: "&HDD000000", outlineWidth: 0, borderStyle: 4, shadow: 0,
+    uppercase: false, glow: false, bgOff: false,
   },
-  "pink-pop": {
-    colorHighlight: "&H009948EC",
-    colorSpoken: "&H00888888",
-    colorUnspoken: "&H00FFFFFF",
-    backColor: "&HCC000000",
-    outlineWidth: 3,
-    borderStyle: 3,
-    shadow: 0,
+  "punch": {
+    colorHighlight: "&H009348EC", colorSpoken: "&H00888888", colorUnspoken: "&H00FFFFFF",
+    backColor: "&HCC000000", outlineWidth: 0, borderStyle: 4, shadow: 0,
+    uppercase: true, glow: false, bgOff: false,
   },
-  "lime-shock": {
-    colorHighlight: "&H0035E6A3",
-    colorSpoken: "&H00227700",
-    colorUnspoken: "&H00FFFFFF",
-    backColor: "&H20000000",
-    outlineWidth: 3,
-    borderStyle: 1,
-    shadow: 0,
+  "cove": {
+    colorHighlight: "&H00E0D040", colorSpoken: "&H00999999", colorUnspoken: "&H00FFFFFF",
+    backColor: "&HCC201810", outlineWidth: 0, borderStyle: 4, shadow: 0,
+    uppercase: false, glow: false, bgOff: false,
+  },
+  "spotlight": {
+    colorHighlight: "&H0000FFFF", colorSpoken: "&H00999999", colorUnspoken: "&H00FFFFFF",
+    backColor: "&H00000000", outlineWidth: 2, borderStyle: 1, shadow: 0,
+    uppercase: false, glow: true, bgOff: true,
+  },
+  "reel": {
+    colorHighlight: "&H0000FFFF", colorSpoken: "&H00AAAAAA", colorUnspoken: "&H00FFFFFF",
+    backColor: "&H00000000", outlineWidth: 4, borderStyle: 1, shadow: 0,
+    uppercase: true, glow: false, bgOff: true,
+  },
+  "noir": {
+    colorHighlight: "&H00FFFFFF", colorSpoken: "&H00888888", colorUnspoken: "&H00CCCCCC",
+    backColor: "&H00000000", outlineWidth: 5, borderStyle: 1, shadow: 1,
+    uppercase: true, glow: false, bgOff: true,
+  },
+  "hormozi-caps": {
+    colorHighlight: "&H0000FFFF", colorSpoken: "&H00FFFFFF", colorUnspoken: "&H00FFFFFF",
+    backColor: "&H00000000", outlineWidth: 5, borderStyle: 1, shadow: 2,
+    uppercase: true, glow: false, bgOff: true,
   },
 };
 
@@ -209,10 +207,25 @@ export const RAW_STYLES = {
 const TELUGU_STACK = '"Noto Sans Telugu", sans-serif';
 const RAMABHADRA_STACK = '"Ramabhadra", "Noto Sans Telugu", sans-serif';
 const MANDALI_STACK = '"Mandali", "Noto Sans Telugu", sans-serif';
+// Feature #16 — the 6 bundled Latin caption fonts, loaded @font-face from the
+// SAME .ttf the backend burns (services/fonts.py :: LATIN_CAPTION_FONTS). Each
+// falls back to a nearby system family only while the web font loads.
+const MONTSERRAT_STACK = '"Montserrat", "Arial Black", sans-serif';
+const ANTON_STACK = '"Anton", "Arial Black", sans-serif';
+const BEBAS_STACK = '"Bebas Neue", "Oswald", sans-serif';
+const OSWALD_STACK = '"Oswald", "Arial Narrow", sans-serif';
+const POPPINS_STACK = '"Poppins", "Segoe UI", sans-serif';
+const INTER_STACK = '"Inter", "Segoe UI", sans-serif';
 const CAPTION_FONT_STACKS = {
   "Noto Sans Telugu": TELUGU_STACK,
   Ramabhadra: RAMABHADRA_STACK,
   Mandali: MANDALI_STACK,
+  Montserrat: MONTSERRAT_STACK,
+  Anton: ANTON_STACK,
+  "Bebas Neue": BEBAS_STACK,
+  Oswald: OSWALD_STACK,
+  Poppins: POPPINS_STACK,
+  Inter: INTER_STACK,
 };
 // Public lookup used by editor UI (caption font dropdown / Inspector).
 export const getCaptionFontStack = (name) =>
@@ -238,9 +251,17 @@ const SHADOW_LAYERS = {
   2: "0 3px 0 rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.5)",
 };
 
-const boxStyle = (opacity) =>
-  opacity > 0
-    ? { background: `rgba(0,0,0,${opacity})`, padding: "0.15em 0.45em", borderRadius: 6 }
+// The box uses the preset's ACTUAL back colour (classic's box is WHITE, cove's
+// is dark navy) — not a hardcoded black. rgba from the decoded hex + opacity.
+const boxStyle = (back) =>
+  back.opacity > 0
+    ? {
+        background: `rgba(${parseInt(back.hex.slice(1, 3), 16)},${parseInt(
+          back.hex.slice(3, 5), 16
+        )},${parseInt(back.hex.slice(5, 7), 16)},${back.opacity})`,
+        padding: "0.12em 0.4em",
+        borderRadius: 6,
+      }
     : null;
 
 function buildPreview(id, raw) {
@@ -261,10 +282,15 @@ function buildPreview(id, raw) {
     // typewriter's "unspoken" word is fully transparent by design (alpha
     // 0xFF -> opacity 0) — render as literally invisible, not a dim color.
     colorUnspoken: unspoken.opacity === 0 ? "transparent" : unspoken.hex,
-    // Only border_style 3 renders an actual box; for border_style 1,
-    // back_color is a shadow tint (already folded into textShadow above).
-    box: raw.borderStyle === 3 ? boxStyle(back.opacity) : null,
+    // border_style 3 OR 4 renders an actual box (feature #16 boxes use 4); for
+    // border_style 1, back_color is a shadow tint (folded into textShadow).
+    box: raw.borderStyle === 3 || raw.borderStyle === 4 ? boxStyle(back) : null,
     textShadow,
+    // Feature #16 — surfaced so CaptionBody/Inspector can render caps + glow
+    // and gate animation to bg-off styles.
+    uppercase: !!raw.uppercase,
+    glow: !!raw.glow,
+    bgOff: raw.bgOff !== undefined ? !!raw.bgOff : raw.borderStyle === 1,
     // STYLES[id].get("words_per_line", MAX_WORDS_PER_LINE) — only big-bold
     // overrides this in the backend.
     wordsPerLine: raw.wordsPerLine || MAX_WORDS_PER_LINE,

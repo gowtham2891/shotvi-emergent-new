@@ -47,7 +47,7 @@ export default function Editor() {
   const undo = useAppStore((s) => s.undo);
   const redo = useAppStore((s) => s.redo);
   const captionScript = useAppStore((s) => s.exportSettings.captionScript);
-  const setExportSetting = useAppStore((s) => s.setExportSetting);
+  const setCaptionScript = useAppStore((s) => s.setCaptionScript);
   const draftLoadStatus = useAppStore((s) => s.draftLoadStatus);
 
   // Pending-autosave flush (A5). Ref-based so cleanups/beforeunload see the
@@ -179,7 +179,7 @@ export default function Editor() {
               <button
                 key={id}
                 data-testid={id === "telugu" ? EDITOR.scriptTelugu : EDITOR.scriptTanglish}
-                onClick={() => setExportSetting("captionScript", id)}
+                onClick={() => setCaptionScript(id)}
                 title={tip}
                 aria-pressed={captionScript === id}
                 className={`px-3 py-1 rounded-md text-xs font-semibold transition-colors ${

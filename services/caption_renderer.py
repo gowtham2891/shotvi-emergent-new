@@ -181,86 +181,83 @@ STYLES = {
         "shadow":          1,
         "border_style":    1,
     },
-    # ── Feature #16: 6 new preset bundles (colours only — the 3 bundled
-    # Telugu fonts are unchanged; caption_font drives the family, font_name
-    # here is decoupled/dead per Stage 5). ASS colour is &H00BBGGRR. ────────
-    "purple-punch": {
-        "font_name":       "Noto Sans Telugu SemiBold",
-        "font_size":       64,
-        "bold":            -1,
-        "color_highlight": "&H00F755A8",   # #A855F7 purple → BGR F755A8
-        "color_spoken":    "&H00999999",
-        "color_unspoken":  "&H00FFFFFF",
-        "outline_color":   "&H00000000",
-        "back_color":      "&H30000000",   # light black scrim
-        "outline_width":   3,
-        "shadow":          0,
-        "border_style":    1,
+    # ── Feature #16 (research-grounded): 10 new presets = Replix's 9 named
+    # styles + the market "Hormozi formula". Each carries extra keys the newer
+    # renderer reads: `uppercase` (Tanglish-only ALL-CAPS), `glow` (neon halo
+    # on the active word), `spacing` (ASS letter-spacing), `bg_off` (text-only,
+    # animation-eligible — mirrors Replix's "animation only on bg-off styles"),
+    # and `latin_font` (the recommended Tanglish font; Telugu mode keeps the
+    # user's Telugu pick). Colours are &H00BBGGRR. font_name stays dead (Stage
+    # 5) — the family is resolved from caption_font by script at render time.
+    "classic": {  # Replix Classic — white pill, current word black, upcoming grey
+        "font_name": "Poppins", "latin_font": "Poppins", "font_size": 56, "bold": -1,
+        "color_highlight": "&H00000000", "color_spoken": "&H00000000",
+        "color_unspoken": "&H00888888", "outline_color": "&H00FFFFFF",
+        "back_color": "&H00FFFFFF", "outline_width": 0, "shadow": 0, "border_style": 4,
+        "uppercase": False, "glow": False, "spacing": 0, "bg_off": False,
     },
-    "ocean-blue": {
-        "font_name":       "Noto Sans Telugu",
-        "font_size":       60,
-        "bold":            -1,
-        "color_highlight": "&H00EED322",   # #22D3EE cyan → BGR EED322
-        "color_spoken":    "&H00888888",
-        "color_unspoken":  "&H00FFFFFF",
-        "outline_color":   "&H00000000",
-        "back_color":      "&H00000000",
-        "outline_width":   3,
-        "shadow":          1,
-        "border_style":    1,
+    "yellow": {  # Replix Yellow — bg-off, active word yellow, animatable
+        "font_name": "Poppins", "latin_font": "Poppins", "font_size": 60, "bold": -1,
+        "color_highlight": "&H0000FFFF", "color_spoken": "&H00AAAAAA",
+        "color_unspoken": "&H00FFFFFF", "outline_color": "&H00000000",
+        "back_color": "&H00000000", "outline_width": 3, "shadow": 0, "border_style": 1,
+        "uppercase": False, "glow": False, "spacing": 0, "bg_off": True,
     },
-    "sunshine": {
-        "font_name":       "Noto Sans Telugu SemiBold",
-        "font_size":       64,
-        "bold":            -1,
-        "color_highlight": "&H003C92FB",   # #FB923C orange → BGR 3C92FB
-        "color_spoken":    "&H00AAAAAA",
-        "color_unspoken":  "&H00FFFFFF",
-        "outline_color":   "&H00000000",
-        "back_color":      "&H00000000",
-        "outline_width":   3,
-        "shadow":          0,
-        "border_style":    1,
+    "minimal": {  # Replix Minimal — bg-off, subtle, thin
+        "font_name": "Poppins", "latin_font": "Inter", "font_size": 54, "bold": 0,
+        "color_highlight": "&H00FFFFFF", "color_spoken": "&H00CCCCCC",
+        "color_unspoken": "&H00AAAAAA", "outline_color": "&H00000000",
+        "back_color": "&H00000000", "outline_width": 2, "shadow": 1, "border_style": 1,
+        "uppercase": False, "glow": False, "spacing": 0, "bg_off": True,
     },
-    "mono-bold": {
-        "font_name":       "Noto Sans Telugu SemiBold",
-        "font_size":       62,
-        "bold":            -1,
-        "color_highlight": "&H00FFFFFF",   # all-white, weight-only emphasis
-        "color_spoken":    "&H00BBBBBB",
-        "color_unspoken":  "&H00FFFFFF",
-        "outline_color":   "&H00000000",
-        "back_color":      "&H00000000",
-        "outline_width":   4,              # thick black outline, no box
-        "shadow":          0,
-        "border_style":    1,
+    "dark": {  # Replix Dark — dark solid box, yellow accent
+        "font_name": "Poppins", "latin_font": "Montserrat", "font_size": 56, "bold": -1,
+        "color_highlight": "&H0000FFFF", "color_spoken": "&H00AAAAAA",
+        "color_unspoken": "&H00FFFFFF", "outline_color": "&H00000000",
+        "back_color": "&HDD000000", "outline_width": 0, "shadow": 0, "border_style": 4,
+        "uppercase": False, "glow": False, "spacing": 0, "bg_off": False,
     },
-    "pink-pop": {
-        "font_name":       "Noto Sans Telugu SemiBold",
-        "font_size":       66,
-        "bold":            -1,
-        "color_highlight": "&H009948EC",   # #EC4899 hot pink → BGR 9948EC
-        "color_spoken":    "&H00888888",
-        "color_unspoken":  "&H00FFFFFF",
-        "outline_color":   "&H00000000",
-        "back_color":      "&HCC000000",   # near-opaque black box
-        "outline_width":   3,
-        "shadow":          0,
-        "border_style":    3,
+    "punch": {  # loud ALL-CAPS, hot-pink pop, near-opaque box
+        "font_name": "Anton", "latin_font": "Anton", "font_size": 66, "bold": -1,
+        "color_highlight": "&H009348EC", "color_spoken": "&H00888888",
+        "color_unspoken": "&H00FFFFFF", "outline_color": "&H00000000",
+        "back_color": "&HCC000000", "outline_width": 0, "shadow": 0, "border_style": 4,
+        "uppercase": True, "glow": False, "spacing": 0, "bg_off": False,
     },
-    "lime-shock": {
-        "font_name":       "Noto Sans Telugu SemiBold",
-        "font_size":       64,
-        "bold":            -1,
-        "color_highlight": "&H0035E6A3",   # #A3E635 lime → BGR 35E6A3
-        "color_spoken":    "&H00227700",   # dark green spoken
-        "color_unspoken":  "&H00FFFFFF",
-        "outline_color":   "&H00000000",
-        "back_color":      "&H20000000",
-        "outline_width":   3,
-        "shadow":          0,
-        "border_style":    1,
+    "cove": {  # editorial, rounded dark box, soft cyan accent, mixed case
+        "font_name": "Poppins", "latin_font": "Poppins", "font_size": 54, "bold": 0,
+        "color_highlight": "&H00E0D040", "color_spoken": "&H00999999",
+        "color_unspoken": "&H00FFFFFF", "outline_color": "&H00000000",
+        "back_color": "&HCC201810", "outline_width": 0, "shadow": 0, "border_style": 4,
+        "uppercase": False, "glow": False, "spacing": 0, "bg_off": False,
+    },
+    "spotlight": {  # GLOW / neon halo on the active word, bg-off (Replix paid)
+        "font_name": "Montserrat", "latin_font": "Montserrat", "font_size": 62, "bold": -1,
+        "color_highlight": "&H0000FFFF", "color_spoken": "&H00999999",
+        "color_unspoken": "&H00FFFFFF", "outline_color": "&H00000000",
+        "back_color": "&H00000000", "outline_width": 2, "shadow": 0, "border_style": 1,
+        "uppercase": False, "glow": True, "spacing": 0, "bg_off": True,
+    },
+    "reel": {  # bold caps, thick black outline, yellow keyword, bg-off
+        "font_name": "Bebas Neue", "latin_font": "Bebas Neue", "font_size": 68, "bold": -1,
+        "color_highlight": "&H0000FFFF", "color_spoken": "&H00AAAAAA",
+        "color_unspoken": "&H00FFFFFF", "outline_color": "&H00000000",
+        "back_color": "&H00000000", "outline_width": 4, "shadow": 0, "border_style": 1,
+        "uppercase": True, "glow": False, "spacing": 0, "bg_off": True,
+    },
+    "noir": {  # moody, heavy outline, grey/white, no box
+        "font_name": "Oswald", "latin_font": "Oswald", "font_size": 60, "bold": -1,
+        "color_highlight": "&H00FFFFFF", "color_spoken": "&H00888888",
+        "color_unspoken": "&H00CCCCCC", "outline_color": "&H00000000",
+        "back_color": "&H00000000", "outline_width": 5, "shadow": 1, "border_style": 1,
+        "uppercase": True, "glow": False, "spacing": 0, "bg_off": True,
+    },
+    "hormozi-caps": {  # market formula: white ALL-CAPS, thick outline, yellow keyword, shadow
+        "font_name": "Montserrat", "latin_font": "Montserrat", "font_size": 66, "bold": -1,
+        "color_highlight": "&H0000FFFF", "color_spoken": "&H00FFFFFF",
+        "color_unspoken": "&H00FFFFFF", "outline_color": "&H00000000",
+        "back_color": "&H00000000", "outline_width": 5, "shadow": 2, "border_style": 1,
+        "uppercase": True, "glow": False, "spacing": 0, "bg_off": True,
     },
 }
 
@@ -292,6 +289,18 @@ CAPTION_FONT_CAP_K = {
     "Noto Sans Telugu": 0.495,
     "Ramabhadra":       0.660,
     "Mandali":          0.660,
+    # Feature #16 Latin caption fonts (Tanglish). Measured the SAME way (an "H"
+    # rendered at Fontsize 100 through the `ass` filter, cap-height in px ÷ 100)
+    # — so a Tanglish caption renders at the SAME Latin cap-height as a Telugu
+    # one at the preset's nominal size. These display fonts have shorter total
+    # metrics than Noto, so most scale slightly UP (k below the anchor) rather
+    # than down; that's expected, not a bug.
+    "Montserrat": 0.450,
+    "Anton":      0.490,
+    "Bebas Neue": 0.540,
+    "Oswald":     0.480,
+    "Poppins":    0.390,
+    "Inter":      0.500,
 }
 _CAP_K_ANCHOR = CAPTION_FONT_CAP_K["Noto Sans Telugu"]
 
@@ -612,7 +621,8 @@ def generate_ass_karaoke(lines: list, style_name: str = DEFAULT_STYLE,
                          caption_x: float = None, caption_y: float = None,
                          caption_font_size_frac: float = None,
                          caption_pill: dict = None,
-                         animation: str = "karaoke") -> str:
+                         animation: str = "karaoke",
+                         caption_script: str = "telugu") -> str:
     """
     Generate ASS with per-word color highlight animation.
     style_name must be one of: bold-yellow, white-minimal, red-pop, clean-dark,
@@ -658,14 +668,49 @@ def generate_ass_karaoke(lines: list, style_name: str = DEFAULT_STYLE,
     backwards compat; a future cleanup can remove it — see KNOWN_ISSUES).
     """
     # Lazy import (module also runs as a CLI script; matches this file's pattern).
-    from services.fonts import get_caption_font
+    from services.fonts import resolve_caption_font, is_latin_caption_font
     from services.canvas_coords import to_pixel_center
     if style_name not in STYLES:
         print(f"✗ WARN: unknown caption style '{style_name}' — falling back to bold-yellow")
         style_name = DEFAULT_STYLE
     s = STYLES[style_name]
 
-    font_family, _ = get_caption_font(caption_font)          # deterministic family name
+    # Script-aware font: Telugu script → a Telugu font; Tanglish → a Latin font
+    # (feature #16). The resolver enforces the rule and defaults per script.
+    font_family, _ = resolve_caption_font(caption_font, caption_script)
+    _is_latin = is_latin_caption_font(font_family)
+    # The bundled Latin fonts are already black/heavy (weight baked into the
+    # outlines) — faux-bolding on top blurs them, so force Bold OFF for Latin.
+    # Telugu fonts are Regular instances that DO rely on the preset's bold flag.
+    style_bold = 0 if _is_latin else s['bold']
+    # Feature #16 — ALL-CAPS presets uppercase the caption text, but only in
+    # Tanglish (Latin) mode; Telugu script has no case, and .upper() there is a
+    # harmless no-op we skip to keep the Telugu burn byte-identical.
+    _uppercase = bool(s.get("uppercase")) and caption_script == "tanglish"
+
+    def _disp(txt):
+        return txt.upper() if _uppercase else txt
+
+    # Feature #16 — GLOW / spotlight: the active (or emphasized) word gets a
+    # neon halo (border in its own colour, blurred); ASS override tags persist
+    # within an event, so glow presets must RESET \bord/\blur/\3c on every
+    # other word or the halo bleeds onto the rest of the line. Non-glow presets
+    # emit neither tag → byte-identical to before this existed.
+    _glow = bool(s.get("glow"))
+
+    def _rgb(assc):
+        return assc[4:10] if (assc.upper().startswith("&H") and len(assc) >= 10) else "FFFFFF"
+
+    _base_bord = int(s.get("outline_width", 3))
+    _oc_rgb = _rgb(s.get("outline_color", "&H00000000"))
+
+    def _glow_on(color_hex):
+        # Tasteful neon halo: a modest coloured border, lightly blurred, so the
+        # letterforms stay crisp on top of the glow (too much blur buries them).
+        return f"\\3c&H{_rgb(color_hex)}&\\bord{max(_base_bord, 3)}\\blur3"
+
+    def _glow_off():
+        return f"\\3c&H{_oc_rgb}&\\bord{_base_bord}\\blur0"
     # BUG-001 partial: user-set Size (0-1 fraction of video HEIGHT) → absolute
     # pixel size. Falls back to the calibrated preset default when omitted.
     if caption_font_size_frac is not None and caption_font_size_frac > 0:
@@ -727,7 +772,7 @@ WrapStyle: 0
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,{font_family},{font_size},{s['color_unspoken']},&H000000FF,{s['outline_color']},{style_back_color},{s['bold']},0,0,0,100,100,0,0,{style_border_style},{style_outline},{s['shadow']},5,40,40,{margin_v},1
+Style: Default,{font_family},{font_size},{s['color_unspoken']},&H000000FF,{s['outline_color']},{style_back_color},{style_bold},0,0,0,100,100,{s.get('spacing', 0)},0,{style_border_style},{style_outline},{s['shadow']},5,40,40,{margin_v},1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -735,7 +780,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
     events = []
 
-    style_bold_tag_global = "\\b1" if str(s['bold']) in ("-1", "1") else "\\b0"
+    style_bold_tag_global = "\\b1" if str(style_bold) in ("-1", "1") else "\\b0"
 
     for line in lines:
         words      = line["words"]
@@ -750,13 +795,19 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             _has_emph = any(w.get("emphasis") for w in words)
             parts = []
             for w in words:
-                safe_word = _escape_ass_text(w['word'])
+                safe_word = _escape_ass_text(_disp(w['word']))
                 if w.get("emphasis"):
                     tags = f"{_color_tag(s['color_highlight'])}\\b1\\fscx112\\fscy112"
+                    if _glow:
+                        tags += _glow_on(s['color_highlight'])
                 elif _has_emph:
                     tags = f"{_color_tag(s['color_unspoken'])}{style_bold_tag_global}\\fscx100\\fscy100"
+                    if _glow:
+                        tags += _glow_off()
                 else:
                     tags = _color_tag(s['color_unspoken'])
+                    if _glow:
+                        tags += _glow_off()
                 parts.append(f"{{{tags}}}{safe_word}")
             line_text = _reveal_override() + " ".join(parts)
             e_start = line_start
@@ -791,23 +842,32 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             # emphasis-free lines emit the color tag alone — byte-identical to
             # the pre-feature output.
             line_has_emphasis = any(w.get("emphasis") for w in words)
-            style_bold_tag = "\\b1" if str(s['bold']) in ("-1", "1") else "\\b0"
+            style_bold_tag = "\\b1" if str(style_bold) in ("-1", "1") else "\\b0"
             parts = []
             for j, w in enumerate(words):
-                safe_word = _escape_ass_text(w['word'])
+                safe_word = _escape_ass_text(_disp(w['word']))
+                is_active = (j == idx)
                 if j < idx:
                     role_color = s['color_spoken']
-                elif j == idx:
-                    role_color = s['color_highlight']
+                elif is_active:
+                    # Glow presets keep the active word a bright WHITE core and
+                    # push the colour into the blurred halo — a same-colour
+                    # fill+halo just merges into an unreadable blob.
+                    role_color = s['color_unspoken'] if _glow else s['color_highlight']
                 else:
                     role_color = s['color_unspoken']
                 if w.get("emphasis"):
-                    tags = (f"{_color_tag(s['color_highlight'])}"
-                            f"\\b1\\fscx112\\fscy112")
+                    tags = f"{_color_tag(s['color_highlight'])}\\b1\\fscx112\\fscy112"
+                    if _glow:
+                        tags += _glow_on(s['color_highlight'])
                 elif line_has_emphasis:
                     tags = f"{_color_tag(role_color)}{style_bold_tag}\\fscx100\\fscy100"
+                    if _glow:
+                        tags += _glow_on(s['color_highlight']) if is_active else _glow_off()
                 else:
                     tags = _color_tag(role_color)
+                    if _glow:
+                        tags += _glow_on(s['color_highlight']) if is_active else _glow_off()
                 parts.append(f"{{{tags}}}{safe_word}")
 
             line_text = pos_override + " ".join(parts)
@@ -1134,7 +1194,8 @@ def render_captions_for_clip(
                                        caption_x=caption_x,
                                        caption_y=caption_y,
                                        caption_font_size_frac=caption_font_size,
-                                       caption_pill=caption_pill)
+                                       caption_pill=caption_pill,
+                                       caption_script=caption_script)
     with open(ass_path, "w", encoding="utf-8") as f:
         f.write(ass_content)
     print(f"   ✓ ASS: {ass_path}")

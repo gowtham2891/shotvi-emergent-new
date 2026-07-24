@@ -58,13 +58,36 @@ def get_font_path(name: str) -> str:
 # directory flat: .ttf files only (non-font files log an "Error opening
 # memory font"; subdirectories like licenses/ are skipped). Guarded by
 # tests/test_caption_font_resolution.py.
-CAPTION_FONTS = {
+# Telugu-script caption fonts (Telugu caption mode). Keys are the fonts' real
+# internal family names.
+TELUGU_CAPTION_FONTS = {
     "Noto Sans Telugu": os.path.join(FONTS_DIR, "captions", "NotoSansTelugu-Regular.ttf"),
     "Ramabhadra":       os.path.join(FONTS_DIR, "captions", "Ramabhadra-Regular.ttf"),
     "Mandali":          os.path.join(FONTS_DIR, "captions", "Mandali-Regular.ttf"),
 }
 
-DEFAULT_CAPTION_FONT = "Noto Sans Telugu"
+# Latin caption fonts (TANGLISH mode — Telugu written in Latin script). Heavy
+# short-form-video display fonts, each a single static instance with the target
+# weight baked into the outlines and its OS/2 weight-class normalized to 400,
+# so libass resolves each by family name with no faux-bold. Latin glyph
+# coverage only — used ONLY for tanglish captions, never Telugu script (which
+# these fonts cannot render). Downloaded from Google Fonts (OFL).
+LATIN_CAPTION_FONTS = {
+    "Montserrat": os.path.join(FONTS_DIR, "captions", "Montserrat-Black.ttf"),
+    "Anton":      os.path.join(FONTS_DIR, "captions", "Anton-Regular.ttf"),
+    "Bebas Neue": os.path.join(FONTS_DIR, "captions", "BebasNeue-Regular.ttf"),
+    "Oswald":     os.path.join(FONTS_DIR, "captions", "Oswald-Bold.ttf"),
+    "Poppins":    os.path.join(FONTS_DIR, "captions", "Poppins-Bold.ttf"),
+    "Inter":      os.path.join(FONTS_DIR, "captions", "Inter-Bold.ttf"),
+}
+
+# Merged view — every caption .ttf libass may resolve (all flat in the
+# fontsdir). Kept as CAPTION_FONTS for backward compatibility (get_caption_font,
+# tests, the frontend's font list).
+CAPTION_FONTS = {**TELUGU_CAPTION_FONTS, **LATIN_CAPTION_FONTS}
+
+DEFAULT_CAPTION_FONT = "Noto Sans Telugu"        # Telugu mode default
+DEFAULT_LATIN_CAPTION_FONT = "Montserrat"        # Tanglish mode default (Montserrat Black)
 
 # Directory handed to the ass filter as `fontsdir` — the flat directory whose
 # immediate children are exactly the caption .ttf files above (OFL licenses
@@ -78,7 +101,33 @@ def get_caption_font(name: str):
     """(ass_family_name, file_path) for a caption font. Unknown/None falls back
     to DEFAULT_CAPTION_FONT rather than raising — a bad selection should render
     in the default deterministic font, never crash or silently hit host
-    fontconfig."""
+    fontconfig.
+
+    Script-agnostic (legacy). Prefer resolve_caption_font(name, script) so the
+    burn NEVER tries a Telugu-only font on Tanglish text (tofu) or a Latin-only
+    font on Telugu text (tofu)."""
     if name not in CAPTION_FONTS:
         name = DEFAULT_CAPTION_FONT
     return name, CAPTION_FONTS[name]
+
+
+def is_latin_caption_font(name: str) -> bool:
+    return name in LATIN_CAPTION_FONTS
+
+
+def resolve_caption_font(name: str, script: str = "telugu"):
+    """Script-aware caption font resolution → (ass_family_name, file_path).
+
+    HARD rule (no exceptions): Telugu-script captions render ONLY in a Telugu
+    font; Tanglish (Latin-script) captions render ONLY in a Latin font — a
+    Telugu font has no Latin display glyphs worth using and vice-versa, so a
+    cross-script pick would tofu. A `name` that isn't valid for the active
+    script falls back to that script's default (Noto Sans Telugu / Montserrat
+    Black), never to the other script's set."""
+    if script == "tanglish":
+        if name not in LATIN_CAPTION_FONTS:
+            name = DEFAULT_LATIN_CAPTION_FONT
+        return name, LATIN_CAPTION_FONTS[name]
+    if name not in TELUGU_CAPTION_FONTS:
+        name = DEFAULT_CAPTION_FONT
+    return name, TELUGU_CAPTION_FONTS[name]

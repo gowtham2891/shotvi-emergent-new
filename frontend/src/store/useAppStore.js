@@ -25,6 +25,9 @@ import {
   DEFAULT_STYLE_ID,
   isKnownStyle,
   isKnownCaptionFont,
+  presetLatinFont,
+  resolveCaptionFont,
+  DEFAULT_LATIN_CAPTION_FONT,
 } from "@/api/renders";
 import { getCaptionTemplate, putCaptionTemplate } from "@/api/templates";
 import { uploadOverlayImage } from "@/api/overlays";
@@ -1566,6 +1569,46 @@ export const useAppStore = create((set, get) => ({
     set((s) => ({ exportSettings: { ...s.exportSettings, [key]: val } }));
   },
 
+  // Feature #16 — flipping the caption script must reconcile the caption font:
+  // Telugu script can only render a Telugu font and Tanglish only a Latin one
+  // (the other script's glyphs tofu). If the current font is invalid for the
+  // new script, snap it to that script's default (resolveCaptionFont mirrors
+  // the backend). One coalesced history entry covers both changes so undo
+  // restores script AND font together.
+  setCaptionScript: (script) => {
+    const s = get();
+    if (s.exportSettings.captionScript === script) return;
+    const caption = s.getCaptionElement();
+    // ONE history frame for the whole toggle: snapshot the pre-flip state, then
+    // apply the script flip AND the font reconcile in a single set() so a
+    // single undo restores both together (a second updateElementProps would
+    // push its own frame, splitting the undo). No coalesce key — a script flip
+    // is a discrete click, so each toggle is its own undo step.
+    get().pushHistory();
+    let reconciled = caption
+      ? resolveCaptionFont(caption.props.font, script)
+      : null;
+    // Entering Tanglish from a Telugu font falls back to the bare Latin default
+    // (Montserrat). Prefer the current preset's recommended Latin font instead,
+    // so a script flip lands on the same font that picking the preset would —
+    // no lag until the user re-clicks the preset.
+    if (caption && script === "tanglish" && reconciled === DEFAULT_LATIN_CAPTION_FONT) {
+      const latin = presetLatinFont(caption.props.presetId);
+      if (latin) reconciled = latin;
+    }
+    set((st) => ({
+      exportSettings: { ...st.exportSettings, captionScript: script },
+      elements:
+        caption && reconciled !== caption.props.font
+          ? st.elements.map((el) =>
+              el.id === caption.id
+                ? { ...el, props: { ...el.props, font: reconciled } }
+                : el
+            )
+          : st.elements,
+    }));
+  },
+
   // ============ CROP WINDOW (Sprint 4 — drag-to-reframe) ============
   // The editor previews the 16:9 master through a per-aspect fractional
   // window (lib/cropWindow.js owns the math). Windows live in
@@ -2097,10 +2140,20 @@ export const useAppStore = create((set, get) => ({
     const caption = get().getCaptionElement();
     if (!caption) return;
     const pillDefaults = PILL_DEFAULTS_BY_PRESET[presetId] || {};
-    get().updateElementProps(caption.id, {
+    const patch = {
       presetId,
       pill: { ...caption.props.pill, ...pillDefaults },
-    });
+    };
+    // Feature #16 — in Tanglish mode each preset carries a recommended Latin
+    // display font (Anton for Punch, Bebas Neue for Reel, …). Adopt it on pick
+    // so the WYSIWYG preview and burn match the preset's intended look. Telugu
+    // mode leaves the user's Telugu font untouched (presets are colour-only there).
+    const script = get().exportSettings.captionScript;
+    if (script === "tanglish") {
+      const latin = presetLatinFont(presetId);
+      if (latin) patch.font = latin;
+    }
+    get().updateElementProps(caption.id, patch);
   },
   getPresetClass: () => {
     const caption = get().getCaptionElement();

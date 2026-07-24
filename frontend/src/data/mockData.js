@@ -67,6 +67,22 @@ export const PILL_DEFAULTS_BY_PRESET = {
     padding: 8 / 640,
     radius: 6 / 640,
   },
+  // Feature #16 — each new preset reconciles the caption box on selection
+  // (setCaptionPreset merges this over the element's pill). Mirrors the
+  // preset's own box: bg-ON styles enable a pill matching their back_color;
+  // bg-OFF styles DISABLE the pill so no box shows. Without an entry the
+  // previously-selected pill would linger (the QA bug: no-box presets kept a
+  // box, and Classic's black text sat on a stale black pill → invisible).
+  classic: { enabled: true, color: "#ffffff", opacity: 1.0, padding: 10 / 640, radius: 8 / 640 },
+  yellow: { enabled: false, color: "#000000", opacity: 0.5, padding: 8 / 640, radius: 8 / 640 },
+  minimal: { enabled: false, color: "#000000", opacity: 0.5, padding: 8 / 640, radius: 8 / 640 },
+  dark: { enabled: true, color: "#000000", opacity: 0.85, padding: 10 / 640, radius: 8 / 640 },
+  punch: { enabled: true, color: "#000000", opacity: 0.8, padding: 10 / 640, radius: 6 / 640 },
+  cove: { enabled: true, color: "#1a2634", opacity: 0.85, padding: 10 / 640, radius: 8 / 640 },
+  spotlight: { enabled: false, color: "#000000", opacity: 0.5, padding: 8 / 640, radius: 8 / 640 },
+  reel: { enabled: false, color: "#000000", opacity: 0.5, padding: 8 / 640, radius: 8 / 640 },
+  noir: { enabled: false, color: "#000000", opacity: 0.5, padding: 8 / 640, radius: 8 / 640 },
+  "hormozi-caps": { enabled: false, color: "#000000", opacity: 0.5, padding: 8 / 640, radius: 8 / 640 },
 };
 
 // Initial canvas elements — caption visible, others hidden by default so user can toggle
@@ -327,39 +343,40 @@ export const getClipsForProject = (projectId) => {
   }));
 };
 
-// Word-level transcript for the editor — one clip's worth (mixed te/tenglish)
-// Each word has: text, start (sec), end (sec)
+// Word-level transcript for the editor — one clip's worth (mixed te/tenglish).
+// Each word has: text (Telugu-script display), text_tanglish (romanized, for
+// the Tanglish toggle — mirrors the live pipeline's word_tanglish), start, end.
 const WORD_TRANSCRIPT_RAW = [
-  { text: "ఈ", start: 0.0, end: 0.28 },
-  { text: "ఒక్క", start: 0.28, end: 0.72 },
-  { text: "AI", start: 0.72, end: 1.06 },
-  { text: "tool", start: 1.06, end: 1.5 },
-  { text: "మీ", start: 1.5, end: 1.82 },
-  { text: "life", start: 1.82, end: 2.24 },
-  { text: "ni", start: 2.24, end: 2.42 },
-  { text: "totally", start: 2.42, end: 2.98 },
-  { text: "మార్చేస్తుంది!", start: 2.98, end: 3.9 },
-  { text: "Nenu", start: 4.2, end: 4.58 },
-  { text: "ee", start: 4.58, end: 4.8 },
-  { text: "tool", start: 4.8, end: 5.16 },
-  { text: "ni", start: 5.16, end: 5.36 },
-  { text: "roju", start: 5.36, end: 5.74 },
-  { text: "vaadutunna,", start: 5.74, end: 6.42 },
-  { text: "and", start: 6.42, end: 6.72 },
-  { text: "trust", start: 6.72, end: 7.06 },
-  { text: "me,", start: 7.06, end: 7.36 },
-  { text: "ఇది", start: 7.5, end: 7.9 },
-  { text: "next", start: 7.9, end: 8.24 },
-  { text: "level!", start: 8.24, end: 8.86 },
-  { text: "First", start: 9.2, end: 9.6 },
-  { text: "ga,", start: 9.6, end: 9.86 },
-  { text: "meeru", start: 9.86, end: 10.26 },
-  { text: "cheyaalsindi", start: 10.26, end: 10.98 },
-  { text: "ఒకటే —", start: 10.98, end: 11.6 },
-  { text: "sign", start: 11.6, end: 11.92 },
-  { text: "up", start: 11.92, end: 12.16 },
-  { text: "cheyandi,", start: 12.16, end: 12.68 },
-  { text: "అంతే!", start: 12.68, end: 13.3 },
+  { text: "ఈ", text_tanglish: "ee", start: 0.0, end: 0.28 },
+  { text: "ఒక్క", text_tanglish: "okka", start: 0.28, end: 0.72 },
+  { text: "AI", text_tanglish: "AI", start: 0.72, end: 1.06 },
+  { text: "tool", text_tanglish: "tool", start: 1.06, end: 1.5 },
+  { text: "మీ", text_tanglish: "mee", start: 1.5, end: 1.82 },
+  { text: "life", text_tanglish: "life", start: 1.82, end: 2.24 },
+  { text: "ni", text_tanglish: "ni", start: 2.24, end: 2.42 },
+  { text: "totally", text_tanglish: "totally", start: 2.42, end: 2.98 },
+  { text: "మార్చేస్తుంది!", text_tanglish: "maarchestundi!", start: 2.98, end: 3.9 },
+  { text: "Nenu", text_tanglish: "Nenu", start: 4.2, end: 4.58 },
+  { text: "ee", text_tanglish: "ee", start: 4.58, end: 4.8 },
+  { text: "tool", text_tanglish: "tool", start: 4.8, end: 5.16 },
+  { text: "ni", text_tanglish: "ni", start: 5.16, end: 5.36 },
+  { text: "roju", text_tanglish: "roju", start: 5.36, end: 5.74 },
+  { text: "vaadutunna,", text_tanglish: "vaadutunna,", start: 5.74, end: 6.42 },
+  { text: "and", text_tanglish: "and", start: 6.42, end: 6.72 },
+  { text: "trust", text_tanglish: "trust", start: 6.72, end: 7.06 },
+  { text: "me,", text_tanglish: "me,", start: 7.06, end: 7.36 },
+  { text: "ఇది", text_tanglish: "idi", start: 7.5, end: 7.9 },
+  { text: "next", text_tanglish: "next", start: 7.9, end: 8.24 },
+  { text: "level!", text_tanglish: "level!", start: 8.24, end: 8.86 },
+  { text: "First", text_tanglish: "First", start: 9.2, end: 9.6 },
+  { text: "ga,", text_tanglish: "ga,", start: 9.6, end: 9.86 },
+  { text: "meeru", text_tanglish: "meeru", start: 9.86, end: 10.26 },
+  { text: "cheyaalsindi", text_tanglish: "cheyaalsindi", start: 10.26, end: 10.98 },
+  { text: "ఒకటే —", text_tanglish: "okate —", start: 10.98, end: 11.6 },
+  { text: "sign", text_tanglish: "sign", start: 11.6, end: 11.92 },
+  { text: "up", text_tanglish: "up", start: 11.92, end: 12.16 },
+  { text: "cheyandi,", text_tanglish: "cheyandi,", start: 12.16, end: 12.68 },
+  { text: "అంతే!", text_tanglish: "ante!", start: 12.68, end: 13.3 },
 ];
 
 // Decorated with the id/ref shape real transcripts carry (see

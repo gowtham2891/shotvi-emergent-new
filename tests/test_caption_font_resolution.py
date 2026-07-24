@@ -38,7 +38,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 import pytest
 
 from services.caption_renderer import generate_ass_karaoke, burn_captions
-from services.fonts import CAPTION_FONTS, CAPTION_FONTS_DIR
+from services.fonts import (
+    CAPTION_FONTS, CAPTION_FONTS_DIR, TELUGU_CAPTION_FONTS, LATIN_CAPTION_FONTS,
+)
 
 
 def _ffmpeg_available():
@@ -51,21 +53,37 @@ def _ffmpeg_available():
 
 requires_ffmpeg = pytest.mark.skipif(not _ffmpeg_available(), reason="ffmpeg not on PATH")
 
-# Telugu word in every probe so resolution is proven for the glyphs that
-# matter — a wrong (Latin-only) font match would trigger libass's per-glyph
-# "Glyph 0xNNN not found" fallback, which the probe asserts against.
+# Telugu word for the Telugu-font probes (proves the glyphs that matter
+# resolve); a Latin word for the Latin-font (Tanglish) probes — a Telugu word
+# through a Latin font would ALWAYS trigger glyph fallback (those fonts have no
+# Telugu coverage, by design), so each font is probed in ITS script.
 TELUGU_WORD = "పరీక్ష"
+LATIN_WORD = "PAREEKSHA"
 
 # PostScript names of the bundled static instances, as libass logs them in
 # `fontselect: (<family>, <bold>, <italic>) -> <ps-name>, <index>, <ps-name>`.
-# Read from the TTF name tables (nameID 6); they change only if the bundled
-# files themselves are ever replaced (they are calibrated spec — see
-# CAPTION_FONT_CAP_K — so effectively never).
+# Telugu fonts read from nameID 6 as-is; the Latin fonts (feature #16) were
+# normalized to a PostScript name = family with spaces removed (services
+# font-normalization step).
 EXPECTED_POSTSCRIPT = {
     "Noto Sans Telugu": "NotoSansTelugu-Regular",
     "Ramabhadra":       "Ramabhadra",
     "Mandali":          "Mandali",
+    "Montserrat":       "Montserrat",
+    "Anton":            "Anton",
+    "Bebas Neue":       "BebasNeue",
+    "Oswald":           "Oswald",
+    "Poppins":          "Poppins",
+    "Inter":            "Inter",
 }
+
+
+def _script_and_word(family):
+    """(caption_script, probe word) for a caption font — Latin fonts must be
+    probed in Tanglish mode with Latin text, Telugu fonts in Telugu mode."""
+    if family in LATIN_CAPTION_FONTS:
+        return "tanglish", LATIN_WORD
+    return "telugu", TELUGU_WORD
 
 # System fonts libass falls back to when fontsdir yields nothing: Nirmala UI
 # is Windows' only Telugu font (the exact wrong font users saw), Arial the
@@ -155,12 +173,13 @@ def test_internal_family_name_matches_ass_fontname(family):
 # ── 2. Real libass resolution probe ─────────────────────────────────────────
 
 def _burn_and_capture_fontselect_log(caption_font, tmp, monkeypatch):
-    """Burn a 1.2s Telugu caption through the REAL production path and return
-    ffmpeg's verbose stderr. The exact command burn_captions builds (filter
-    string, fontsdir escaping and all) is captured via an intercepted
-    subprocess.run, then replayed with -v verbose prepended — so the probe
-    can't drift from production wiring."""
+    """Burn a 1.2s caption (in the font's own script) through the REAL
+    production path and return ffmpeg's verbose stderr. The exact command
+    burn_captions builds (filter string, fontsdir escaping and all) is captured
+    via an intercepted subprocess.run, then replayed with -v verbose prepended
+    — so the probe can't drift from production wiring."""
     real_run = subprocess.run
+    script, word = _script_and_word(caption_font)
 
     clip = os.path.join(tmp, "clip.mp4")
     real_run(
@@ -169,11 +188,11 @@ def _burn_and_capture_fontselect_log(caption_font, tmp, monkeypatch):
          "-c:v", "libx264", "-pix_fmt", "yuv420p", clip],
         capture_output=True, timeout=60, check=True,
     )
-    lines = [{"words": [{"word": TELUGU_WORD, "start": 0.0, "end": 1.0}],
+    lines = [{"words": [{"word": word, "start": 0.0, "end": 1.0}],
               "line_start": 0.0, "line_end": 1.2}]
     ass = generate_ass_karaoke(lines, "bold-yellow",
                                video_width=540, video_height=960,
-                               caption_font=caption_font)
+                               caption_font=caption_font, caption_script=script)
     ass_path = os.path.join(tmp, "cap.ass")
     with open(ass_path, "w", encoding="utf-8") as f:
         f.write(ass)

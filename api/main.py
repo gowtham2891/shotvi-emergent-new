@@ -67,9 +67,16 @@ app.mount("/outputs", StaticFiles(directory=str(OUTPUT_DIR)), name="outputs")
 
 def _tier_ttl(user_id: str) -> Optional[int]:
     """Feature #20 — the published-clip TTL (seconds) for a user's tier, or
-    None for a no-expiry tier. Free = 24h; paid = longer/none."""
+    None for a no-expiry tier. Free = 24h; paid = longer/none. A billing-store
+    read failure (Redis hiccup) must not 500 job creation — degrade to the
+    free-tier 24h TTL, the safe floor."""
     from api import tiers
-    hours = tiers.expiry_hours(get_user_billing(user_id).get("plan", tiers.FREE))
+    try:
+        plan = get_user_billing(user_id).get("plan", tiers.FREE)
+    except Exception as e:
+        print(f"  [tier_ttl] billing read failed ({e}) — defaulting to free 24h TTL", flush=True)
+        return 86400
+    hours = tiers.expiry_hours(plan)
     return int(hours * 3600) if hours else None
 
 

@@ -60,6 +60,13 @@ export const animationClass = (anim) => {
   }
 };
 
+// Feature #16 — glow (spotlight preset). The backend gives the ACTIVE word a
+// white core (color_unspoken fill) + a coloured neon halo (\3c + \blur3 in
+// color_highlight). CSS approximation: stacked blurred text-shadows in the
+// highlight colour behind a white fill. Only the active karaoke word glows.
+const glowShadow = (hlColor) =>
+  `0 0 4px ${hlColor}, 0 0 9px ${hlColor}, 0 0 16px ${hlColor}`;
+
 const CaptionBody = ({ element, canvasH }) => {
   const transcript = useAppStore((s) => s.transcript);
   const currentTime = useAppStore((s) => s.currentTime);
@@ -153,9 +160,19 @@ const CaptionBody = ({ element, canvasH }) => {
         // at 112% for their whole lifetime — mirror of the ASS override
         // tags generate_ass_karaoke emits (\b1\fscx112\fscy112 + highlight).
         const emphasized = w.id != null && emphasisIds.has(w.id);
+        // Feature #16 — glow preset (spotlight): the active karaoke word gets a
+        // WHITE core (color_unspoken) + a coloured neon halo, mirroring the
+        // backend's white-fill + \blur3 halo. Emphasis still wins (it's an
+        // explicit user override).
+        const glowing = preview.glow && role === "active" && isKaraoke && !emphasized;
         const color = emphasized
           ? preview.colorHighlight
+          : glowing
+          ? preview.colorUnspoken
           : role === "active" ? preview.colorHighlight : role === "spoken" ? preview.colorSpoken : preview.colorUnspoken;
+        const textShadow = glowing
+          ? `${glowShadow(preview.colorHighlight)}, ${preview.textShadow}`
+          : preview.textShadow;
         return (
           <span
             key={`${gIdx}-${w.id ?? w.text}`}
@@ -164,7 +181,10 @@ const CaptionBody = ({ element, canvasH }) => {
               fontFamily,
               fontWeight: emphasized ? 800 : preview.fontWeight,
               color,
-              textShadow: preview.textShadow,
+              textShadow,
+              // Feature #16 — ALL-CAPS presets uppercase ONLY in Tanglish (the
+              // backend .upper()s Latin text; Telugu has no case, left as-is).
+              textTransform: preview.uppercase && captionScript === "tanglish" ? "uppercase" : "none",
               fontSize: fontSize * canvasH * (emphasized ? 1.12 : 1),
               lineHeight: 1.25,
               transform: role === "active" && isKaraoke ? "scale(1.06)" : "scale(1)",

@@ -32,3 +32,53 @@
     font-display: swap;
     src: url("/fonts/Mandali-Regular.ttf") format("truetype");
 }
+
+/*
+ * Latin caption fonts (Tanglish mode). The SAME static .ttf files the backend
+ * burns via fontsdir — each is a single static instance with its target weight
+ * baked into the outlines (weight-class normalized to 400), so font-weight: 400
+ * here matches libass resolving the family by name with no faux-bold. The
+ * family names match services/fonts.py :: LATIN_CAPTION_FONTS exactly.
+ */
+@font-face {
+    font-family: "Anton";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("/fonts/Anton-Regular.ttf") format("truetype");
+}
+@font-face {
+    font-family: "Bebas Neue";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("/fonts/BebasNeue-Regular.ttf") format("truetype");
+}
+@font-face {
+    font-family: "Oswald";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("/fonts/Oswald-Bold.ttf") format("truetype");
+}
+@font-face {
+    font-family: "Montserrat";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("/fonts/Montserrat-Black.ttf") format("truetype");
+}
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("/fonts/Poppins-Bold.ttf") format("truetype");
+}
+@font-face {
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("/fonts/Inter-Bold.ttf") format("truetype");
+}

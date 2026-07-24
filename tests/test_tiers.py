@@ -28,8 +28,11 @@ def test_entitlements_ladder():
 
 
 def test_premium_preset_gate():
-    assert tiers.is_premium_preset("purple-punch") is True
-    assert tiers.is_premium_preset("bold-yellow") is False   # original preset
+    assert tiers.is_premium_preset("spotlight") is True       # Replix paid tier
+    assert tiers.is_premium_preset("cove") is True
+    assert tiers.is_premium_preset("bold-yellow") is False    # original preset
+    assert tiers.is_premium_preset("yellow") is False         # Replix free tier
+    assert tiers.is_premium_preset("hormozi-caps") is False   # market default, free
     assert tiers.can_use_premium_presets("free") is False
     assert tiers.can_use_premium_presets("creator") is True
 
