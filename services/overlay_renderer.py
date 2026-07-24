@@ -115,6 +115,13 @@ class Layer:
     height: int
     ox: int              # top-left position for `overlay=x=ox:y=oy`
     oy: int
+    # Feature #30 — optional display window (seconds, clip-relative). Both None
+    # → always-on for the whole clip (every layer before #30 behaved this way).
+    # Set → the overlay is composited only while enable='between(t,start,end)'
+    # holds, gating a per-caption-line emoji to its line. This is the reusable
+    # timing foundation (#29 b-roll can drive the same window).
+    start: Optional[float] = None
+    end: Optional[float] = None
 
 
 def _ffprobe_duration(path: str) -> float:
@@ -450,11 +457,84 @@ def _prepare_image_layer(element: dict, video_width: int, video_height: int,
     return Layer(path=out_path, is_video=False, width=img.width, height=img.height, ox=ox, oy=oy)
 
 
+def _coerce_time(v):
+    """A props time value → float seconds, or None if absent/unparseable."""
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return None
+
+
+def _prepare_emoji_layer(element: dict, video_width: int, video_height: int,
+                         tmp_dir: str) -> Optional[Layer]:
+    """
+    Feature #30 — a color emoji (Twemoji PNG) composited over the video for the
+    span of ONE caption line. Sizing/positioning/opacity mirror
+    _prepare_image_layer exactly (props.height is a fraction of canvas height,
+    width follows the PNG's square ratio, scale/rotation/opacity all apply the
+    same way), so the editor's EmojiBody preview and the burn stay WYSIWYG.
+
+    The difference from an uploaded image: the source is a BUNDLED asset resolved
+    from props.emoji (or props.codepoint) via services.emoji — no per-video
+    ownership check (static asset, not a user upload), and never a client path.
+    A char outside the curated palette / a missing asset → skip (never an error).
+
+    props.start / props.end (seconds, clip-relative) become the Layer's display
+    window; the compositor gates this layer with enable='between(t,start,end)'.
+    Missing/invalid times → always-on (degrade, never drop the emoji entirely).
+    """
+    from services.emoji import emoji_asset_path, emoji_codepoint, PALETTE_CHARS
+
+    p = element.get("props", {})
+    ch = p.get("emoji")
+    src = emoji_asset_path(ch) if ch else None
+    if not src:
+        print(f"  [Overlay] Skipping emoji element {element.get('id')!r}: "
+              f"emoji {ch!r} not in bundled palette / asset missing", flush=True)
+        return None
+
+    height_frac = p.get("height", 0.12)
+    opacity = p.get("opacity", 1)
+    scale = element.get("scale", 1) or 1
+    rotation = element.get("rotation", 0) or 0
+
+    img = Image.open(src).convert("RGBA")
+    target_h = max(round(height_frac * video_height * scale), 2)
+    target_w = max(round(target_h * img.width / img.height), 2)
+    img = img.resize((target_w, target_h), Image.LANCZOS)
+
+    try:
+        opacity = float(opacity)
+    except (TypeError, ValueError):
+        opacity = 1.0
+    opacity = min(max(opacity, 0.0), 1.0)
+    if opacity < 1.0:
+        alpha = img.split()[3].point(lambda a: round(a * opacity))
+        img.putalpha(alpha)
+
+    img = _rotate_png_if_needed(img, rotation)
+    out_path = os.path.join(tmp_dir, f"emoji_{emoji_codepoint(ch)}_{element.get('id', id(element))}.png")
+    img.save(out_path)
+
+    center = to_pixel_center(element.get("x", 0.5), element.get("y", 0.5),
+                             video_width, video_height)
+    ox, oy = center_to_topleft(center.cx, center.cy, img.width, img.height)
+
+    start, end = _coerce_time(p.get("start")), _coerce_time(p.get("end"))
+    # A degenerate/backwards window would hide the emoji forever — drop it to
+    # always-on rather than burn an invisible layer.
+    if start is not None and end is not None and end <= start:
+        start = end = None
+    return Layer(path=out_path, is_video=False, width=img.width, height=img.height,
+                 ox=ox, oy=oy, start=start, end=end)
+
+
 _PREPARERS = {
     "progress": lambda el, vw, vh, tmp, dur: _prepare_progress_layer(el, vw, vh, tmp, dur),
     "logo": lambda el, vw, vh, tmp, dur: _prepare_logo_layer(el, vw, vh, tmp),
     "headline": lambda el, vw, vh, tmp, dur: _prepare_headline_layer(el, vw, vh, tmp),
     "image": lambda el, vw, vh, tmp, dur: _prepare_image_layer(el, vw, vh, tmp),
+    "emoji": lambda el, vw, vh, tmp, dur: _prepare_emoji_layer(el, vw, vh, tmp),
 }
 
 
@@ -533,8 +613,15 @@ def _composite_layers(input_path: str, output_path: str, layers: list, duration:
     current = "[0:v]"
     for idx, layer in enumerate(layers, start=1):
         next_label = f"[v{idx}]"
+        # Feature #30 — a layer with a display window composites only while
+        # enable='between(t,start,end)' holds; the base video shows through
+        # otherwise. Layers without a window (start/end None) omit enable and
+        # stay full-duration, byte-identical to before this existed.
+        enable = ""
+        if layer.start is not None and layer.end is not None:
+            enable = f":enable='between(t,{layer.start:.3f},{layer.end:.3f})'"
         chain_parts.append(
-            f"{current}[{idx}:v]overlay=x={layer.ox}:y={layer.oy}:shortest=1{next_label}"
+            f"{current}[{idx}:v]overlay=x={layer.ox}:y={layer.oy}{enable}:shortest=1{next_label}"
         )
         current = next_label
 

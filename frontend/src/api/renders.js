@@ -95,8 +95,10 @@ const CAPTION_POS_EPS = 1e-3;
 // flows via caption_x/caption_y and the backend burns captions in a separate
 // pass (render_elements ignores non-overlay types anyway; excluding here just
 // keeps the payload clean). `image` carries an opaque image_id the backend
-// resolves + burns through the same single composite pass.
-export const OVERLAY_ELEMENT_TYPES = new Set(["progress", "logo", "headline", "image"]);
+// resolves + burns through the same single composite pass. `emoji` (feature
+// #30) carries a palette emoji + a [start,end] display window the backend
+// composites time-bounded (overlay enable='between(t,start,end)').
+export const OVERLAY_ELEMENT_TYPES = new Set(["progress", "logo", "headline", "image", "emoji"]);
 
 // ── EditDocument → RerenderRequest ───────────────────────────────
 //

@@ -29,6 +29,7 @@ import {
 } from "@/api/renders";
 import { getCaptionFontStack } from "@/data/captionStylePreview";
 import { getCaptionStylePreview } from "@/data/captionStylePreview";
+import { emojiAssetUrl } from "@/lib/emojiOverlays";
 import { pillFracToSliderPx, pillSliderPxToFrac } from "@/lib/pillUnits";
 import { alignPatches, distributePatches } from "@/lib/alignDistribute";
 import { EDITOR } from "@/constants/testIds";
@@ -179,6 +180,7 @@ const StyleTab = () => {
       {selected?.type === "caption" && <CaptionSection element={selected} />}
       {selected?.type === "headline" && <HeadlineSection element={selected} />}
       {selected?.type === "image" && <ImageSection element={selected} />}
+      {selected?.type === "emoji" && <EmojiSection element={selected} />}
       {!selected && (
         <p className="text-[11px] text-[#5a5a66] leading-relaxed">
           Select an element on the canvas — or toggle one on above — to edit
@@ -575,6 +577,49 @@ const ImageSection = ({ element }) => {
       </div>
       <LabeledSlider
         testId={EDITOR.imageOpacity}
+        label="Opacity" min={0.05} max={1} step={0.05}
+        value={p.opacity ?? 1}
+        onChange={(v) => patch({ opacity: v })}
+      />
+    </div>
+  );
+};
+
+// Feature #30 — a timed emoji overlay. Size/opacity mirror ImageSection; the
+// emoji itself + its [start,end] window come from the Gemini suggestion (auto-
+// timed to the caption line) and are shown read-only. Delete/reposition ride
+// the shared element controls (ElementList, drag, hotkeys).
+const EmojiSection = ({ element }) => {
+  const updateElementProps = useAppStore((s) => s.updateElementProps);
+  const p = element.props;
+  const patch = (np) => updateElementProps(element.id, np);
+  const fmt = (t) => (typeof t === "number" ? `${t.toFixed(1)}s` : "—");
+  return (
+    <div className="space-y-3">
+      <div>
+        <SectionTitle>Emoji</SectionTitle>
+        <div className="flex items-center gap-2 text-xs text-[#9a9aa6]">
+          <img src={emojiAssetUrl(p.emoji)} alt={p.emoji} className="w-6 h-6" />
+          <span>
+            Shows {fmt(p.start)}–{fmt(p.end)} (its caption line)
+          </span>
+        </div>
+      </div>
+      <div>
+        <SectionTitle>Emoji Size</SectionTitle>
+        <input
+          data-testid={EDITOR.emojiSize}
+          type="range"
+          min={0.05}
+          max={0.4}
+          step={0.01}
+          value={p.height ?? 0.12}
+          onChange={(e) => patch({ height: parseFloat(e.target.value) })}
+          className="w-full accent-[#7c3aed]"
+        />
+      </div>
+      <LabeledSlider
+        testId={EDITOR.emojiOpacity}
         label="Opacity" min={0.05} max={1} step={0.05}
         value={p.opacity ?? 1}
         onChange={(v) => patch({ opacity: v })}

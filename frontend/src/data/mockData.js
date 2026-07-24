@@ -391,6 +391,16 @@ export const WORD_TRANSCRIPT = WORD_TRANSCRIPT_RAW.map((w, index) => ({
 
 export const CLIP_DURATION = 13.6; // seconds — matches transcript
 
+// Feature #30 — mock Gemini emoji suggestions ({emoji, word_index}) in the
+// clip's filtered-word index space (same as emphasis). With 4 words/line these
+// land on three distinct early lines (line 0: words 0-3, line 1: 4-7, line 2:
+// 8-11), so the editor shows a different emoji as each line plays.
+export const MOCK_EMOJI_SUGGESTIONS = [
+  { emoji: "💡", word_index: 2 },  // "AI" — line 0
+  { emoji: "🔥", word_index: 5 },  // "life" — line 1
+  { emoji: "🚀", word_index: 9 },  // "Nenu" — line 2
+];
+
 export const STATUS_META = {
   uploading: { label: "Uploading", color: "#7c3aed" },
   transcribing: { label: "Transcribing", color: "#f59e0b" },

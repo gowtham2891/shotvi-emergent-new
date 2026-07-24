@@ -144,4 +144,29 @@ describe("draft round-trip + export payload", () => {
     const req = buildRerenderRequest({ elements: PRISTINE_ELEMENTS });
     expect(req.elements).toBeUndefined(); // defaults: headline/progress/logo all hidden
   });
+
+  // Feature #30 — a timed emoji overlay rides the SAME OVERLAY_ELEMENT_TYPES
+  // path as an image, carrying its emoji + [start,end] window to the burn.
+  test("a visible emoji overlay reaches req.elements with its timing window", () => {
+    const emoji = {
+      id: "el_emoji_0", type: "emoji", x: 0.5, y: 0.66, scale: 1, rotation: 0,
+      visible: true, locked: false,
+      props: { emoji: "🔥", codepoint: "1f525", height: 0.12, opacity: 1, start: 1.8, end: 3.6 },
+    };
+    const req = buildRerenderRequest({ elements: [...PRISTINE_ELEMENTS, emoji] });
+    const sent = (req.elements || []).find((e) => e.type === "emoji");
+    expect(sent).toBeTruthy();
+    expect(sent.props.emoji).toBe("🔥");
+    expect(sent.props.start).toBe(1.8);
+    expect(sent.props.end).toBe(3.6);
+  });
+
+  test("a hidden emoji overlay is not sent", () => {
+    const emoji = {
+      id: "el_emoji_0", type: "emoji", x: 0.5, y: 0.66, scale: 1, rotation: 0,
+      visible: false, locked: false, props: { emoji: "🔥", start: 1, end: 2 },
+    };
+    const req = buildRerenderRequest({ elements: [...PRISTINE_ELEMENTS, emoji] });
+    expect(req.elements).toBeUndefined();
+  });
 });

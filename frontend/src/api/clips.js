@@ -52,6 +52,10 @@ export function mapClipToUi(clipOut, index, jobId) {
     // lineSplits index space). Auto-set fallback when the user hasn't
     // materialized transcriptEdits.emphasisIndices yet.
     emphasis_indices: clipOut.emphasis_indices || [],
+    // Feature #30: Gemini-suggested emoji anchored to the same word-index
+    // space ([{emoji, word_index}]). openClip seeds one TIMED emoji overlay per
+    // suggestion (timed to the caption line holding word_index) on a clean clip.
+    emoji_suggestions: clipOut.emoji_suggestions || [],
     startAt: formatTimecode(clipOut.start),
     thumbnail: thumbnailFileUrl(clipOut.thumbnail_path),
     // Playable URLs via the static /outputs mount.

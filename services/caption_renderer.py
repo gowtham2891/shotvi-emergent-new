@@ -950,6 +950,80 @@ def burn_captions(video_path: str, ass_path: str, output_path: str) -> bool:
 # Main render functions
 # ══════════════════════════════════════════════════════════════════════════════
 
+# Typed-caption emoji overlays sit at the same height as feature #30's
+# auto-suggested emoji (just above the lower-third caption).
+CAPTION_EMOJI_Y = 0.66
+
+
+def _extract_caption_emoji_overlays(lines: list) -> list:
+    """Typed-emoji → overlay. STRIP every emoji from each line's word text (so
+    libass never sees a color glyph it renders as mono/tofu) and return overlay
+    specs [{emoji, start, end}] for the PALETTE emoji, each timed to its word's
+    LINE. Non-palette emoji are stripped with a warning (no overlay). Mutates
+    word['word'] in place. Emoji-free captions return [] and are byte-identical
+    to before this existed."""
+    from services.emoji import split_caption_emoji, resolve_palette_emoji
+    overlays = []
+    for line in lines:
+        ls, le = line.get("line_start"), line.get("line_end")
+        for w in line.get("words", []):
+            clean, tokens = split_caption_emoji(w.get("word", ""))
+            if not tokens:
+                continue
+            w["word"] = clean  # libass now renders emoji-free text
+            for tok in tokens:
+                pal = resolve_palette_emoji(tok)
+                if pal:
+                    overlays.append({"emoji": pal, "start": ls, "end": le})
+                else:
+                    print(f"   [Emoji] typed {tok!r} not in the 54-emoji palette "
+                          f"— stripped, no overlay", flush=True)
+    return overlays
+
+
+def _burn_caption_emoji_overlays(captioned_path: str, overlays: list,
+                                 video_width: int, video_height: int) -> str:
+    """Composite typed-caption emoji as timed color PNG overlays onto the
+    captioned video via the SAME render_elements path feature #30 uses (one
+    consistent system). Multiple emoji on a line spread horizontally. Bakes the
+    result back into captioned_path (returned unchanged); on any failure the
+    caption-only video is kept rather than lost."""
+    from collections import defaultdict
+    from services.overlay_renderer import render_elements
+
+    by_line = defaultdict(list)
+    for e in overlays:
+        by_line[(e["start"], e["end"])].append(e["emoji"])
+
+    elements = []
+    for (start, end), emojis in by_line.items():
+        n = len(emojis)
+        for j, em in enumerate(emojis):
+            x = 0.5 + (j - (n - 1) / 2.0) * 0.12   # centered row, ~0.12 apart
+            elements.append({
+                "id": f"capemoji_{len(elements)}",
+                "type": "emoji",
+                "x": min(max(x, 0.05), 0.95),
+                "y": CAPTION_EMOJI_Y,
+                "scale": 1, "rotation": 0, "visible": True,
+                "props": {"emoji": em, "height": 0.12, "opacity": 1.0,
+                          "start": start, "end": end},
+            })
+    if not elements:
+        return captioned_path
+
+    tmp_out = captioned_path + ".capemoji.mp4"
+    try:
+        result = render_elements(captioned_path, tmp_out, elements, video_width, video_height)
+    except Exception as e:  # noqa: BLE001 — never lose the captioned video over emoji
+        print(f"   ⚠ Caption-emoji overlay failed ({e}) — captions kept without emoji", flush=True)
+        return captioned_path
+    if result == tmp_out and os.path.exists(tmp_out):
+        os.replace(tmp_out, captioned_path)   # bake emoji into the returned path
+        print(f"   ✓ Burned {len(elements)} typed-caption emoji as color overlays", flush=True)
+    return captioned_path
+
+
 def render_captions_for_clip(
     transcript_path: str,
     clips_path: str,
@@ -1167,6 +1241,14 @@ def render_captions_for_clip(
 
     print(f"   {len(lines)} lines × up to {wpl} words — karaoke highlight mode")
 
+    # Typed-caption emoji → timed overlays (same path as feature #30). Strips
+    # emoji from the word text BEFORE ASS generation so libass never renders a
+    # color glyph as mono/tofu; palette emoji are re-emitted as overlays below.
+    _caption_emoji = _extract_caption_emoji_overlays(lines)
+    if _caption_emoji:
+        print(f"   😀 {len(_caption_emoji)} typed-caption emoji → color overlays "
+              f"(stripped from caption text)", flush=True)
+
     ass_path    = safe_ass_path(vertical_clip_path, style_name)
     output_path = safe_output_path(vertical_clip_path, output_dir, style_name)
 
@@ -1204,6 +1286,13 @@ def render_captions_for_clip(
     success = burn_captions(vertical_clip_path, ass_path, output_path)
 
     if success:
+        # Composite any typed-caption emoji as color PNG overlays (feature #30
+        # path). Failure here never loses the captioned video — the emoji are a
+        # non-critical enhancement.
+        if _caption_emoji:
+            output_path = _burn_caption_emoji_overlays(
+                output_path, _caption_emoji, video_width, video_height
+            )
         size_mb = os.path.getsize(output_path) / (1024 * 1024)
         print(f"   ✓ Saved: {output_path} ({size_mb:.1f} MB)")
         return output_path

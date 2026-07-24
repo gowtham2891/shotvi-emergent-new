@@ -210,6 +210,12 @@ class ClipOut(BaseModel):
     # filtered word array (the lineSplits index space). Seeds the editor's
     # emphasis set; the user's toggles ride RerenderRequest.emphasis_indices.
     emphasis_indices: List[int] = []
+    # Feature #30: Gemini-suggested emoji anchored to the same word-index space
+    # — [{emoji, word_index}]. The editor seeds one TIMED color-emoji overlay
+    # per suggestion, timed to the caption line containing word_index; the burn
+    # composites them via RerenderRequest.elements (type "emoji"). Empty when
+    # Gemini suggested none / a pre-#30 job.
+    emoji_suggestions: List[dict] = []
     raw_path:         Optional[str] = None
     video_path:       Optional[str] = None
     vertical_path:    Optional[str] = None

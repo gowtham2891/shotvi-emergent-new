@@ -248,6 +248,7 @@ def process_video(self, job_id: str, url: str, language: str = "te", known_video
                 "refined_end":     clip.get("refined_end"),
                 "refined_segments": clip.get("refined_segments", []),
                 "emphasis_indices": clip.get("emphasis_indices", []),
+                "emoji_suggestions": clip.get("emoji_suggestions", []),
                 "raw_path":        str(raw_files[0])      if raw_files      else "",
                 "vertical_path":   str(vertical_file[0])  if vertical_file  else "",
                 "captioned_path":  str(captioned_file[0]) if captioned_file else "",

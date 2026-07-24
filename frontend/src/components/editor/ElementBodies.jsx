@@ -8,6 +8,7 @@ import {
   findActiveWordIndex,
 } from "@/lib/captionLines";
 import { normalizePillUnits } from "@/lib/pillUnits";
+import { emojiAssetUrl, EMOJI_DEFAULT_HEIGHT } from "@/lib/emojiOverlays";
 
 /**
  * Per-type element content renderers — extracted from ElementRenderer so
@@ -28,6 +29,8 @@ export const ElementBody = ({ element, canvasH }) => {
       return <LogoBody element={element} canvasH={canvasH} />;
     case "image":
       return <ImageBody element={element} canvasH={canvasH} />;
+    case "emoji":
+      return <EmojiBody element={element} canvasH={canvasH} />;
     default:
       return null;
   }
@@ -298,6 +301,34 @@ const ImageBody = ({ element, canvasH }) => {
       draggable={false}
       style={{
         height: (p.height ?? 0.18) * canvasH,
+        width: "auto",
+        opacity: p.opacity ?? 1,
+        display: "block",
+        pointerEvents: "none",
+      }}
+    />
+  );
+};
+
+// Feature #30 — a timed color-emoji overlay (Twemoji PNG). Renders the SAME
+// asset the burn composites (public/emoji/* == services/assets/emoji/*), and is
+// visible ONLY inside its [start,end] window — the DOM mirror of the burn's
+// overlay enable='between(t,start,end)', so preview and export show the emoji
+// over the same span. An emoji with no window (both null) is always-on.
+const EmojiBody = ({ element, canvasH }) => {
+  const currentTime = useAppStore((s) => s.currentTime);
+  const p = element.props;
+  const { start, end } = p;
+  const windowed = start != null && end != null;
+  if (windowed && !(currentTime >= start && currentTime < end)) return null;
+  if (!p.emoji) return null;
+  return (
+    <img
+      src={emojiAssetUrl(p.emoji)}
+      alt={p.emoji}
+      draggable={false}
+      style={{
+        height: (p.height ?? EMOJI_DEFAULT_HEIGHT) * canvasH,
         width: "auto",
         opacity: p.opacity ?? 1,
         display: "block",

@@ -8,6 +8,7 @@ import {
   CAPTION_PRESETS,
   INITIAL_ELEMENTS,
   PILL_DEFAULTS_BY_PRESET,
+  MOCK_EMOJI_SUGGESTIONS,
 } from "@/data/mockData";
 import { USE_MOCKS, outputFileUrl } from "@/api/client";
 import { createJobFromUrl, createJobFromFile, getJob, listJobs } from "@/api/uploads";
@@ -53,6 +54,7 @@ import { fetchTanglish } from "@/api/tanglish";
 import { fetchTransliterations } from "@/api/transliterate";
 import { supabase, AUTH_ENABLED, mapSupabaseUser, DEV_USER } from "@/lib/supabaseClient";
 import { applyHookHeadline } from "@/lib/hookHeadline";
+import { buildEmojiOverlayElements } from "@/lib/emojiOverlays";
 import { generatePunchPoints, punchesToKeyframes, togglePunch } from "@/lib/autoZoom";
 import { detectRemovableSpans, wordInSpans, spansToPairs } from "@/lib/fillerRemoval";
 import { setUnauthorizedHandler } from "@/api/client";
@@ -68,7 +70,7 @@ const nextElementId = (type) => `el_${type}_${++elementIdCounter}`;
 // Element types the editor can render/burn. Drafts saved before a type was
 // removed (e.g. the retired `sticker`) may still reference it — filter those
 // out on load so an old draft neither crashes nor renders a ghost element.
-const KNOWN_ELEMENT_TYPES = new Set(["caption", "headline", "progress", "logo", "image"]);
+const KNOWN_ELEMENT_TYPES = new Set(["caption", "headline", "progress", "logo", "image", "emoji"]);
 const sanitizeDraftElements = (elements) =>
   (elements || []).filter((el) => el && KNOWN_ELEMENT_TYPES.has(el.type));
 
@@ -709,6 +711,9 @@ export const useAppStore = create((set, get) => ({
         reframeMode: false,
         draftLoadStatus: "ready",
       });
+      // Feature #30 — seed the mock clip's emoji overlays (mock mode has no
+      // currentClip, so pass the suggestions directly).
+      get().seedEmojiOverlays(MOCK_EMOJI_SUGGESTIONS);
       return;
     }
     set({
@@ -818,9 +823,16 @@ export const useAppStore = create((set, get) => ({
         // A restored draft may carry Tanglish-view edits whose Telugu never
         // resolved (service was down at commit) — retry now, fire-and-forget.
         get().resolvePendingTelugu();
-      } else if (tplResult.status === "fulfilled" && tplResult.value) {
-        // Confirmed no-draft: a clean clip starts from the saved style.
-        get().applyCaptionTemplateToCleanClip(tplResult.value);
+      } else {
+        // Confirmed no-draft: a clean clip starts from the saved style...
+        if (tplResult.status === "fulfilled" && tplResult.value) {
+          get().applyCaptionTemplateToCleanClip(tplResult.value);
+        }
+        // ...and gets its Gemini-suggested emoji seeded as timed overlays
+        // (feature #30). A clip's OWN draft (the `if` branch above) already
+        // carries whatever emoji the user kept/moved, so this only fires on a
+        // clip the user hasn't edited yet — same stance as the hook headline.
+        get().seedEmojiOverlays();
       }
       set({ draftLoadStatus: "ready" });
     } else {
@@ -842,6 +854,25 @@ export const useAppStore = create((set, get) => ({
         : {}),
       ...(transcriptEdits ? { transcriptEdits } : {}),
     })),
+
+  // Feature #30 — seed one TIMED emoji overlay per Gemini suggestion, each
+  // timed to the caption line holding its anchor word. Idempotent: skips if any
+  // emoji element already exists (a restored draft, or a second call), so a
+  // clip is never double-seeded. Plain set (no history frame) — part of the
+  // clip's INITIAL document, exactly like applyHookHeadline. `override` lets
+  // mock mode (no currentClip) inject suggestions directly.
+  seedEmojiOverlays: (override) => {
+    const s = get();
+    const suggestions = override || s.currentClip?.emoji_suggestions || [];
+    if (!suggestions.length || !s.transcript?.length) return;
+    if (s.elements.some((el) => el.type === "emoji")) return;
+    const emojiEls = buildEmojiOverlayElements(suggestions, s.transcript, {
+      lineSplits: s.transcriptEdits.lineSplits,
+      lineRealignments: s.transcriptEdits.lineRealignments,
+    });
+    if (!emojiEls.length) return;
+    set((st) => ({ elements: [...st.elements, ...emojiEls] }));
+  },
 
   // Apply a persisted draft to editor state. Extracted from openClip so the
   // draft → state mapping is unit-testable without the network round-trip.

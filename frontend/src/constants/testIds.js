@@ -168,6 +168,8 @@ export const EDITOR = {
   addImageInput: "editor-add-image-input",
   imageOpacity: "editor-image-opacity",
   imageSize: "editor-image-size",
+  emojiSize: "editor-emoji-size",
+  emojiOpacity: "editor-emoji-opacity",
 
   // Canvas toolbar
   zoomIn: "editor-zoom-in",

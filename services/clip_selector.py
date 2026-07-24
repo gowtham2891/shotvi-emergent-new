@@ -911,6 +911,10 @@ Return ONLY valid JSON. No markdown, no explanation:
 def build_fine_cut_prompt(candidates: list[dict], sentences: list[dict],
                           sent_by_id: dict, video_id: str = "",
                           first_sentences: list[dict] = None) -> str:
+    # Feature #30 — the curated emoji menu Gemini must choose from, so every
+    # suggestion resolves to a bundled Twemoji PNG (services/emoji.py).
+    from services.emoji import palette_prompt_block
+    emoji_menu = palette_prompt_block()
 
     clip_id_prefix = video_id if video_id else "clip"
 
@@ -1031,6 +1035,19 @@ EXACTLY as it appears in the clip's sentences (same script, same
 spelling, single words — not phrases). They will be visually emphasised
 (bigger/bolder/coloured) in the burned captions.
 
+━━━ STEP 3.6 — EMOJI (feature #30) ━━━
+For each clip, suggest 2-5 emoji a Reels editor would pop on screen at the key
+beats — one reaction per emotional or informational spike (the shock, the
+number, the punchline, the payoff). ANCHOR each emoji to the single word it
+lands on by copying that word EXACTLY from the clip's sentences (same script,
+same spelling — a single word, like the emphasis words). Pick ONLY from this
+menu, using the emoji character exactly as shown:
+{emoji_menu}
+Rules: choose the emoji whose meaning best fits that moment; never invent an
+emoji outside the menu; skip a beat rather than force an unrelated emoji; at
+most one emoji per anchor word. They are burned as COLOR image overlays timed
+to the caption line that contains the anchor word.
+
 ━━━ STEP 4 — RANK ━━━
 confidence_rank 1 = the clip you'd post first if you could only post one.
 
@@ -1071,6 +1088,9 @@ Return ONLY valid JSON. No markdown, no explanation.
       "engagement_score": 7,
       "psychological_trigger": "<e.g. Curiosity Gap, Myth Busting, Middle-Class Relatability, Controversial Take>",
       "emphasis_words": ["<2-6 exact punch words copied verbatim from the clip's sentences>"],
+      "emoji_suggestions": [
+        {{"emoji": "<one emoji copied exactly from the STEP 3.6 menu>", "word": "<exact anchor word copied verbatim from the clip's sentences>"}}
+      ],
       "trimmed": false,
       "trim_reason": "",
       "notes": ""
@@ -1386,6 +1406,11 @@ def gemini_fine_cut(candidates: list[dict], sentences: list[dict],
             # once the word-level transcript is in hand.
             "emphasis_words":        [str(w) for w in (gc.get("emphasis_words") or [])
                                       if isinstance(w, (str,))][:8],
+            # Feature #30: raw {emoji, word} anchors from Gemini; resolved to
+            # {emoji, word_index} in select_clips (map_emoji_to_indices) once
+            # the word-level transcript is in hand. Non-palette emoji dropped
+            # here so a hallucinated emoji never reaches the resolver.
+            "emoji_suggestions":     _clean_emoji_suggestions(gc.get("emoji_suggestions")),
             "trimmed":               gc.get("trimmed", False),
             "trim_reason":           gc.get("trim_reason", ""),
             "notes":                 gc.get("notes", ""),
@@ -1771,6 +1796,68 @@ def map_emphasis_to_indices(clip: dict, transcript: dict) -> list:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# Feature #30 — emoji suggestion → clip-local anchor index mapping
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _clean_emoji_suggestions(raw) -> list:
+    """Post-process Gemini's raw emoji_suggestions into [{emoji, word}] —
+    keeping ONLY palette emoji (a hallucinated emoji outside the curated menu
+    is dropped, never resolved) with a non-empty anchor word. Cap at 8."""
+    from services.emoji import is_palette_emoji
+    out = []
+    for item in (raw or []):
+        if not isinstance(item, dict):
+            continue
+        emoji = str(item.get("emoji", "")).strip()
+        word = str(item.get("word", "")).strip()
+        if emoji and word and is_palette_emoji(emoji):
+            out.append({"emoji": emoji, "word": word})
+    return out[:8]
+
+
+def map_emoji_to_indices(clip: dict, transcript: dict) -> list:
+    """
+    Resolve Gemini's emoji anchors ({emoji, word}) to
+    [{emoji, word_index}] where word_index addresses the clip's FILTERED word
+    array — the SAME index space emphasis_indices and lineSplits use (so the
+    frontend can find which caption LINE contains the anchor and time the emoji
+    overlay to that line's [line_start, line_end]).
+
+    Same matching discipline as map_emphasis_to_indices: first unused
+    occurrence of the anchor word wins, punctuation/case-insensitive. An anchor
+    that doesn't match any word is dropped — emoji are cosmetic, never worth
+    failing a pipeline over. One emoji per word index (a word already claimed by
+    an earlier suggestion is skipped) so two emoji never stack on one line word.
+    """
+    from services.caption_renderer import get_words_for_multisegment_clip
+
+    raw = clip.get("emoji_suggestions") or []
+    if not raw:
+        return []
+
+    sent_by_id = {s["id"]: s for s in transcript.get("sentences", [])}
+    try:
+        words = get_words_for_multisegment_clip(transcript, clip, sent_by_id)
+    except Exception as e:
+        print(f"  [Emoji] ⚠ word extraction failed ({e}) — no emoji")
+        return []
+
+    tokens = [_norm_token(w["word"]) for w in words]
+    used: set = set()
+    out: list = []
+    for item in raw:
+        anchor = _norm_token(item.get("word", ""))
+        if not anchor:
+            continue
+        for i, t in enumerate(tokens):
+            if i not in used and t == anchor:
+                used.add(i)
+                out.append({"emoji": item["emoji"], "word_index": i})
+                break
+    return sorted(out, key=lambda e: e["word_index"])
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # Main entry point
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -1845,11 +1932,19 @@ def select_clips(transcript_path: str) -> dict:
     # Feature #6: resolve Gemini's punch words to clip-local word indices
     # (the lineSplits index space) so render + frontend emphasize the same
     # words without re-matching strings.
+    # Feature #30: resolve emoji anchors the same way — [{emoji, word_index}] in
+    # the same index space, so the frontend can time each emoji overlay to the
+    # caption line containing its anchor word.
     for clip in clips:
         clip["emphasis_indices"] = map_emphasis_to_indices(clip, data)
         if clip["emphasis_indices"]:
             print(f"  [Emphasis] {clip.get('clip_id', '?')}: "
                   f"{len(clip['emphasis_indices'])} word(s) at {clip['emphasis_indices']}")
+        clip["emoji_suggestions"] = map_emoji_to_indices(clip, data)
+        if clip["emoji_suggestions"]:
+            print(f"  [Emoji] {clip.get('clip_id', '?')}: "
+                  f"{len(clip['emoji_suggestions'])} emoji "
+                  f"{[e['emoji'] for e in clip['emoji_suggestions']]}")
 
     elapsed = time.time() - pipeline_start
     print(f"\n{'='*65}")
